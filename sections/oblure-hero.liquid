@@ -1,0 +1,421 @@
+{% comment %}
+  Oblure hero
+
+  Full-width image hero with a heading, text and a button bar. When it is the first
+  section on the page it can lay Dawn's header (sections/header.liquid, unchanged)
+  transparently over the image and give it a background color once the visitor scrolls.
+  Sticky behaviour itself still comes from the header's own "Sticky header" setting.
+
+  Behaviour lives in assets/oblure-hero.js (<oblure-hero>).
+  Styles live in assets/oblure-hero.css.
+{% endcomment %}
+
+{{ 'oblure-hero.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'oblure-hero.js' | asset_url }}" defer="defer"></script>
+
+{%- liquid
+  assign overlay_header = false
+  if section.settings.transparent_header and section.index == 1
+    assign overlay_header = true
+  endif
+
+  assign accent_font_italic = section.settings.accent_font | font_modify: 'style', 'italic'
+  assign accent_font = accent_font_italic | default: section.settings.accent_font
+  assign heading_font_bold = settings.type_header_font | font_modify: 'weight', 'bold'
+
+  assign header_text = section.settings.header_text_color | default: '#121212'
+  assign scrolled_text = section.settings.scrolled_text_color | default: '#121212'
+
+  assign image_loading = 'lazy'
+  assign image_fetchpriority = 'auto'
+  if section.index == 1
+    assign image_loading = 'eager'
+    assign image_fetchpriority = 'high'
+  endif
+-%}
+
+{%- style -%}
+  {{ accent_font | font_face: font_display: 'swap' }}
+  {{ heading_font_bold | font_face: font_display: 'swap' }}
+
+  #shopify-section-{{ section.id }} {
+    --oblure-accent-font-family: {{ accent_font.family }}, {{ accent_font.fallback_families }};
+    --oblure-accent-font-style: {{ accent_font.style }};
+    --oblure-accent-font-weight: {{ accent_font.weight }};
+    --oblure-title-weight-primary: {{ heading_font_bold.weight | default: 700 }};
+    --oblure-hero-text: {{ section.settings.content_text_color | default: '#ffffff' }};
+    --oblure-hero-overlay-opacity: {{ section.settings.image_overlay_opacity | divided_by: 100.0 }};
+    --oblure-hero-content-width: {{ section.settings.content_width }}%;
+  }
+
+  {%- if overlay_header %}
+    {% comment %} Pulls the hero up under the header; the height is measured by the inline script below. {% endcomment %}
+    #shopify-section-{{ section.id }} {
+      margin-top: calc(-1 * var(--oblure-header-height, 0px));
+    }
+
+    .section-header {
+      --oblure-header-text-rgb: {{ header_text | color_extract: 'red' }}, {{ header_text | color_extract: 'green' }}, {{ header_text | color_extract: 'blue' }};
+      --oblure-header-scrolled-text-rgb: {{ scrolled_text | color_extract: 'red' }}, {{ scrolled_text | color_extract: 'green' }}, {{ scrolled_text | color_extract: 'blue' }};
+      --oblure-header-scrolled-background: {{ section.settings.scrolled_background_color | default: '#ffffff' }};
+    }
+  {%- endif %}
+{%- endstyle -%}
+
+{%- if overlay_header -%}
+  {% comment %}
+    Runs before the hero is painted so the page does not jump. assets/oblure-hero.js
+    keeps the value up to date afterwards.
+  {% endcomment %}
+  <script>
+    (() => {
+      const header = document.querySelector('.section-header');
+      if (!header) return;
+      document.documentElement.classList.add('oblure-header-overlay');
+      document.documentElement.style.setProperty('--oblure-header-height', `${header.offsetHeight}px`);
+    })();
+  </script>
+{%- endif -%}
+
+<oblure-hero
+  class="oblure-hero oblure-hero--height-{{ section.settings.hero_height }} oblure-hero--content-{{ section.settings.content_position }}"
+  {% if overlay_header %}
+    data-overlay-header
+    data-scroll-background="{{ section.settings.enable_scroll_background }}"
+    data-scroll-offset="{{ section.settings.scroll_offset }}"
+  {% endif %}
+>
+  <div class="oblure-hero__media">
+    {%- if section.settings.image != blank -%}
+      <picture>
+        {%- if section.settings.image_mobile != blank -%}
+          <source
+            media="(max-width: 749px)"
+            srcset="
+              {{ section.settings.image_mobile | image_url: width: 375 }} 375w,
+              {{ section.settings.image_mobile | image_url: width: 750 }} 750w,
+              {{ section.settings.image_mobile | image_url: width: 1100 }} 1100w,
+              {{ section.settings.image_mobile | image_url: width: 1500 }} 1500w
+            "
+            sizes="100vw"
+            width="{{ section.settings.image_mobile.width }}"
+            height="{{ section.settings.image_mobile.height }}"
+          >
+        {%- endif -%}
+        {{
+          section.settings.image
+          | image_url: width: 3840
+          | image_tag:
+            class: 'oblure-hero__image',
+            widths: '375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840',
+            sizes: '100vw',
+            loading: image_loading,
+            fetchpriority: image_fetchpriority
+        }}
+      </picture>
+    {%- else -%}
+      {{ 'hero-apparel-1' | placeholder_svg_tag: 'oblure-hero__image oblure-hero__image--placeholder' }}
+    {%- endif -%}
+  </div>
+
+  {%- if section.blocks.size > 0 -%}
+    <div class="oblure-hero__content">
+      {%- for block in section.blocks -%}
+        {%- case block.type -%}
+          {%- when 'heading' -%}
+            <{{ block.settings.heading_tag }}
+              class="oblure-hero__title {{ block.settings.heading_size }}"
+              {{ block.shopify_attributes }}
+            >
+              {%- if block.settings.title_primary != blank -%}
+                <span class="oblure-hero__title-line oblure-hero__title-line--primary">
+                  {{- block.settings.title_primary | escape -}}
+                </span>
+              {%- endif -%}
+              {%- if block.settings.title_secondary != blank -%}
+                <span class="oblure-hero__title-line">{{ block.settings.title_secondary | escape }}</span>
+              {%- endif -%}
+            </{{ block.settings.heading_tag }}>
+
+          {%- when 'text' -%}
+            {%- if block.settings.text != blank -%}
+              <p class="oblure-hero__text" {{ block.shopify_attributes }}>{{ block.settings.text }}</p>
+            {%- endif -%}
+
+          {%- when 'button' -%}
+            {%- if block.settings.label != blank -%}
+              <a
+                class="oblure-hero__cta color-{{ block.settings.color_scheme }}"
+                {% if block.settings.link != blank %}
+                  href="{{ block.settings.link }}"
+                {% else %}
+                  role="link" aria-disabled="true"
+                {% endif %}
+                {{ block.shopify_attributes }}
+              >
+                {{- block.settings.label | escape -}}
+              </a>
+            {%- endif -%}
+        {%- endcase -%}
+      {%- endfor -%}
+    </div>
+  {%- endif -%}
+</oblure-hero>
+
+{% schema %}
+{
+  "name": "Oblure hero",
+  "tag": "section",
+  "class": "section oblure-hero-section",
+  "disabled_on": {
+    "groups": ["header", "footer", "aside"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Header over the hero"
+    },
+    {
+      "type": "paragraph",
+      "content": "Only applies when this is the first section on the page. Turn sticky on or off in the Header section."
+    },
+    {
+      "type": "checkbox",
+      "id": "transparent_header",
+      "label": "Show header over the image",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "header_text_color",
+      "label": "Header text color over the image",
+      "default": "#121212"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_scroll_background",
+      "label": "Change header background on scroll",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "scroll_offset",
+      "min": 0,
+      "max": 400,
+      "step": 10,
+      "unit": "px",
+      "label": "Scroll distance before the change",
+      "default": 80
+    },
+    {
+      "type": "color",
+      "id": "scrolled_background_color",
+      "label": "Header background color on scroll",
+      "default": "#f4f1e6"
+    },
+    {
+      "type": "color",
+      "id": "scrolled_text_color",
+      "label": "Header text color on scroll",
+      "default": "#121212"
+    },
+    {
+      "type": "header",
+      "content": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_mobile",
+      "label": "Mobile image",
+      "info": "Optional. Used on screens narrower than 750px."
+    },
+    {
+      "type": "range",
+      "id": "image_overlay_opacity",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "label": "Image overlay opacity",
+      "default": 10
+    },
+    {
+      "type": "select",
+      "id": "hero_height",
+      "label": "Height",
+      "options": [
+        {
+          "value": "full",
+          "label": "Full screen"
+        },
+        {
+          "value": "large",
+          "label": "Large"
+        },
+        {
+          "value": "medium",
+          "label": "Medium"
+        }
+      ],
+      "default": "full"
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "select",
+      "id": "content_position",
+      "label": "Position",
+      "options": [
+        {
+          "value": "center",
+          "label": "Middle"
+        },
+        {
+          "value": "end",
+          "label": "Bottom"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "content_width",
+      "min": 20,
+      "max": 60,
+      "step": 5,
+      "unit": "%",
+      "label": "Width on desktop",
+      "default": 30
+    },
+    {
+      "type": "color",
+      "id": "content_text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "font_picker",
+      "id": "accent_font",
+      "label": "Text font",
+      "info": "Shown in italic.",
+      "default": "playfair_display_n4"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "heading",
+      "name": "Heading",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "title_primary",
+          "label": "First line (bold)",
+          "default": "Explore"
+        },
+        {
+          "type": "text",
+          "id": "title_secondary",
+          "label": "Second line",
+          "default": "New lightings"
+        },
+        {
+          "type": "select",
+          "id": "heading_size",
+          "label": "Size",
+          "options": [
+            {
+              "value": "h2",
+              "label": "Small"
+            },
+            {
+              "value": "h1",
+              "label": "Medium"
+            },
+            {
+              "value": "h0",
+              "label": "Large"
+            },
+            {
+              "value": "hxxl",
+              "label": "Extra large"
+            }
+          ],
+          "default": "h1"
+        },
+        {
+          "type": "select",
+          "id": "heading_tag",
+          "label": "HTML tag",
+          "info": "Dawn's header already uses h1 for the logo on the homepage.",
+          "options": [
+            {
+              "value": "h1",
+              "label": "H1"
+            },
+            {
+              "value": "h2",
+              "label": "H2"
+            },
+            {
+              "value": "p",
+              "label": "Paragraph"
+            }
+          ],
+          "default": "h2"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "inline_richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "Discover sculptural lighting that merges art, craftsmanship, and emotion."
+        }
+      ]
+    },
+    {
+      "type": "button",
+      "name": "Button",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Shop"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        },
+        {
+          "type": "color_scheme",
+          "id": "color_scheme",
+          "label": "Color scheme",
+          "default": "scheme-2"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Oblure hero",
+      "blocks": [{ "type": "heading" }, { "type": "text" }, { "type": "button" }]
+    }
+  ]
+}
+{% endschema %}
