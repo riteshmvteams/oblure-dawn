@@ -15,8 +15,13 @@
         "slide_hVd4Kq": {
           "type": "slide",
           "settings": {
-            "image": "shopify://shop_images/Obure_Lightbon.jpg",
-            "image_mobile": ""
+            "image": "shopify://shop_images/Obure_Lightbon.jpg"
+          }
+        },
+        "slide_BCWQed": {
+          "type": "slide",
+          "settings": {
+            "image": "shopify://shop_images/superwave_hero_nr_1_jpg.webp"
           }
         },
         "heading_eXJGrr": {
@@ -45,6 +50,7 @@
       },
       "block_order": [
         "slide_hVd4Kq",
+        "slide_BCWQed",
         "heading_eXJGrr",
         "text_FM9xxY",
         "button_pPKwzr"
