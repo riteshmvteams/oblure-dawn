@@ -12,6 +12,13 @@
     "oblure_hero_pyhygg": {
       "type": "oblure-hero",
       "blocks": {
+        "slide_hVd4Kq": {
+          "type": "slide",
+          "settings": {
+            "image": "shopify://shop_images/Obure_Lightbon.jpg",
+            "image_mobile": ""
+          }
+        },
         "heading_eXJGrr": {
           "type": "heading",
           "settings": {
@@ -37,6 +44,7 @@
         }
       },
       "block_order": [
+        "slide_hVd4Kq",
         "heading_eXJGrr",
         "text_FM9xxY",
         "button_pPKwzr"
@@ -49,11 +57,13 @@
         "scroll_offset": 80,
         "scrolled_background_color": "#f4f1e6",
         "scrolled_text_color": "#121212",
-        "image": "shopify://shop_images/Obure_Lightbon.jpg",
+        "slide_duration": 4,
+        "transition_duration": 2000,
+        "enable_zoom": true,
         "image_overlay_opacity": 10,
         "hero_height": "full",
         "content_position": "center",
-        "content_alignment": "edge",
+        "content_alignment": "header",
         "content_width": 30,
         "text_max_width": 330,
         "button_extension": 36,

@@ -1,0 +1,46 @@
+{% doc %}
+  Applies the current resource's color theme to the header and footer backgrounds.
+
+  Reads the `custom.page_color_theme` metafield (a reference to a `page_color_theme`
+  metaobject) from the page, collection, product, blog or article being viewed.
+  Articles without their own theme fall back to their blog's theme.
+
+  Also exposes `--oblure-page-background` on :root, which the full page menu uses as
+  its default background.
+
+  @example
+  {% render 'oblure-page-color-theme' %}
+{% enddoc %}
+
+{%- liquid
+  case request.page_type
+    when 'page'
+      assign color_resource = page
+    when 'collection'
+      assign color_resource = collection
+    when 'product'
+      assign color_resource = product
+    when 'blog'
+      assign color_resource = blog
+    when 'article'
+      assign color_resource = article
+      if article.metafields.custom.page_color_theme == blank
+        assign color_resource = blog
+      endif
+  endcase
+
+  assign page_background = color_resource.metafields.custom.page_color_theme.value.page_background.value
+-%}
+
+{%- if page_background != blank -%}
+  {%- style -%}
+    :root {
+      --oblure-page-background: {{ page_background }};
+    }
+
+    .section-header .header-wrapper,
+    .shopify-section-group-footer-group .footer {
+      background: var(--oblure-page-background);
+    }
+  {%- endstyle -%}
+{%- endif -%}

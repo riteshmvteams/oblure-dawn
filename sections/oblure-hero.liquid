@@ -1,19 +1,21 @@
 {% comment %}
   Oblure hero
 
-  Full-width image hero with a heading, text and a button bar. When it is the first
+  Full-width image hero with a heading, text and a button bar. Images come from "Slide"
+  blocks; with two or more they crossfade with a slow zoom (Swiper, fade effect), like
+  the Elementor background slideshow on the old site. When it is the first
   section on the page it can lay Dawn's header (sections/header.liquid, unchanged)
   transparently over the image and give it a background color once the visitor scrolls.
   Sticky behaviour itself still comes from the header's own "Sticky header" setting.
 
-  Behaviour lives in assets/oblure-hero.js (<oblure-hero>).
+  Behaviour lives in assets/oblure-hero.js (<oblure-hero>) and
+  assets/oblure-hero-slider.js (<oblure-hero-slider>).
   Styles live in assets/oblure-hero.css.
 {% endcomment %}
 
-{{ 'oblure-hero.css' | asset_url | stylesheet_tag }}
-<script src="{{ 'oblure-hero.js' | asset_url }}" defer="defer"></script>
-
 {%- liquid
+  assign slides = section.blocks | where: 'type', 'slide'
+  assign content_blocks_count = section.blocks.size | minus: slides.size
   assign overlay_header = false
   if section.settings.transparent_header and section.index == 1
     assign overlay_header = true
@@ -33,6 +35,17 @@
     assign image_fetchpriority = 'high'
   endif
 -%}
+
+{%- if slides.size > 1 -%}
+  {{ 'swiper-bundle.min.css' | asset_url | stylesheet_tag }}
+  <script src="{{ 'swiper-bundle.min.js' | asset_url }}" defer="defer"></script>
+{%- endif -%}
+{%- if slides.size > 0 -%}
+  {% comment %} Loaded for a single slide too, so a second slide added in the editor can start the slider. {% endcomment %}
+  <script src="{{ 'oblure-hero-slider.js' | asset_url }}" defer="defer"></script>
+{%- endif -%}
+{{ 'oblure-hero.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'oblure-hero.js' | asset_url }}" defer="defer"></script>
 
 {%- style -%}
   {{ accent_font | font_face: font_display: 'swap' }}
@@ -88,39 +101,67 @@
   {% endif %}
 >
   <div class="oblure-hero__media">
-    {%- if section.settings.image != blank -%}
-      <picture>
-        {%- if section.settings.image_mobile != blank -%}
-          <source
-            media="(max-width: 749px)"
-            srcset="
-              {{ section.settings.image_mobile | image_url: width: 375 }} 375w,
-              {{ section.settings.image_mobile | image_url: width: 750 }} 750w,
-              {{ section.settings.image_mobile | image_url: width: 1100 }} 1100w,
-              {{ section.settings.image_mobile | image_url: width: 1500 }} 1500w
-            "
-            sizes="100vw"
-            width="{{ section.settings.image_mobile.width }}"
-            height="{{ section.settings.image_mobile.height }}"
-          >
-        {%- endif -%}
-        {{
-          section.settings.image
-          | image_url: width: 3840
-          | image_tag:
-            class: 'oblure-hero__image',
-            widths: '375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840',
-            sizes: '100vw',
-            loading: image_loading,
-            fetchpriority: image_fetchpriority
-        }}
-      </picture>
+    {%- if slides.size > 0 -%}
+      <oblure-hero-slider
+        class="oblure-hero__slider swiper"
+        data-slide-duration="{{ section.settings.slide_duration | times: 1000 }}"
+        data-transition-duration="{{ section.settings.transition_duration }}"
+        data-swiper-src="{{ 'swiper-bundle.min.js' | asset_url }}"
+        {% if section.settings.enable_zoom %}
+          data-zoom
+        {% endif %}
+      >
+        <div class="swiper-wrapper">
+          {%- for block in slides -%}
+            {%- liquid
+              assign slide_loading = 'lazy'
+              assign slide_fetchpriority = 'auto'
+              if forloop.first
+                assign slide_loading = image_loading
+                assign slide_fetchpriority = image_fetchpriority
+              endif
+            -%}
+            <div class="oblure-hero__slide swiper-slide" {{ block.shopify_attributes }}>
+              {%- if block.settings.image != blank -%}
+                <picture>
+                  {%- if block.settings.image_mobile != blank -%}
+                    <source
+                      media="(max-width: 749px)"
+                      srcset="
+                        {{ block.settings.image_mobile | image_url: width: 375 }} 375w,
+                        {{ block.settings.image_mobile | image_url: width: 750 }} 750w,
+                        {{ block.settings.image_mobile | image_url: width: 1100 }} 1100w,
+                        {{ block.settings.image_mobile | image_url: width: 1500 }} 1500w
+                      "
+                      sizes="100vw"
+                      width="{{ block.settings.image_mobile.width }}"
+                      height="{{ block.settings.image_mobile.height }}"
+                    >
+                  {%- endif -%}
+                  {{
+                    block.settings.image
+                    | image_url: width: 3840
+                    | image_tag:
+                      class: 'oblure-hero__image',
+                      widths: '375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840',
+                      sizes: '100vw',
+                      loading: slide_loading,
+                      fetchpriority: slide_fetchpriority
+                  }}
+                </picture>
+              {%- else -%}
+                {{ 'hero-apparel-1' | placeholder_svg_tag: 'oblure-hero__image oblure-hero__image--placeholder' }}
+              {%- endif -%}
+            </div>
+          {%- endfor -%}
+        </div>
+      </oblure-hero-slider>
     {%- else -%}
       {{ 'hero-apparel-1' | placeholder_svg_tag: 'oblure-hero__image oblure-hero__image--placeholder' }}
     {%- endif -%}
   </div>
 
-  {%- if section.blocks.size > 0 -%}
+  {%- if content_blocks_count > 0 -%}
     <div class="oblure-hero__container">
       <div class="oblure-hero__content">
         {%- for block in section.blocks -%}
@@ -225,18 +266,37 @@
     },
     {
       "type": "header",
-      "content": "Image"
+      "content": "Slideshow"
     },
     {
-      "type": "image_picker",
-      "id": "image",
-      "label": "Image"
+      "type": "paragraph",
+      "content": "Add a Slide block for each image. With two or more slides the images crossfade automatically."
     },
     {
-      "type": "image_picker",
-      "id": "image_mobile",
-      "label": "Mobile image",
-      "info": "Optional. Used on screens narrower than 750px."
+      "type": "range",
+      "id": "slide_duration",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "unit": "s",
+      "label": "Time per slide",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "transition_duration",
+      "min": 500,
+      "max": 4000,
+      "step": 100,
+      "unit": "ms",
+      "label": "Fade duration",
+      "default": 2000
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_zoom",
+      "label": "Slow zoom on images",
+      "default": true
     },
     {
       "type": "range",
@@ -353,6 +413,23 @@
   ],
   "blocks": [
     {
+      "type": "slide",
+      "name": "Slide",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_mobile",
+          "label": "Mobile image",
+          "info": "Optional. Used on screens narrower than 750px."
+        }
+      ]
+    },
+    {
       "type": "heading",
       "name": "Heading",
       "limit": 1,
@@ -457,7 +534,13 @@
   "presets": [
     {
       "name": "Oblure hero",
-      "blocks": [{ "type": "heading" }, { "type": "text" }, { "type": "button" }]
+      "blocks": [
+        { "type": "slide" },
+        { "type": "slide" },
+        { "type": "heading" },
+        { "type": "text" },
+        { "type": "button" }
+      ]
     }
   ]
 }

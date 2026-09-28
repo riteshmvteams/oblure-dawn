@@ -1,0 +1,86 @@
+{% doc %}
+  Full page menu for the header ("Full page" menu type in sections/header.liquid).
+
+  Renders the "Menu" toggle and a panel that covers the viewport behind the header,
+  with a search field, the primary and secondary menus, and the social links.
+  Hovering or focusing a link changes the panel (and header) background to the
+  linked resource's color theme. Behaviour: assets/oblure-full-page-menu.js.
+
+  @param {object} primary_menu - Link list shown large.
+  @param {object} [secondary_menu] - Link list shown smaller, below the primary menu.
+  @param {boolean} [show_search] - Whether to render the search field.
+  @param {boolean} [show_social] - Whether to render the social links.
+
+  @example
+  {% render 'oblure-full-page-menu', primary_menu: section.settings.menu, show_search: true %}
+{% enddoc %}
+
+{{ 'oblure-full-page-menu.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'oblure-full-page-menu.js' | asset_url }}" defer="defer"></script>
+
+<oblure-full-page-menu class="oblure-fpm">
+  <button
+    type="button"
+    class="oblure-fpm__toggle"
+    aria-expanded="false"
+    aria-controls="OblureFullPageMenu"
+    data-oblure-fpm-toggle
+  >
+    <span class="oblure-fpm__toggle-icons" aria-hidden="true">
+      {{- 'icon-hamburger.svg' | inline_asset_content -}}
+      {{- 'icon-close.svg' | inline_asset_content -}}
+    </span>
+    <span class="oblure-fpm__toggle-label oblure-fpm__toggle-label--open">{{ 'sections.header.menu' | t }}</span>
+    <span class="oblure-fpm__toggle-label oblure-fpm__toggle-label--close">{{ 'accessibility.close' | t }}</span>
+  </button>
+
+  <div id="OblureFullPageMenu" class="oblure-fpm__panel" inert data-oblure-fpm-panel>
+    <div class="oblure-fpm__inner page-width">
+      {%- if show_search -%}
+        <form action="{{ routes.search_url }}" method="get" role="search" class="oblure-fpm__search">
+          <label class="visually-hidden" for="OblureFullPageMenuSearch">{{ 'general.search.search' | t }}</label>
+          <input
+            id="OblureFullPageMenuSearch"
+            class="oblure-fpm__search-input"
+            type="search"
+            name="q"
+            value="{{ search.terms | escape }}"
+            placeholder="{{ 'general.search.search' | t }}"
+            autocomplete="off"
+          >
+          <input type="hidden" name="options[prefix]" value="last">
+        </form>
+      {%- endif -%}
+
+      <nav class="oblure-fpm__nav" aria-label="{{ 'sections.header.menu' | t }}" data-oblure-fpm-nav>
+        {%- if primary_menu != blank -%}
+          {%- render 'oblure-full-page-menu-list',
+            menu: primary_menu,
+            variant: 'primary',
+            id_prefix: 'OblureFpmPrimary'
+          -%}
+        {%- endif -%}
+
+        {%- if secondary_menu != blank -%}
+          {%- render 'oblure-full-page-menu-list',
+            menu: secondary_menu,
+            variant: 'secondary',
+            id_prefix: 'OblureFpmSecondary'
+          -%}
+        {%- endif -%}
+      </nav>
+
+      {%- if show_social -%}
+        <div class="oblure-fpm__footer">
+          {%- render 'social-icons', class: 'oblure-fpm__social' -%}
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+
+  {% comment %}
+    Dawn's localization-form.js toggles a class on `.menu-drawer` and throws when none
+    exists. The header drawer isn't rendered with this menu type, so leave an empty one.
+  {% endcomment %}
+  <div class="menu-drawer" hidden></div>
+</oblure-full-page-menu>
