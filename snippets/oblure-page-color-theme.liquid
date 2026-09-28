@@ -1,9 +1,11 @@
 {% doc %}
-  Applies the current resource's color theme to the header and footer backgrounds.
+  Applies the current page's color theme to the header and footer backgrounds.
 
-  Reads the `custom.page_color_theme` metafield (a reference to a `page_color_theme`
-  metaobject) from the page, collection, product, blog or article being viewed.
-  Articles without their own theme fall back to their blog's theme.
+  The theme is a `page_color_theme` metaobject, taken from:
+  1. the `custom.page_color_theme` metafield of the page, collection, product, blog or
+     article being viewed (articles without one fall back to their blog), otherwise
+  2. the Theme settings > "Page color themes" entry for pages that have no metafield:
+     home, search, all products (/collections/all), collections list, cart and 404.
 
   Also exposes `--oblure-page-background` on :root, which the full page menu uses as
   its default background.
@@ -29,7 +31,28 @@
       endif
   endcase
 
-  assign page_background = color_resource.metafields.custom.page_color_theme.value.page_background.value
+  assign color_theme = color_resource.metafields.custom.page_color_theme.value
+
+  if color_theme == blank
+    case request.page_type
+      when 'index'
+        assign color_theme = settings.oblure_page_theme_home
+      when 'search'
+        assign color_theme = settings.oblure_page_theme_search
+      when 'collection'
+        if collection.handle == 'all'
+          assign color_theme = settings.oblure_page_theme_all_products
+        endif
+      when 'list-collections'
+        assign color_theme = settings.oblure_page_theme_collections
+      when 'cart'
+        assign color_theme = settings.oblure_page_theme_cart
+      when '404'
+        assign color_theme = settings.oblure_page_theme_404
+    endcase
+  endif
+
+  assign page_background = color_theme.page_background.value
 -%}
 
 {%- if page_background != blank -%}

@@ -3,9 +3,8 @@
 
   Top-level links with children become accordion toggles; their children (and any
   grandchildren, listed under each child) are revealed below them.
-  Every item carries the hover background of the page/collection/product/blog/article
-  it links to, read from its `custom.page_color_theme` metaobject
-  (`menu_hover_background`, falling back to `page_background`).
+  Every item carries the hover background of the page it links to
+  (see snippets/oblure-link-hover-background.liquid).
 
   @param {object} menu - The link list to render.
   @param {string} variant - 'primary' or 'secondary'; sets the text style.
@@ -18,8 +17,9 @@
 <ul class="oblure-fpm__list oblure-fpm__list--{{ variant }} list-unstyled" role="list">
   {%- for link in menu.links -%}
     {%- liquid
-      assign color_theme = link.object.metafields.custom.page_color_theme.value
-      assign hover_background = color_theme.menu_hover_background.value | default: color_theme.page_background.value
+      capture hover_background
+        render 'oblure-link-hover-background', link: link
+      endcapture
       assign sublist_id = id_prefix | append: '-' | append: forloop.index
     -%}
     <li
@@ -42,10 +42,9 @@
 
         <ul id="{{ sublist_id }}" class="oblure-fpm__sublist list-unstyled" role="list" hidden>
           {%- for child in link.links -%}
-            {%- liquid
-              assign child_theme = child.object.metafields.custom.page_color_theme.value
-              assign child_background = child_theme.menu_hover_background.value | default: child_theme.page_background.value
-            -%}
+            {%- capture child_background -%}
+              {%- render 'oblure-link-hover-background', link: child -%}
+            {%- endcapture -%}
             <li
               class="oblure-fpm__item"
               {% if child_background != blank %}
@@ -65,10 +64,9 @@
               {%- if child.links != blank -%}
                 <ul class="oblure-fpm__sublist oblure-fpm__sublist--nested list-unstyled" role="list">
                   {%- for grandchild in child.links -%}
-                    {%- liquid
-                      assign grandchild_theme = grandchild.object.metafields.custom.page_color_theme.value
-                      assign grandchild_background = grandchild_theme.menu_hover_background.value | default: grandchild_theme.page_background.value
-                    -%}
+                    {%- capture grandchild_background -%}
+                      {%- render 'oblure-link-hover-background', link: grandchild -%}
+                    {%- endcapture -%}
                     <li
                       class="oblure-fpm__item"
                       {% if grandchild_background != blank %}

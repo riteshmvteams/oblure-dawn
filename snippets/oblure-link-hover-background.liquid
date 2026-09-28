@@ -1,0 +1,32 @@
+{% doc %}
+  Outputs the hover background color (hex) for a menu link, or nothing.
+
+  The color comes from the linked resource's `custom.page_color_theme` metaobject; links
+  to pages without a metafield (home, search, all products, collections list) use the
+  matching Theme settings > "Page color themes" entry. `menu_hover_background` is used
+  first, then `page_background`.
+
+  @param {object} link - The menu link.
+
+  @example
+  {%- capture hover_background -%}{% render 'oblure-link-hover-background', link: link %}{%- endcapture -%}
+{% enddoc %}
+
+{%- liquid
+  assign color_theme = link.object.metafields.custom.page_color_theme.value
+
+  if color_theme == blank
+    case link.type
+      when 'frontpage_link'
+        assign color_theme = settings.oblure_page_theme_home
+      when 'search_link'
+        assign color_theme = settings.oblure_page_theme_search
+      when 'catalog_link'
+        assign color_theme = settings.oblure_page_theme_all_products
+      when 'collections_link'
+        assign color_theme = settings.oblure_page_theme_collections
+    endcase
+  endif
+
+  echo color_theme.menu_hover_background.value | default: color_theme.page_background.value
+-%}
