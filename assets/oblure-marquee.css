@@ -1,0 +1,70 @@
+/*
+ * Oblure marquee
+ * Used by sections/oblure-marquee.liquid. Pure CSS: two identical groups translate
+ * by their own width (+ the gap between them), which makes the loop seamless.
+ */
+
+.oblure-marquee {
+  display: flex;
+  gap: var(--oblure-marquee-gap);
+  overflow: hidden;
+  padding-block: var(--oblure-marquee-padding);
+  user-select: none;
+}
+
+.oblure-marquee__group {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  /* Spreads a short list across the full width, like the design. */
+  justify-content: space-around;
+  gap: var(--oblure-marquee-gap);
+  min-width: 100%;
+  animation: oblure-marquee-scroll var(--oblure-marquee-duration) linear infinite;
+}
+
+.oblure-marquee--right .oblure-marquee__group {
+  animation-direction: reverse;
+}
+
+.oblure-marquee--pause-on-hover:hover .oblure-marquee__group,
+.oblure-marquee:focus-within .oblure-marquee__group {
+  animation-play-state: paused;
+}
+
+.oblure-marquee__item {
+  flex-shrink: 0;
+}
+
+.oblure-marquee__text {
+  display: block;
+  color: rgb(var(--color-foreground));
+  font-family: var(--font-body-family);
+  font-size: var(--oblure-marquee-font-size);
+  /* Keep in sync with the strip-height calc in sections/oblure-marquee.liquid. */
+  line-height: 1.3;
+  letter-spacing: 0.04rem;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.oblure-marquee--uppercase .oblure-marquee__text {
+  text-transform: uppercase;
+}
+
+.oblure-marquee__text--link:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.3rem;
+}
+
+@keyframes oblure-marquee-scroll {
+  to {
+    transform: translateX(calc(-100% - var(--oblure-marquee-gap)));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .oblure-marquee__group {
+    animation-play-state: paused;
+  }
+}

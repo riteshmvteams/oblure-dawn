@@ -9,10 +9,6 @@
  * is toggled on `.section-header` by assets/oblure-hero.js. Nothing in header.liquid changes.
  * ------------------------------------------------------------------------ */
 
-.oblure-header-overlay .section-header:not(.shopify-section-header-sticky) {
-  position: relative;
-}
-
 .oblure-header-overlay .section-header .header-wrapper {
   /* Keeps the header's own scheme color for the popups that don't set one (see below). */
   --oblure-scheme-foreground: var(--color-foreground);
@@ -52,8 +48,6 @@
  * ------------------------------------------------------------------------ */
 
 .oblure-hero {
-  --oblure-gutter: clamp(2rem, 5vw, 7rem);
-
   position: relative;
   isolation: isolate;
   display: flex;
@@ -113,14 +107,53 @@
   fill: rgba(var(--color-foreground), 0.35);
 }
 
+.oblure-hero__container {
+  width: 100%;
+  /* Top padding keeps the content clear of the overlaid header (0 when there is none). */
+  padding-block: calc(var(--oblure-header-height, 0px) + 4rem) 4rem;
+}
+
 .oblure-hero__content {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 1.2rem;
+  max-width: 100%;
+}
+
+/*
+ * Alignment "Header": mirrors the container of Dawn's header (.header.page-width and its
+ * padding in base.css / header.liquid) so the content lines up with it at every width.
+ * The content is as wide as its widest line, so the button bar can follow it.
+ */
+.oblure-hero--align-header .oblure-hero__container {
+  max-width: var(--page-width);
+  margin-inline: auto;
+  padding-inline: 3rem;
+}
+
+body:has(.section-header .drawer-menu) .oblure-hero--align-header .oblure-hero__container {
+  max-width: 100%;
+}
+
+.oblure-hero--align-header .oblure-hero__content {
+  width: fit-content;
+}
+
+/*
+ * Alignment "Screen edge": a fluid gutter from the hero's left edge, and the content
+ * takes a percentage of the hero width on desktop (--oblure-hero-content-width).
+ */
+.oblure-hero--align-edge {
+  --oblure-hero-gutter: clamp(2rem, 5vw, 7rem);
+}
+
+.oblure-hero--align-edge .oblure-hero__container {
+  padding-inline: var(--oblure-hero-gutter);
+}
+
+.oblure-hero--align-edge .oblure-hero__content {
   width: 100%;
-  /* Keeps the content clear of the overlaid header (0 when there is none). */
-  padding: calc(var(--oblure-header-height, 0px) + 4rem) var(--oblure-gutter) 4rem;
 }
 
 .oblure-hero .oblure-hero__title {
@@ -140,7 +173,7 @@
 
 .oblure-hero__text {
   margin: 0;
-  max-width: 36rem;
+  max-width: var(--oblure-hero-text-max-width);
   font-family: var(--oblure-accent-font-family);
   font-style: var(--oblure-accent-font-style);
   font-weight: var(--oblure-accent-font-weight);
@@ -148,15 +181,19 @@
   line-height: 1.2;
 }
 
-/* Bar that runs from the hero's left edge to the end of the content column. */
+/*
+ * Button bar: ends a little past the widest text line (--oblure-hero-cta-extension)
+ * and its ::before fills the space back to the hero's left edge (clipped by .oblure-hero).
+ */
 .oblure-hero .oblure-hero__cta {
+  position: relative;
   align-self: stretch;
   display: flex;
   align-items: center;
   justify-content: flex-end;
   min-height: 4.8rem;
   margin-top: 1.6rem;
-  margin-inline-start: calc(-1 * var(--oblure-gutter));
+  margin-inline-end: calc(-1 * var(--oblure-hero-cta-extension));
   padding: 1rem 2rem;
   background-color: rgb(var(--color-background));
   color: rgb(var(--color-foreground));
@@ -169,6 +206,19 @@
   transition:
     background-color var(--duration-default) ease,
     color var(--duration-default) ease;
+}
+
+.oblure-hero--align-edge .oblure-hero__cta {
+  margin-inline-end: 0;
+}
+
+.oblure-hero .oblure-hero__cta::before {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  right: 100%;
+  width: 100vw;
+  background: inherit;
 }
 
 .oblure-hero .oblure-hero__cta:not([aria-disabled='true']):hover {
@@ -201,12 +251,26 @@
     min-height: 56rem;
   }
 
-  .oblure-hero__content {
-    width: max(var(--oblure-hero-content-width), 36rem);
+  .oblure-hero__container {
     padding-bottom: 6rem;
+  }
+
+  .oblure-hero--align-header .oblure-hero__container {
+    padding-inline: 3.2rem;
+  }
+
+  .oblure-hero--align-edge .oblure-hero__content {
+    /* The gutter is part of the width so the column matches the percentage of the hero. */
+    width: calc(max(var(--oblure-hero-content-width), 36rem) - var(--oblure-hero-gutter));
   }
 
   .oblure-hero__text {
     font-size: 2rem;
+  }
+}
+
+@media screen and (min-width: 990px) {
+  body:has(.section-header .header:not(.drawer-menu)) .oblure-hero--align-header .oblure-hero__container {
+    padding-inline: 5rem;
   }
 }
