@@ -9,6 +9,117 @@
  */
 {
   "sections": {
+    "oblure_hero_pyhygg": {
+      "type": "oblure-hero",
+      "blocks": {
+        "heading_eXJGrr": {
+          "type": "heading",
+          "settings": {
+            "title_primary": "Explore",
+            "title_secondary": "New lightings",
+            "heading_size": "h1",
+            "heading_tag": "h2"
+          }
+        },
+        "text_FM9xxY": {
+          "type": "text",
+          "settings": {
+            "text": "Discover sculptural lighting that merges art, craftsmanship, and emotion."
+          }
+        },
+        "button_pPKwzr": {
+          "type": "button",
+          "settings": {
+            "label": "Shop",
+            "link": "",
+            "color_scheme": ""
+          }
+        }
+      },
+      "block_order": [
+        "heading_eXJGrr",
+        "text_FM9xxY",
+        "button_pPKwzr"
+      ],
+      "name": "Oblure hero",
+      "settings": {
+        "transparent_header": true,
+        "header_text_color": "#121212",
+        "enable_scroll_background": true,
+        "scroll_offset": 80,
+        "scrolled_background_color": "#f4f1e6",
+        "scrolled_text_color": "#121212",
+        "image": "shopify://shop_images/Obure_Lightbon.jpg",
+        "image_overlay_opacity": 10,
+        "hero_height": "full",
+        "content_position": "center",
+        "content_alignment": "edge",
+        "content_width": 30,
+        "text_max_width": 330,
+        "button_extension": 36,
+        "content_text_color": "#ffffff",
+        "accent_font": "playfair_display_n4"
+      }
+    },
+    "oblure_marquee_JF3NTF": {
+      "type": "oblure-marquee",
+      "blocks": {
+        "item_kGaF7w": {
+          "type": "item",
+          "settings": {
+            "text": "Discover the collection",
+            "link": ""
+          }
+        },
+        "item_n3rDdM": {
+          "type": "item",
+          "settings": {
+            "text": "Discover the collection",
+            "link": ""
+          }
+        },
+        "item_Uj8TiV": {
+          "type": "item",
+          "settings": {
+            "text": "Discover the collection",
+            "link": ""
+          }
+        },
+        "item_paPftX": {
+          "type": "item",
+          "settings": {
+            "text": "Discover the collection",
+            "link": ""
+          }
+        },
+        "item_CcLUhi": {
+          "type": "item",
+          "settings": {
+            "text": "Discover the collection",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "item_kGaF7w",
+        "item_n3rDdM",
+        "item_Uj8TiV",
+        "item_paPftX",
+        "item_CcLUhi"
+      ],
+      "name": "Oblure scrolling text",
+      "settings": {
+        "color_scheme": "",
+        "font_size": 17,
+        "uppercase": true,
+        "padding_block": 18,
+        "item_gap": 80,
+        "duration": 40,
+        "direction": "left",
+        "pause_on_hover": true,
+        "fit_with_hero": true
+      }
+    },
     "image_banner": {
       "type": "image-banner",
       "blocks": {
@@ -38,33 +149,32 @@
       "settings": {
         "image_overlay_opacity": 40,
         "image_height": "large",
-        "desktop_content_position": "bottom-center",
-        "show_text_box": false,
         "image_behavior": "none",
+        "desktop_content_position": "bottom-center",
         "desktop_content_alignment": "center",
+        "show_text_box": false,
         "color_scheme": "scheme-3",
-        "mobile_content_alignment": "center",
         "stack_images_on_mobile": false,
+        "mobile_content_alignment": "center",
         "show_text_below": false
       }
     },
     "featured_collection": {
       "type": "featured-collection",
       "settings": {
+        "collection": "all",
+        "products_to_show": 8,
         "title": "Featured products",
         "heading_size": "h2",
         "description": "",
         "show_description": false,
         "description_style": "body",
-        "collection": "all",
-        "products_to_show": 8,
         "columns_desktop": 4,
-        "color_scheme": "scheme-1",
+        "enable_desktop_slider": false,
         "full_width": false,
         "show_view_all": true,
         "view_all_style": "solid",
-        "enable_desktop_slider": false,
-        "swipe_on_mobile": false,
+        "color_scheme": "scheme-1",
         "image_ratio": "adapt",
         "image_shape": "default",
         "show_secondary_image": true,
@@ -72,12 +182,15 @@
         "show_rating": false,
         "quick_add": "none",
         "columns_mobile": "2",
+        "swipe_on_mobile": false,
         "padding_top": 44,
         "padding_bottom": 36
       }
     }
   },
   "order": [
+    "oblure_hero_pyhygg",
+    "oblure_marquee_JF3NTF",
     "image_banner",
     "featured_collection"
   ]
