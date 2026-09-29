@@ -24,6 +24,9 @@
         "content_position": "end",
         "image_overlay_opacity": 20,
         "overlay_text_color": "#ffffff",
+        "all_products_title": "Shop",
+        "all_products_description": "<p>Our collection contains work from emerging talent and internationally recognized designers. Together, we create A Life Extraordinary.</p>",
+        "all_products_image": "",
         "padding_top": 56,
         "padding_bottom": 48
       }

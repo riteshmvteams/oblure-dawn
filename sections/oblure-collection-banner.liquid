@@ -9,6 +9,10 @@
   The collection image (Admin > Collection > Image) can be shown below the text or
   behind it ("Image" setting); without an image the banner is text only.
 
+  The automatic /collections/all page (no real collection with the handle "all") has no
+  description or image, so it uses the "All products page" settings instead. Once the
+  client creates a real "all" collection, its own content is used.
+
   Styles live in assets/oblure-collection-banner.css.
 {% endcomment %}
 
@@ -18,8 +22,19 @@
   assign accent_font_italic = section.settings.accent_font | font_modify: 'style', 'italic'
   assign accent_font = accent_font_italic | default: section.settings.accent_font
 
+  assign banner_title = collection.title
+  assign banner_description = collection.description
+  assign banner_image = collection.image
+
+  # Automatic /collections/all: Shopify generates it without an id, description or image.
+  if collection.handle == 'all' and collection.id == blank
+    assign banner_title = section.settings.all_products_title | default: collection.title
+    assign banner_description = section.settings.all_products_description
+    assign banner_image = section.settings.all_products_image
+  endif
+
   assign image_layout = section.settings.image_layout
-  if collection.image == blank
+  if banner_image == blank
     assign image_layout = 'none'
   endif
 -%}
@@ -36,8 +51,8 @@
     --oblure-banner-padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round }}px;
     --oblure-banner-overlay-opacity: {{ section.settings.image_overlay_opacity | divided_by: 100.0 }};
     --oblure-banner-overlay-text: {{ section.settings.overlay_text_color | default: '#ffffff' }};
-    {%- if collection.image %}
-      --oblure-banner-image-ratio: {{ collection.image.aspect_ratio }};
+    {%- if banner_image %}
+      --oblure-banner-image-ratio: {{ banner_image.aspect_ratio }};
     {%- endif %}
   }
 
@@ -52,7 +67,7 @@
 {%- capture banner_image -%}
   {%- if image_layout != 'none' -%}
     {{
-      collection.image
+      banner_image
       | image_url: width: 3840
       | image_tag:
         class: 'oblure-collection-banner__image',
@@ -75,11 +90,11 @@
   <div class="oblure-collection-banner__container">
     <h1 class="oblure-collection-banner__title {{ section.settings.heading_size }}{% if section.settings.uppercase_title %} oblure-collection-banner__title--uppercase{% endif %}">
       <span class="visually-hidden">{{ 'sections.collection_template.title' | t }}: </span>
-      {{- collection.title | escape -}}
+      {{- banner_title | escape -}}
     </h1>
 
-    {%- if section.settings.show_description and collection.description != blank -%}
-      <div class="oblure-collection-banner__description rte">{{ collection.description }}</div>
+    {%- if section.settings.show_description and banner_description != blank -%}
+      <div class="oblure-collection-banner__description rte">{{ banner_description }}</div>
     {%- endif -%}
   </div>
 
@@ -251,6 +266,32 @@
       "label": "Text color over the image",
       "default": "#ffffff",
       "visible_if": "{{ section.settings.image_layout == 'background' }}"
+    },
+    {
+      "type": "header",
+      "content": "All products page"
+    },
+    {
+      "type": "paragraph",
+      "content": "Used on /collections/all while no collection with the URL handle \"all\" exists. Creating that collection in the admin replaces these settings."
+    },
+    {
+      "type": "text",
+      "id": "all_products_title",
+      "label": "Title",
+      "info": "Leave empty for Shopify's default (\"Products\").",
+      "default": "Shop"
+    },
+    {
+      "type": "richtext",
+      "id": "all_products_description",
+      "label": "Description",
+      "default": "<p>Our collection contains work from emerging talent and internationally recognized designers. Together, we create A Life Extraordinary.</p>"
+    },
+    {
+      "type": "image_picker",
+      "id": "all_products_image",
+      "label": "Image"
     },
     {
       "type": "header",
