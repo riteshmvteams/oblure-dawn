@@ -142,6 +142,7 @@
       }
     },
     "image_banner": {
+      "disabled": true,
       "type": "image-banner",
       "blocks": {
         "heading": {
@@ -168,6 +169,7 @@
         "button"
       ],
       "settings": {
+        "unique_class": "",
         "image_overlay_opacity": 40,
         "image_height": "large",
         "image_behavior": "none",
@@ -180,26 +182,70 @@
         "show_text_below": false
       }
     },
+    "image_gallery_with_text_eiB8Td": {
+      "type": "image_gallery_with_text",
+      "name": "Image gallery with text",
+      "settings": {
+        "unique_class": "image-gallery",
+        "heading": "STORIES",
+        "left_image": "shopify://shop_images/Obure_Lightbone_Blue_Lifestyle_3.png",
+        "left_image_url": "",
+        "center_image": "shopify://shop_images/ChatGPT_Image_29_apr._2026_15_15_48.png",
+        "center_image_url": "",
+        "right_image": "shopify://shop_images/Oblure_Arch_Straight_villa_costum_1.png",
+        "right_image_url": "",
+        "center_heading": "Our experience – your projects",
+        "description": "We offer professionals our experience and a lighting and acoustic design service, providing solutions to suit the complexities of the projects.",
+        "btn_url": "shopify://pages/contact",
+        "btn_text": "Contact us"
+      }
+    },
+    "rich_text_873Ubd": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_aJHVrR": {
+          "type": "heading",
+          "settings": {
+            "heading": "<strong>Our vision</strong> is to curate the <strong>original, bold</strong> and <strong>beautiful</strong>",
+            "heading_size": "h1"
+          }
+        }
+      },
+      "block_order": [
+        "heading_aJHVrR"
+      ],
+      "name": "t:sections.rich-text.presets.name",
+      "settings": {
+        "unique_class": "text-above-collection",
+        "desktop_content_position": "center",
+        "content_alignment": "center",
+        "color_scheme": "",
+        "full_width": true,
+        "padding_top": 100,
+        "padding_bottom": 80
+      }
+    },
     "featured_collection": {
       "type": "featured-collection",
       "settings": {
-        "collection": "all",
-        "products_to_show": 8,
-        "title": "Featured products",
+        "unique_class": "homepage-collection",
+        "collection": "frontpage",
+        "products_to_show": 5,
+        "title": "PRODUCT SELECTION",
         "heading_size": "h2",
         "description": "",
         "show_description": false,
         "description_style": "body",
-        "columns_desktop": 4,
+        "columns_desktop": 5,
         "enable_desktop_slider": false,
         "full_width": false,
-        "show_view_all": true,
+        "show_view_all": false,
         "view_all_style": "solid",
         "color_scheme": "scheme-1",
-        "image_ratio": "adapt",
+        "image_ratio": "portrait",
         "image_shape": "default",
         "show_secondary_image": true,
-        "show_vendor": false,
+        "show_vendor": true,
         "show_rating": false,
         "quick_add": "none",
         "columns_mobile": "2",
@@ -207,12 +253,73 @@
         "padding_top": 44,
         "padding_bottom": 36
       }
+    },
+    "image_banner_Ydk3ah": {
+      "type": "image-banner",
+      "blocks": {
+        "heading_XfHwiE": {
+          "type": "heading",
+          "settings": {
+            "heading": "OBLURE AT SALONE DEL MOBILE",
+            "heading_size": "h1"
+          }
+        },
+        "text_mKKHNM": {
+          "type": "text",
+          "settings": {
+            "text": "<h3>EUROLUCE 2025</h3>",
+            "text_style": "body"
+          }
+        },
+        "text_Beejeh": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Oblure presents new Scandinavian lighting collections at Salone del Mobile, Milan&nbsp;<br/>one of the world’s leading design fairs.</p>",
+            "text_style": "body"
+          }
+        }
+      },
+      "block_order": [
+        "heading_XfHwiE",
+        "text_mKKHNM",
+        "text_Beejeh"
+      ],
+      "name": "t:sections.image-banner.presets.name",
+      "settings": {
+        "unique_class": "featured-image",
+        "image": "shopify://shop_images/Skarmbild_2026-05-20_140442.jpg",
+        "image_overlay_opacity": 0,
+        "image_height": "large",
+        "image_behavior": "none",
+        "desktop_content_position": "bottom-right",
+        "desktop_content_alignment": "right",
+        "show_text_box": false,
+        "color_scheme": "scheme-4",
+        "stack_images_on_mobile": false,
+        "mobile_content_alignment": "center",
+        "show_text_below": false
+      }
+    },
+    "side_by_side_image_mT9typ": {
+      "type": "side-by-side-image",
+      "name": "Side by side image",
+      "settings": {
+        "unique_class": "side-by-side-image",
+        "left_image": "shopify://shop_images/VictorCastanera_BALANCE.jpg",
+        "right_image": "shopify://shop_images/Oblure_mondo_large_pendant_costum_1.png",
+        "left_heading": "DESIGNER",
+        "right_heading": "ABOUT"
+      }
     }
   },
   "order": [
     "oblure_hero_pyhygg",
     "oblure_marquee_JF3NTF",
     "image_banner",
-    "featured_collection"
+    "image_gallery_with_text_eiB8Td",
+    "rich_text_873Ubd",
+    "featured_collection",
+    "image_banner_Ydk3ah",
+    "side_by_side_image_mT9typ"
   ]
 }

@@ -1,0 +1,152 @@
+<div class="{{ section.settings.unique_class }} side-by-side-bg page-width">
+    <div class="whole-content">
+      <div class="left-content">
+          <div class="heading">
+              <h2>{{ section.settings.left_heading }}</h2>
+          </div>
+          <div class="image-container">
+              <img src="{{ section.settings.left_image | image_url }}" alt="left image" height="" width="">
+          </div>
+      </div>  
+
+      <div class="right-content">
+          <div class="heading">
+            <h2> {{ section.settings.right_heading }}</h2>
+          </div>
+          <div class="image-container">
+              <img src="{{ section.settings.right_image | image_url }}" alt="right image" height="" width="">
+          </div>
+      </div>   
+    </div>
+</div>
+
+
+
+
+{% comment %} --------------animation test css----------------- {% endcomment %}
+
+<style>
+  .side-by-side-bg .left-content,
+  .side-by-side-bg .right-content {
+    overflow: hidden;
+  }
+
+  .side-by-side-bg .left-content .image-container {
+    overflow: hidden;
+    clip-path: inset(0 100% 0 0);
+  }
+
+  .side-by-side-bg .right-content .image-container {
+    overflow: hidden;
+    clip-path: inset(0 0 0 100%);
+  }
+
+  .side-by-side-bg .image-container img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.12);
+    transition: transform 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .side-by-side-bg.is-visible .left-content .image-container,
+  .side-by-side-bg.is-visible .right-content .image-container {
+    clip-path: inset(0 0 0 0);
+    transition: clip-path 1.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .side-by-side-bg.is-visible .image-container img {
+    transform: scale(1);
+  }
+
+  .side-by-side-bg .heading {
+    opacity: 0;
+    transform: translateY(25px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .side-by-side-bg.is-visible .heading {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media screen and (max-width: 749px) {
+    .side-by-side-bg .left-content .image-container,
+    .side-by-side-bg .right-content .image-container {
+      clip-path: inset(0 0 100% 0);
+    }
+
+    .side-by-side-bg.is-visible .left-content .image-container,
+    .side-by-side-bg.is-visible .right-content .image-container {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+</style>
+
+
+
+{% schema %}
+{
+  "name": "side by side image",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "unique_class",
+      "label": "Unique class"
+    },
+    {
+      "type": "image_picker",
+      "id": "left_image",
+      "label": "Left image"
+    },
+    {
+      "type": "image_picker",
+      "id": "right_image",
+      "label": "Right image"
+    },
+    {
+      "type": "text",
+      "id": "left_heading",
+      "label": "Left heading"
+    },
+    {
+      "type": "text",
+      "id": "right_heading",
+      "label": "Right heading"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Side by side image"
+    }
+  ]
+}
+{% endschema %}
+
+
+{% comment %} --------------animation test js----------------- {% endcomment %}
+
+
+<script> 
+document.addEventListener('DOMContentLoaded', function () { 
+  const sections = document.querySelectorAll('.side-by-side-bg'); 
+ 
+  const observer = new IntersectionObserver(function (entries) { 
+    entries.forEach(function (entry) { 
+      if (entry.isIntersecting) { 
+        entry.target.classList.add('is-visible'); 
+        observer.unobserve(entry.target); 
+      } 
+    }); 
+  }, { 
+    threshold: 0.15 
+  }); 
+ 
+  sections.forEach(function (section) { 
+    observer.observe(section); 
+  }); 
+}); 
+</script>

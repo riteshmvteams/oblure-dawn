@@ -1,0 +1,254 @@
+<div class="{{ section.settings.unique_class }} gallery-bg page-width">
+   <div class="whole-content">
+      <div class="heading">
+        <h2>{{ section.settings.heading }}</h2>
+      </div> 
+
+		<div class="inner-content">
+			<div class="static-content left-content">
+				<div class="image-wapper">
+					<a href="{{ section.settings.left_image_url }}">
+						<img src="{{ section.settings.left_image | image_url }}" alt="left image" height="" width="">
+					</a>
+				</div>
+			</div> 
+			
+			<div class="static-content center-content">
+				<div class="image-wapper">
+					<a href="{{ section.settings.center_image_url }}">
+						<img src="{{ section.settings.center_image | image_url }}" alt="center image" height="" width="">
+					</a>
+				</div>
+				<div class="text-container">
+					<h3>{{ section.settings.center_heading }}</h3>
+					<div>
+						<p>{{ section.settings.description }}</p>
+						<a href="{{ section.settings.btn_url }}">
+							{{ section.settings.btn_text }}
+						</a>
+					</div>
+				</div>
+			</div>
+
+			<div class="static-content right-content">
+				<div class="image-wapper">
+					<a href="{{ section.settings.right_image_url }}">
+						<img src="{{ section.settings.right_image | image_url }}" alt="right image" height="" width="">
+					</a>
+				</div>
+			</div>  
+		</div> 
+   </div>
+</div>
+
+
+
+{% comment %} --------------animation test css----------------- {% endcomment %}
+<style>
+  /* =========================
+     IMAGE GALLERY ANIMATION
+  ========================= */
+
+  /* SECTION HEADING */
+
+  .image-gallery .heading {
+    opacity: 0;
+    transform: translateY(20px);
+    transition:
+      opacity 0.8s ease,
+      transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .image-gallery.is-visible .heading {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+
+  /* LEFT + RIGHT IMAGES */
+
+  .image-gallery .left-content .image-wapper,
+  .image-gallery .right-content .image-wapper {
+    overflow: hidden;
+  }
+
+  .image-gallery .left-content .image-wapper img,
+  .image-gallery .right-content .image-wapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.08);
+    opacity: 0;
+    transition:
+      transform 1.4s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.8s ease;
+  }
+
+  .image-gallery.is-visible .left-content .image-wapper img {
+    transform: scale(1);
+    opacity: 1;
+    transition-delay: 0.1s;
+  }
+
+  .image-gallery.is-visible .right-content .image-wapper img {
+    transform: scale(1);
+    opacity: 1;
+    transition-delay: 0.15s;
+  }
+
+
+  /* CENTER IMAGE */
+
+  .image-gallery .center-content .image-wapper:first-child {
+    overflow: hidden;
+  }
+
+  .image-gallery .center-content .image-wapper:first-child img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transform: scale(1.06);
+    transition:
+      opacity 1s ease,
+      transform 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .image-gallery.is-visible .center-content .image-wapper:first-child img {
+    opacity: 1;
+    transform: scale(1);
+    transition-delay: 0.2s;
+  }
+
+
+  /* CENTER TEXT */
+
+  .image-gallery .text-container h3,
+  .image-gallery .text-container p,
+  .image-gallery .text-container a {
+    opacity: 0;
+    transform: translateY(25px);
+    transition:
+      opacity 0.7s ease,
+      transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .image-gallery.is-visible .text-container h3 {
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: 0.45s;
+  }
+
+  .image-gallery.is-visible .text-container p {
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: 0.6s;
+  }
+
+  .image-gallery.is-visible .text-container a {
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: 0.75s;
+  }
+</style>
+
+
+
+{% schema %}
+{
+  "name": "image gallery with text",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "unique_class",
+      "label": "Unique class"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading"
+    },
+    {
+      "type": "image_picker",
+      "id": "left_image",
+      "label": "Left image"
+    },
+	 {
+      "type": "url",
+      "id": "left_image_url",
+      "label": "Left image link"
+    },
+	 {
+      "type": "image_picker",
+      "id": "center_image",
+      "label": "Center image"
+    },
+	 {
+      "type": "url",
+      "id": "center_image_url",
+      "label": "Center image link"
+    },
+    {
+      "type": "image_picker",
+      "id": "right_image",
+      "label": "Right image"
+    },
+	 {
+      "type": "url",
+      "id": "right_image_url",
+      "label": "Right image link"
+    },
+	 {
+      "type": "text",
+      "id": "center_heading",
+      "label": "Center Heading"
+    },
+	 {
+      "type": "text",
+      "id": "description",
+      "label": "Description"
+    },
+	 {
+      "type": "url",
+      "id": "btn_url",
+      "label": "Button link"
+    },
+	 {
+      "type": "text",
+      "id": "btn_text",
+      "label": "Button text"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Image gallery with text"
+    }
+  ]
+}
+{% endschema %}
+
+
+{% comment %} --------------animation test js----------------- {% endcomment %}
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const sections = document.querySelectorAll('.image-gallery');
+
+    const observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, {
+      threshold: 0.15
+    });
+
+    sections.forEach(function (section) {
+      observer.observe(section);
+    });
+  });
+</script>
