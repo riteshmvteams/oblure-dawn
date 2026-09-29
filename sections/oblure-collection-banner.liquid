@@ -1,0 +1,286 @@
+{% comment %}
+  Oblure collection banner
+
+  Collection title and (when the collection has one) its description, on the collection's
+  page color theme so it runs on from the header as one band
+  (`--oblure-page-background`, set by snippets/oblure-page-color-theme.liquid).
+  Collections without a color theme use the section's color scheme.
+
+  The collection image (Admin > Collection > Image) can be shown below the text or
+  behind it ("Image" setting); without an image the banner is text only.
+
+  Styles live in assets/oblure-collection-banner.css.
+{% endcomment %}
+
+{{ 'oblure-collection-banner.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign accent_font_italic = section.settings.accent_font | font_modify: 'style', 'italic'
+  assign accent_font = accent_font_italic | default: section.settings.accent_font
+
+  assign image_layout = section.settings.image_layout
+  if collection.image == blank
+    assign image_layout = 'none'
+  endif
+-%}
+
+{%- style -%}
+  {{ accent_font | font_face: font_display: 'swap' }}
+
+  #shopify-section-{{ section.id }} {
+    --oblure-banner-accent-family: {{ accent_font.family }}, {{ accent_font.fallback_families }};
+    --oblure-banner-accent-style: {{ accent_font.style }};
+    --oblure-banner-accent-weight: {{ accent_font.weight }};
+    --oblure-banner-text-max-width: {{ section.settings.text_max_width }}px;
+    --oblure-banner-padding-top: {{ section.settings.padding_top | times: 0.75 | round }}px;
+    --oblure-banner-padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round }}px;
+    --oblure-banner-overlay-opacity: {{ section.settings.image_overlay_opacity | divided_by: 100.0 }};
+    --oblure-banner-overlay-text: {{ section.settings.overlay_text_color | default: '#ffffff' }};
+    {%- if collection.image %}
+      --oblure-banner-image-ratio: {{ collection.image.aspect_ratio }};
+    {%- endif %}
+  }
+
+  @media screen and (min-width: 750px) {
+    #shopify-section-{{ section.id }} {
+      --oblure-banner-padding-top: {{ section.settings.padding_top }}px;
+      --oblure-banner-padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
+
+{%- capture banner_image -%}
+  {%- if image_layout != 'none' -%}
+    {{
+      collection.image
+      | image_url: width: 3840
+      | image_tag:
+        class: 'oblure-collection-banner__image',
+        widths: '375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840',
+        sizes: '100vw',
+        loading: 'eager',
+        fetchpriority: 'high',
+        alt: ''
+    }}
+  {%- endif -%}
+{%- endcapture -%}
+
+<div class="oblure-collection-banner color-{{ section.settings.color_scheme }} oblure-collection-banner--image-{{ image_layout }} oblure-collection-banner--height-{{ section.settings.image_height }} oblure-collection-banner--content-{{ section.settings.content_position }}">
+  {%- if image_layout == 'background' -%}
+    <div class="oblure-collection-banner__media oblure-collection-banner__media--background">
+      {{- banner_image -}}
+    </div>
+  {%- endif -%}
+
+  <div class="oblure-collection-banner__container">
+    <h1 class="oblure-collection-banner__title {{ section.settings.heading_size }}{% if section.settings.uppercase_title %} oblure-collection-banner__title--uppercase{% endif %}">
+      <span class="visually-hidden">{{ 'sections.collection_template.title' | t }}: </span>
+      {{- collection.title | escape -}}
+    </h1>
+
+    {%- if section.settings.show_description and collection.description != blank -%}
+      <div class="oblure-collection-banner__description rte">{{ collection.description }}</div>
+    {%- endif -%}
+  </div>
+
+  {%- if image_layout == 'below' -%}
+    <div class="oblure-collection-banner__media oblure-collection-banner__media--below{% unless section.settings.image_full_width %} oblure-collection-banner__media--contained{% endunless %}">
+      {{- banner_image -}}
+    </div>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Oblure collection banner",
+  "tag": "section",
+  "class": "section oblure-collection-banner-section",
+  "enabled_on": {
+    "templates": ["collection"]
+  },
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "The background follows the collection's \"Page color theme\", matching the header and footer. Without one, the color scheme below is used."
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Title size",
+      "options": [
+        {
+          "value": "h2",
+          "label": "Small"
+        },
+        {
+          "value": "h1",
+          "label": "Medium"
+        },
+        {
+          "value": "h0",
+          "label": "Large"
+        }
+      ],
+      "default": "h1"
+    },
+    {
+      "type": "checkbox",
+      "id": "uppercase_title",
+      "label": "Uppercase title",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_description",
+      "label": "Show collection description",
+      "info": "Hidden automatically when the collection has no description.",
+      "default": true
+    },
+    {
+      "type": "font_picker",
+      "id": "accent_font",
+      "label": "Description font",
+      "info": "Shown in italic.",
+      "default": "playfair_display_n4"
+    },
+    {
+      "type": "range",
+      "id": "text_max_width",
+      "min": 280,
+      "max": 800,
+      "step": 10,
+      "unit": "px",
+      "label": "Description max width",
+      "default": 420
+    },
+    {
+      "type": "header",
+      "content": "Collection image"
+    },
+    {
+      "type": "select",
+      "id": "image_layout",
+      "label": "Image",
+      "info": "Uses the collection's own image. Collections without one show the text only.",
+      "options": [
+        {
+          "value": "none",
+          "label": "Don't show"
+        },
+        {
+          "value": "below",
+          "label": "Below the title and description"
+        },
+        {
+          "value": "background",
+          "label": "Background, text over the image"
+        }
+      ],
+      "default": "below"
+    },
+    {
+      "type": "select",
+      "id": "image_height",
+      "label": "Image height",
+      "options": [
+        {
+          "value": "adapt",
+          "label": "Adapt to image"
+        },
+        {
+          "value": "small",
+          "label": "Small"
+        },
+        {
+          "value": "medium",
+          "label": "Medium"
+        },
+        {
+          "value": "large",
+          "label": "Large"
+        }
+      ],
+      "default": "medium",
+      "visible_if": "{{ section.settings.image_layout != 'none' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "image_full_width",
+      "label": "Full-width image",
+      "info": "Off: the image lines up with the text column edges.",
+      "default": true,
+      "visible_if": "{{ section.settings.image_layout == 'below' }}"
+    },
+    {
+      "type": "select",
+      "id": "content_position",
+      "label": "Text position",
+      "options": [
+        {
+          "value": "center",
+          "label": "Middle"
+        },
+        {
+          "value": "end",
+          "label": "Bottom"
+        }
+      ],
+      "default": "end",
+      "visible_if": "{{ section.settings.image_layout == 'background' }}"
+    },
+    {
+      "type": "range",
+      "id": "image_overlay_opacity",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "label": "Image overlay opacity",
+      "default": 20,
+      "visible_if": "{{ section.settings.image_layout == 'background' }}"
+    },
+    {
+      "type": "color",
+      "id": "overlay_text_color",
+      "label": "Text color over the image",
+      "default": "#ffffff",
+      "visible_if": "{{ section.settings.image_layout == 'background' }}"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 48
+    }
+  ],
+  "presets": [
+    {
+      "name": "Oblure collection banner"
+    }
+  ]
+}
+{% endschema %}
