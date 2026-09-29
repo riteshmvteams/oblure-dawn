@@ -1,0 +1,3 @@
+# Store and check out all text files with LF line endings on every OS, so diffs only
+# show real code changes. Git detects binary files (images, fonts) and leaves them as is.
+* text=auto eol=lf
