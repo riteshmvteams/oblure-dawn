@@ -48,6 +48,7 @@
         "image_ratio": "square",
         "wide_image_ratio": "21-9",
         "show_secondary_image": true,
+        "enable_video": true,
         "hover_effect": "fade",
         "price_font": "serif",
         "new_tag": "new",

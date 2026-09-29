@@ -17,6 +17,9 @@
 {{ 'template-collection.css' | asset_url | stylesheet_tag }}
 {{ 'oblure-product-grid.css' | asset_url | stylesheet_tag }}
 <script src="{{ 'oblure-product-grid.js' | asset_url }}" defer="defer"></script>
+{%- if section.settings.enable_video -%}
+  <script src="{{ 'oblure-card-media.js' | asset_url }}" defer="defer"></script>
+{%- endif -%}
 
 {%- liquid
   assign price_font_italic = section.settings.price_font | font_modify: 'style', 'italic'
@@ -307,6 +310,7 @@
                         max_swatches: section.settings.max_swatches,
                         show_secondary_image: section.settings.show_secondary_image,
                         hover_effect: section.settings.hover_effect,
+                        enable_video: section.settings.enable_video,
                         product_view_context: 'collection'
                       -%}
                     </li>
@@ -515,6 +519,13 @@
       "id": "show_secondary_image",
       "label": "Show second image on hover (light on / light off)",
       "info": "Upload the lamp switched on as the product's first image and switched off as its second. Products with one image don't change.",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_video",
+      "label": "Play product videos",
+      "info": "A video as a product's first media plays muted while on screen; as its second media it plays on hover. Only videos uploaded to Shopify; YouTube/Vimeo show their preview image.",
       "default": true
     },
     {

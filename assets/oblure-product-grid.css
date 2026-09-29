@@ -287,6 +287,11 @@
  * Light on / light off: the second image lies over the first and appears on hover.
  * "Flicker" plays a short switch-like flicker as it comes in; leaving fades it back.
  */
+/* Card videos fill the frame like the images (snippets/oblure-card-video.liquid). */
+.oblure-card__video {
+  background-color: var(--oblure-card-image-background);
+}
+
 /* Own background, so a transparent "light off" image doesn't show the "light on" one through it. */
 .oblure-card__image--secondary {
   position: absolute;

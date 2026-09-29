@@ -13,6 +13,9 @@
   @param {number} [max_swatches] - How many swatches to show before "+N". Default: 6.
   @param {boolean} [show_secondary_image] - On hover, switch to the product's second image ("light off").
   @param {string} [hover_effect] - 'fade' or 'flicker'; how the second image comes in. Default: 'fade'.
+  @param {boolean} [enable_video] - Play Shopify-hosted videos: a first-media video plays (muted, looping)
+    while the card is on screen, a second-media video plays on hover. Needs assets/oblure-card-media.js.
+    Off, or for YouTube/Vimeo, the video's preview image is shown instead.
   @param {string} [product_view_context] - Context for the standard "view" event.
 
   @example
@@ -28,6 +31,23 @@
     assign secondary_media = null
     if show_secondary_image and card_product.media.size > 1
       assign secondary_media = card_product.media[1]
+    endif
+
+    # Only Shopify-hosted videos can play here; other media types show their preview image.
+    assign primary_is_video = false
+    assign secondary_is_video = false
+    if enable_video
+      if card_product.featured_media.media_type == 'video'
+        assign primary_is_video = true
+      endif
+      if secondary_media.media_type == 'video'
+        assign secondary_is_video = true
+      endif
+    endif
+
+    assign media_tag = 'div'
+    if primary_is_video or secondary_is_video
+      assign media_tag = 'oblure-card-media'
     endif
 
     # NEW badge: tag match, ignoring case and spacing.
@@ -81,7 +101,7 @@
 
   <product-component view-event-payload="{{ card_product | standard_event_data: 'view', context: product_view_context | escape }}">
     <article class="oblure-card{% if secondary_media %} oblure-card--has-secondary oblure-card--effect-{{ hover_effect }}{% endif %}{% unless card_product.available %} oblure-card--sold-out{% endunless %}">
-      <div class="oblure-card__media">
+      <{{ media_tag }} class="oblure-card__media">
         {%- if card_product.featured_media -%}
           {%- liquid
             assign image_loading = 'lazy'
@@ -89,18 +109,32 @@
               assign image_loading = 'eager'
             endif
           -%}
-          {{
-            card_product.featured_media
-            | image_url: width: 2400
-            | image_tag:
+          {%- if primary_is_video -%}
+            {%- render 'oblure-card-video',
+              media: card_product.featured_media,
               class: 'oblure-card__image oblure-card__image--primary',
-              widths: '360, 533, 720, 940, 1066, 1400, 1800, 2400',
-              sizes: image_sizes,
-              loading: image_loading,
-              alt: card_product.featured_media.alt
-          }}
+              playback: 'visible'
+            -%}
+          {%- else -%}
+            {{
+              card_product.featured_media
+              | image_url: width: 2400
+              | image_tag:
+                class: 'oblure-card__image oblure-card__image--primary',
+                widths: '360, 533, 720, 940, 1066, 1400, 1800, 2400',
+                sizes: image_sizes,
+                loading: image_loading,
+                alt: card_product.featured_media.alt
+            }}
+          {%- endif -%}
 
-          {%- if secondary_media -%}
+          {%- if secondary_is_video -%}
+            {%- render 'oblure-card-video',
+              media: secondary_media,
+              class: 'oblure-card__image oblure-card__image--secondary',
+              playback: 'hover'
+            -%}
+          {%- elsif secondary_media -%}
             {% comment %} "Light off" image, revealed on hover; decorative (empty alt), so screen readers skip it. {% endcomment %}
             {{
               secondary_media
@@ -120,7 +154,7 @@
         {%- if is_new and new_label != blank -%}
           <span class="oblure-card__badge">{{ new_label | escape }}</span>
         {%- endif -%}
-      </div>
+      </{{ media_tag }}>
 
       <div class="oblure-card__info">
         <div class="oblure-card__text">

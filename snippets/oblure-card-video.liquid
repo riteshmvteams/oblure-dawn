@@ -1,0 +1,65 @@
+{% doc %}
+  Renders a Shopify-hosted product video for the Oblure product card: muted, looping,
+  no controls, and nothing downloaded until it plays (preload="none", poster frame shown).
+  Playback is started and stopped by assets/oblure-card-media.js.
+
+  Uses the MP4 closest to 720p (Shopify generates several sizes), which is plenty for a
+  card and much lighter than the original upload.
+
+  @param {object} media - A media object with media_type 'video'.
+  @param {string} class - Classes for the <video> element.
+  @param {string} playback - 'visible' (plays while on screen) or 'hover' (plays on hover).
+
+  @example
+  {% render 'oblure-card-video', media: card_product.featured_media, class: 'oblure-card__image', playback: 'visible' %}
+{% enddoc %}
+
+{%- liquid
+  assign video_source = null
+  assign smallest_source = null
+
+  for source in media.sources
+    if source.mime_type != 'video/mp4'
+      continue
+    endif
+
+    if smallest_source == null or source.height < smallest_source.height
+      assign smallest_source = source
+    endif
+
+    if source.height <= 720
+      if video_source == null or source.height > video_source.height
+        assign video_source = source
+      endif
+    endif
+  endfor
+
+  if video_source == null
+    assign video_source = smallest_source
+  endif
+-%}
+
+{%- if video_source -%}
+  <video
+    class="{{ class }} oblure-card__video"
+    poster="{{ media.preview_image | image_url: width: 1400 }}"
+    muted
+    loop
+    playsinline
+    disablepictureinpicture
+    preload="none"
+    tabindex="-1"
+    aria-hidden="true"
+    data-oblure-card-video="{{ playback }}"
+  >
+    {% comment %} Shopify's own video CDN URL; there is no asset_url equivalent for media. {% endcomment %}
+    {% # theme-check-disable-next-line RemoteAsset %}
+    <source src="{{ video_source.url }}" type="video/mp4">
+  </video>
+{%- else -%}
+  {{
+    media.preview_image
+    | image_url: width: 1400
+    | image_tag: class: class, loading: 'lazy', alt: ''
+  }}
+{%- endif -%}
