@@ -9,37 +9,59 @@
  */
 {
   "sections": {
-    "banner": {
-      "type": "main-collection-banner",
+    "oblure_collection_banner": {
+      "type": "oblure-collection-banner",
       "settings": {
-        "show_collection_description": true,
-        "show_collection_image": false,
-        "color_scheme": "scheme-1"
+        "color_scheme": "scheme-1",
+        "heading_size": "h1",
+        "uppercase_title": true,
+        "show_description": true,
+        "accent_font": "playfair_display_n4",
+        "text_max_width": 420,
+        "image_layout": "below",
+        "image_height": "medium",
+        "image_full_width": true,
+        "content_position": "end",
+        "image_overlay_opacity": 20,
+        "overlay_text_color": "#ffffff",
+        "padding_top": 56,
+        "padding_bottom": 48
       }
     },
-    "product-grid": {
-      "type": "main-collection-product-grid",
+    "oblure_product_grid": {
+      "type": "oblure-collection-product-grid",
       "settings": {
-        "products_per_page": 16,
-        "columns_desktop": 4,
+        "products_per_page": 12,
         "color_scheme": "scheme-1",
-        "image_ratio": "adapt",
-        "image_shape": "default",
-        "show_secondary_image": false,
-        "show_vendor": false,
-        "show_rating": false,
-        "quick_add": "none",
+        "grid_max_width": 1200,
+        "column_gap": 16,
+        "default_density": "compact",
+        "show_density_switch": true,
+        "label_fewer_columns": "Show fewer columns",
+        "label_more_columns": "Show more columns",
+        "enable_wide": true,
+        "wide_every_rows": 1,
+        "image_background": "#cdd7d9",
+        "image_ratio": "square",
+        "wide_image_ratio": "2-1",
+        "show_secondary_image": true,
+        "hover_effect": "fade",
+        "price_font": "playfair_display_n4",
+        "new_tag": "new",
+        "new_label": "New",
+        "new_badge_color": "#e3000f",
+        "swatch_option_names": "Color, Colour, Färg",
+        "max_swatches": 6,
         "enable_filtering": true,
-        "filter_type": "horizontal",
+        "filter_type": "drawer",
         "enable_sorting": true,
-        "columns_mobile": "2",
-        "padding_top": 36,
-        "padding_bottom": 36
+        "padding_top": 32,
+        "padding_bottom": 64
       }
     }
   },
   "order": [
-    "banner",
-    "product-grid"
+    "oblure_collection_banner",
+    "oblure_product_grid"
   ]
 }

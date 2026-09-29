@@ -1,0 +1,494 @@
+/*
+ * Oblure product grid + product card
+ * Used by sections/oblure-collection-product-grid.liquid and snippets/oblure-card-product.liquid.
+ *
+ * Columns come from `data-density` on .oblure-product-grid:
+ *   comfortable: 1 column on mobile, 2 on desktop
+ *   compact:     2 columns on mobile, 3 on desktop
+ * Items flagged --wide-2 / --wide-3 span the full row in the 2- / 3-column layouts.
+ */
+
+/* --oblure-grid-max-width and --oblure-grid-column-gap come from the section settings. */
+.oblure-product-grid {
+  --oblure-grid-columns: 1;
+  --oblure-grid-row-gap: 3.2rem;
+  --oblure-grid-gutter: 3rem;
+  --oblure-grid-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  padding-block: var(--oblure-grid-padding-top) var(--oblure-grid-padding-bottom);
+}
+
+.oblure-product-grid[data-density='compact'] {
+  --oblure-grid-columns: 2;
+}
+
+/* Capped, centered content width (the setting), plus the header's side gutter on small screens. */
+.oblure-product-grid__container {
+  width: 100%;
+  max-width: calc(var(--oblure-grid-max-width) + 2 * var(--oblure-grid-gutter));
+  margin-inline: auto;
+  padding-inline: var(--oblure-grid-gutter);
+}
+
+/* The vertical filter layout already sits in a page-width container. */
+.facets-vertical .oblure-product-grid__container {
+  padding-inline: 0;
+}
+
+.oblure-product-grid__main {
+  flex-grow: 1;
+  min-width: 0;
+}
+
+/* ---------------------------------------------------------------------------
+ * Grid
+ * ------------------------------------------------------------------------ */
+
+.oblure-product-grid__list {
+  display: grid;
+  grid-template-columns: repeat(var(--oblure-grid-columns), minmax(0, 1fr));
+  column-gap: var(--oblure-grid-column-gap);
+  row-gap: var(--oblure-grid-row-gap);
+}
+
+/* A spanning item also switches its image to the wide ratio. */
+.oblure-product-grid--wide-cards[data-density='compact'] .oblure-product-grid__item--wide-2 {
+  --oblure-card-ratio: var(--oblure-card-wide-ratio);
+
+  grid-column: 1 / -1;
+}
+
+/* ---------------------------------------------------------------------------
+ * Filter row + column switch
+ * The column switch sits in front of Dawn's Filter button; Dawn's own filter
+ * wrapper keeps its markup, only its page-width box is flattened inside this row.
+ * ------------------------------------------------------------------------ */
+
+.oblure-product-grid__controls {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  margin-bottom: 1.6rem;
+}
+
+.oblure-product-grid__controls:not(:has(.facets-wrapper)) {
+  justify-content: flex-end;
+}
+
+.oblure-product-grid__controls .facets-wrapper.page-width {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+.oblure-product-grid__toolbar {
+  display: flex;
+  flex-shrink: 0;
+}
+
+/* Vertical filters: the switch sits above the grid instead. */
+.oblure-product-grid__main > .oblure-product-grid__toolbar {
+  justify-content: flex-end;
+  margin-bottom: 1.6rem;
+}
+
+.oblure-product-grid__density {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.oblure-product-grid__density-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.2rem;
+  height: 3.2rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: rgb(var(--color-foreground));
+  opacity: 0.4;
+  cursor: pointer;
+  transition: opacity 0.3s var(--oblure-grid-ease);
+}
+
+.oblure-product-grid__density-button:hover,
+.oblure-product-grid__density-button[aria-pressed='true'] {
+  opacity: 1;
+}
+
+.oblure-product-grid__density-icon {
+  width: 2rem;
+  height: 2rem;
+}
+
+.oblure-product-grid__density-icon--desktop {
+  display: none;
+}
+
+/* ---------------------------------------------------------------------------
+ * Card
+ * ------------------------------------------------------------------------ */
+
+.oblure-product-grid__item > product-component {
+  display: block;
+  height: 100%;
+}
+
+.oblure-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  height: 100%;
+}
+
+.oblure-card__media {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: var(--oblure-card-ratio);
+  /* Shows behind transparent product images (setting "Image background color"). */
+  background-color: var(--oblure-card-image-background);
+}
+
+.oblure-card__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition:
+    opacity 0.6s var(--oblure-grid-ease),
+    filter 0.6s var(--oblure-grid-ease);
+}
+
+.oblure-card__image--placeholder {
+  fill: rgba(var(--color-foreground), 0.35);
+}
+
+.oblure-card__badge {
+  position: absolute;
+  top: 1.2rem;
+  right: 1.4rem;
+  z-index: 2;
+  color: var(--oblure-card-badge-color);
+  font-family: var(--font-body-family);
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.08rem;
+  line-height: 1;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.oblure-card__info {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.2rem;
+}
+
+.oblure-card__text {
+  min-width: 0;
+}
+
+.oblure-card__title {
+  margin: 0;
+  color: rgb(var(--color-foreground));
+  font-family: var(--font-body-family);
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.06rem;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.oblure-card__link {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* The whole card is the link. */
+.oblure-card__link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.oblure-card__link:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.oblure-card:has(.oblure-card__link:focus-visible) {
+  outline: 0.2rem solid rgba(var(--color-foreground), 0.5);
+  outline-offset: 0.4rem;
+}
+
+.oblure-card__price {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 0.6rem;
+  margin-top: 0.2rem;
+  color: rgb(var(--color-foreground));
+  font-family: var(--oblure-card-price-family);
+  font-style: var(--oblure-card-price-style);
+  font-weight: var(--oblure-card-price-weight);
+  font-size: 1.2rem;
+  line-height: 1.3;
+}
+
+.oblure-card__price-compare {
+  opacity: 0.55;
+}
+
+.oblure-card__sold-out {
+  opacity: 0.7;
+}
+
+.oblure-card__swatches {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+  max-width: 50%;
+  padding-top: 0.2rem;
+}
+
+.oblure-card__swatch {
+  width: 0.9rem;
+  height: 0.9rem;
+  background: var(--oblure-swatch);
+}
+
+/* Option value without a swatch color set in the admin. */
+.oblure-card__swatch--empty {
+  background: linear-gradient(
+    to top right,
+    transparent calc(50% - 0.05rem),
+    rgba(var(--color-foreground), 0.5) 50%,
+    transparent calc(50% + 0.05rem)
+  );
+  box-shadow: inset 0 0 0 0.1rem rgba(var(--color-foreground), 0.3);
+}
+
+.oblure-card__swatch-more {
+  color: rgba(var(--color-foreground), 0.7);
+  font-size: 1rem;
+  line-height: 0.9rem;
+}
+
+/*
+ * Light on / light off: the second image lies over the first and appears on hover.
+ * "Flicker" plays a short switch-like flicker as it comes in; leaving fades it back.
+ */
+/* Own background, so a transparent "light off" image doesn't show the "light on" one through it. */
+.oblure-card__image--secondary {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background-color: var(--oblure-card-image-background);
+}
+
+@media (hover: hover) {
+  .oblure-card--has-secondary:hover .oblure-card__image--secondary {
+    opacity: 1;
+  }
+
+  .oblure-card--effect-flicker:hover .oblure-card__image--secondary {
+    animation: oblure-light-flicker 0.6s linear;
+  }
+}
+
+@keyframes oblure-light-flicker {
+  0% {
+    opacity: 0;
+  }
+
+  15% {
+    opacity: 0.85;
+  }
+
+  25% {
+    opacity: 0.15;
+  }
+
+  40% {
+    opacity: 1;
+  }
+
+  55% {
+    opacity: 0.55;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Show more
+ * ------------------------------------------------------------------------ */
+
+.oblure-load-more {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.6rem;
+  margin-top: 6rem;
+}
+
+.oblure-load-more__count {
+  margin: 0;
+  color: rgb(var(--color-foreground));
+  font-size: 1.2rem;
+  letter-spacing: 0.12rem;
+  text-transform: uppercase;
+}
+
+.oblure-load-more__progress {
+  position: relative;
+  width: 20rem;
+  height: 0.1rem;
+  overflow: hidden;
+  background-color: rgba(var(--color-foreground), 0.15);
+}
+
+.oblure-load-more__progress-bar {
+  position: absolute;
+  inset: 0;
+  background-color: rgb(var(--color-foreground));
+  transform: scaleX(var(--oblure-progress, 0));
+  transform-origin: left;
+  transition: transform 0.6s var(--oblure-grid-ease);
+}
+
+.oblure-load-more__button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20rem;
+  min-height: 4.4rem;
+  padding: 1.2rem 3.2rem;
+  border: 0.1rem solid rgb(var(--color-foreground));
+  background: transparent;
+  color: rgb(var(--color-foreground));
+  font-family: var(--font-body-family);
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0.12rem;
+  text-decoration: none;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background-color 0.3s var(--oblure-grid-ease),
+    color 0.3s var(--oblure-grid-ease);
+}
+
+.oblure-load-more__button:hover {
+  background-color: rgb(var(--color-foreground));
+  color: rgb(var(--color-background));
+}
+
+.oblure-load-more__button[aria-busy='true'] {
+  cursor: progress;
+}
+
+.oblure-load-more__spinner {
+  position: absolute;
+  width: 1.6rem;
+  height: 1.6rem;
+  border: 0.15rem solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  opacity: 0;
+}
+
+.oblure-load-more__button[aria-busy='true'] .oblure-load-more__label {
+  opacity: 0;
+}
+
+.oblure-load-more__button[aria-busy='true'] .oblure-load-more__spinner {
+  opacity: 1;
+  animation: oblure-load-more-spin 0.8s linear infinite;
+}
+
+@keyframes oblure-load-more-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .oblure-card--effect-flicker:hover .oblure-card__image--secondary {
+    animation: none;
+  }
+
+  .oblure-card__image,
+  .oblure-load-more__progress-bar,
+  .oblure-load-more__button {
+    transition: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Tablet and up
+ * ------------------------------------------------------------------------ */
+
+@media screen and (min-width: 750px) {
+  .oblure-product-grid {
+    --oblure-grid-columns: 2;
+    --oblure-grid-gutter: 3.2rem;
+    --oblure-grid-row-gap: 4rem;
+  }
+
+  .oblure-product-grid[data-density='compact'] {
+    --oblure-grid-columns: 3;
+  }
+
+  .oblure-product-grid--wide-cards[data-density='compact'] .oblure-product-grid__item--wide-2 {
+    --oblure-card-ratio: inherit;
+
+    grid-column: auto;
+  }
+
+  .oblure-product-grid--wide-cards[data-density='compact'] .oblure-product-grid__item--wide-3,
+  .oblure-product-grid--wide-cards[data-density='comfortable'] .oblure-product-grid__item--wide-2 {
+    --oblure-card-ratio: var(--oblure-card-wide-ratio);
+
+    grid-column: 1 / -1;
+  }
+
+  .oblure-product-grid__density-icon--mobile {
+    display: none;
+  }
+
+  .oblure-product-grid__density-icon--desktop {
+    display: block;
+  }
+
+  .oblure-card__title {
+    font-size: 1.2rem;
+  }
+
+  .oblure-card__price {
+    font-size: 1.3rem;
+  }
+
+  .oblure-card__swatch {
+    width: 1rem;
+    height: 1rem;
+  }
+}
+
+@media screen and (min-width: 990px) {
+  body:has(.section-header .header:not(.drawer-menu)) .oblure-product-grid {
+    --oblure-grid-gutter: 5rem;
+  }
+}

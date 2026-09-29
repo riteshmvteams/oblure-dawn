@@ -1,0 +1,648 @@
+{% comment %}
+  Oblure collection product grid
+
+  Product grid for collection pages with Oblure product cards (snippets/oblure-card-product.liquid):
+  - 2/3 columns on desktop (1/2 on mobile), switchable by the visitor and remembered.
+  - Optionally one full-width product after every N rows.
+  - Optional second image on hover ("light off").
+  - "Show more" button with an "8 of 24 products" count instead of page links.
+
+  Filtering and sorting are Dawn's (snippets/facets.liquid + assets/facets.js, unchanged).
+  The ids facets.js relies on are kept: #ProductGridContainer, #product-grid (data-id), and
+  the .collection wrapper that gets the loading state.
+
+  Behaviour: assets/oblure-product-grid.js. Styles: assets/oblure-product-grid.css.
+{% endcomment %}
+
+{{ 'template-collection.css' | asset_url | stylesheet_tag }}
+{{ 'oblure-product-grid.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'oblure-product-grid.js' | asset_url }}" defer="defer"></script>
+
+{%- liquid
+  assign price_font_italic = section.settings.price_font | font_modify: 'style', 'italic'
+  assign price_font = price_font_italic | default: section.settings.price_font
+
+  # A full-width card follows every `wide_every_rows` rows, so it is every (columns × rows + 1)th product.
+  assign wide_rows = section.settings.wide_every_rows
+  assign wide_every_3 = 3 | times: wide_rows | plus: 1
+  assign wide_every_2 = 2 | times: wide_rows | plus: 1
+
+  # Image sizes for the capped grid width.
+  assign grid_max_width = section.settings.grid_max_width
+  assign grid_breakpoint = grid_max_width | plus: 100
+  assign column_width_3 = grid_max_width | divided_by: 3
+  assign card_sizes = '(min-width: ' | append: grid_breakpoint | append: 'px) ' | append: column_width_3 | append: 'px, (min-width: 990px) 33vw, (min-width: 750px) 50vw, 100vw'
+  assign wide_sizes = '(min-width: ' | append: grid_breakpoint | append: 'px) ' | append: grid_max_width | append: 'px, 100vw'
+
+  case section.settings.image_ratio
+    when 'square'
+      assign card_ratio = '1 / 1'
+    when 'portrait-4-5'
+      assign card_ratio = '4 / 5'
+    else
+      assign card_ratio = '3 / 4'
+  endcase
+
+  case section.settings.wide_image_ratio
+    when '16-9'
+      assign wide_ratio = '16 / 9'
+    when '21-9'
+      assign wide_ratio = '21 / 9'
+    else
+      assign wide_ratio = '2 / 1'
+  endcase
+-%}
+
+{%- style -%}
+  {{ price_font | font_face: font_display: 'swap' }}
+
+  #shopify-section-{{ section.id }} {
+    --oblure-grid-max-width: {{ grid_max_width }}px;
+    --oblure-grid-column-gap: {{ section.settings.column_gap }}px;
+    --oblure-card-ratio: {{ card_ratio }};
+    --oblure-card-wide-ratio: {{ wide_ratio }};
+    --oblure-card-badge-color: {{ section.settings.new_badge_color | default: '#e3000f' }};
+    --oblure-card-image-background: {{ section.settings.image_background | default: 'transparent' }};
+    --oblure-card-price-family: {{ price_font.family }}, {{ price_font.fallback_families }};
+    --oblure-card-price-style: {{ price_font.style }};
+    --oblure-card-price-weight: {{ price_font.weight }};
+    --oblure-grid-padding-top: {{ section.settings.padding_top | times: 0.75 | round }}px;
+    --oblure-grid-padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    #shopify-section-{{ section.id }} {
+      --oblure-grid-padding-top: {{ section.settings.padding_top }}px;
+      --oblure-grid-padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
+
+<collection-component
+  view-event-payload="{{ collection | standard_event_data: 'view' | escape }}"
+  data-collection-id="{{ collection.id }}"
+>
+  <div
+    class="oblure-product-grid color-{{ section.settings.color_scheme }} gradient{% if section.settings.enable_wide %} oblure-product-grid--wide-cards{% endif %}"
+    data-density="{{ section.settings.default_density }}"
+    data-oblure-product-grid
+  >
+    {%- if section.settings.show_density_switch -%}
+      {% comment %} Applies the visitor's saved column choice before the grid is painted. {% endcomment %}
+      <script>
+        (() => {
+          try {
+            const density = localStorage.getItem('oblure-grid-density');
+            if (density === 'compact' || density === 'comfortable') {
+              document.currentScript.parentElement.dataset.density = density;
+            }
+          } catch (error) {}
+        })();
+      </script>
+    {%- endif -%}
+
+    {%- paginate collection.products by section.settings.products_per_page -%}
+      {% comment %} Sort is the first tabbable element when filter type is vertical (same as Dawn) {% endcomment %}
+      {%- if section.settings.enable_sorting and section.settings.filter_type == 'vertical' -%}
+        <facet-filters-form class="facets facets-vertical-sort page-width small-hide">
+          <form class="facets-vertical-form" id="FacetSortForm">
+            <div class="facet-filters sorting caption">
+              <div class="facet-filters__field">
+                <h2 class="facet-filters__label caption-large text-body">
+                  <label for="SortBy">{{ 'products.facets.sort_by_label' | t }}</label>
+                </h2>
+                <div class="select">
+                  {%- assign sort_by = collection.sort_by | default: collection.default_sort_by -%}
+                  <select
+                    name="sort_by"
+                    class="facet-filters__sort select__select caption-large"
+                    id="SortBy"
+                    aria-describedby="a11y-refresh-page-message"
+                  >
+                    {%- for option in collection.sort_options -%}
+                      <option
+                        value="{{ option.value | escape }}"
+                        {% if option.value == sort_by %}
+                          selected="selected"
+                        {% endif %}
+                      >
+                        {{ option.name | escape }}
+                      </option>
+                    {%- endfor -%}
+                  </select>
+                  <span class="svg-wrapper">
+                    {{- 'icon-caret.svg' | inline_asset_content -}}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="product-count-vertical light" role="status">
+              <h2 class="product-count__text text-body">
+                <span id="ProductCountDesktop">
+                  {%- if collection.results_count -%}
+                    {{
+                      'templates.search.results_with_count'
+                      | t: terms: collection.terms, count: collection.results_count
+                    }}
+                  {%- elsif collection.products_count == collection.all_products_count -%}
+                    {{ 'products.facets.product_count_simple' | t: count: collection.products_count }}
+                  {%- else -%}
+                    {{
+                      'products.facets.product_count'
+                      | t: product_count: collection.products_count, count: collection.all_products_count
+                    }}
+                  {%- endif -%}
+                </span>
+              </h2>
+              {%- render 'loading-spinner' -%}
+            </div>
+          </form>
+        </facet-filters-form>
+      {%- endif -%}
+
+      {%- capture filters -%}
+        {%- if section.settings.enable_filtering or section.settings.enable_sorting -%}
+          <aside
+            aria-labelledby="verticalTitle"
+            class="facets-wrapper{% unless section.settings.enable_filtering %} facets-wrapper--no-filters{% endunless %}{% if section.settings.filter_type != 'vertical' %} page-width{% endif %}"
+            id="main-collection-filters"
+            data-id="{{ section.id }}"
+          >
+            {% render 'facets',
+              results: collection,
+              enable_filtering: section.settings.enable_filtering,
+              enable_sorting: section.settings.enable_sorting,
+              filter_type: section.settings.filter_type,
+              paginate: paginate
+            %}
+          </aside>
+        {%- endif -%}
+      {%- endcapture -%}
+
+      {%- capture density_switch -%}
+        {%- if section.settings.show_density_switch -%}
+          <oblure-grid-density class="oblure-product-grid__toolbar">
+            <div class="oblure-product-grid__density">
+              <button
+                type="button"
+                class="oblure-product-grid__density-button"
+                data-density="comfortable"
+                aria-pressed="false"
+                aria-label="{{ section.settings.label_fewer_columns | escape }}"
+              >
+                <svg class="oblure-product-grid__density-icon oblure-product-grid__density-icon--mobile" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+                  <rect x="1.5" y="1.5" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.2"/>
+                </svg>
+                <svg class="oblure-product-grid__density-icon oblure-product-grid__density-icon--desktop" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+                  <rect x="1.5" y="1.5" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.2"/>
+                  <path d="M10 1.5v17" stroke="currentColor" stroke-width="1.2"/>
+                </svg>
+              </button>
+              <button
+                type="button"
+                class="oblure-product-grid__density-button"
+                data-density="compact"
+                aria-pressed="false"
+                aria-label="{{ section.settings.label_more_columns | escape }}"
+              >
+                <svg class="oblure-product-grid__density-icon oblure-product-grid__density-icon--mobile" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+                  <rect x="1.5" y="1.5" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.2"/>
+                  <path d="M10 1.5v17" stroke="currentColor" stroke-width="1.2"/>
+                </svg>
+                <svg class="oblure-product-grid__density-icon oblure-product-grid__density-icon--desktop" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+                  <rect x="1.5" y="1.5" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.2"/>
+                  <path d="M7.17 1.5v17M12.83 1.5v17" stroke="currentColor" stroke-width="1.2"/>
+                </svg>
+              </button>
+            </div>
+          </oblure-grid-density>
+        {%- endif -%}
+      {%- endcapture -%}
+
+      <div class="oblure-product-grid__body{% if section.settings.filter_type == 'vertical' %} facets-vertical page-width{% endif %}">
+        {{ 'component-facets.css' | asset_url | stylesheet_tag }}
+        <script src="{{ 'facets.js' | asset_url }}" defer="defer"></script>
+        {%- if section.settings.filter_type == 'vertical' -%}
+          {{ filters }}
+        {%- else -%}
+          {% comment %} Column switch sits next to the Filter button. {% endcomment %}
+          <div class="oblure-product-grid__controls oblure-product-grid__container">
+            {{ density_switch }}
+            {{ filters }}
+          </div>
+        {%- endif -%}
+
+        <div class="oblure-product-grid__main">
+          {%- if section.settings.filter_type == 'vertical' -%}
+            {{ density_switch }}
+          {%- endif -%}
+
+          <div
+            class="product-grid-container{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+            id="ProductGridContainer"
+            {% if settings.animations_reveal_on_scroll %}
+              data-cascade
+            {% endif %}
+          >
+            {%- if collection.products.size == 0 -%}
+              <div class="collection collection--empty page-width" id="product-grid" data-id="{{ section.id }}">
+                <div class="loading-overlay gradient"></div>
+                <div class="title-wrapper center">
+                  <h2 class="title title--primary">
+                    {{ 'sections.collection_template.empty' | t -}}
+                    <br>
+                    {{
+                      'sections.collection_template.use_fewer_filters_html'
+                      | t: link: collection.url, class: 'underlined-link link'
+                    }}
+                  </h2>
+                </div>
+              </div>
+            {%- else -%}
+              <div class="collection oblure-product-grid__container">
+                <div class="loading-overlay gradient"></div>
+                <ul id="product-grid" data-id="{{ section.id }}" class="oblure-product-grid__list list-unstyled" role="list">
+                  {%- for product in collection.products -%}
+                    {%- liquid
+                      # Position across all pages, so "Show more" keeps the full-width rhythm.
+                      assign position = paginate.current_offset | plus: forloop.index
+                      assign wide_in_3 = false
+                      assign wide_in_2 = false
+                      if section.settings.enable_wide
+                        assign remainder_3 = position | modulo: wide_every_3
+                        assign remainder_2 = position | modulo: wide_every_2
+                        if remainder_3 == 0
+                          assign wide_in_3 = true
+                        endif
+                        if remainder_2 == 0
+                          assign wide_in_2 = true
+                        endif
+                      endif
+
+                      assign image_sizes = card_sizes
+                      if wide_in_3 or wide_in_2
+                        assign image_sizes = wide_sizes
+                      endif
+
+                      assign lazy_load = true
+                      if position <= 3
+                        assign lazy_load = false
+                      endif
+                    -%}
+                    <li
+                      class="oblure-product-grid__item{% if wide_in_3 %} oblure-product-grid__item--wide-3{% endif %}{% if wide_in_2 %} oblure-product-grid__item--wide-2{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+                      {% if settings.animations_reveal_on_scroll %}
+                        data-cascade
+                        style="--animation-order: {{ forloop.index }};"
+                      {% endif %}
+                    >
+                      {%- render 'oblure-card-product',
+                        card_product: product,
+                        lazy_load: lazy_load,
+                        image_sizes: image_sizes,
+                        new_tag: section.settings.new_tag,
+                        new_label: section.settings.new_label,
+                        swatch_option_names: section.settings.swatch_option_names,
+                        max_swatches: section.settings.max_swatches,
+                        show_secondary_image: section.settings.show_secondary_image,
+                        hover_effect: section.settings.hover_effect,
+                        product_view_context: 'collection'
+                      -%}
+                    </li>
+                  {%- endfor -%}
+                </ul>
+
+                {%- if paginate.pages > 1 -%}
+                  {%- liquid
+                    assign shown_count = paginate.current_offset | plus: collection.products.size
+                    assign progress = shown_count | times: 1.0 | divided_by: paginate.items
+                  -%}
+                  <oblure-load-more
+                    class="oblure-load-more"
+                    data-section-id="{{ section.id }}"
+                    {% if paginate.next %}
+                      data-next-url="{{ paginate.next.url }}"
+                    {% endif %}
+                  >
+                    <p class="oblure-load-more__count" role="status">
+                      {{ 'products.facets.product_count' | t: product_count: shown_count, count: paginate.items }}
+                    </p>
+                    <div class="oblure-load-more__progress" style="--oblure-progress: {{ progress }};" aria-hidden="true">
+                      <span class="oblure-load-more__progress-bar"></span>
+                    </div>
+
+                    {%- if paginate.next -%}
+                      <button type="button" class="oblure-load-more__button" data-load-more>
+                        <span class="oblure-load-more__label">{{ 'products.facets.show_more' | t }}</span>
+                        <span class="oblure-load-more__spinner" aria-hidden="true"></span>
+                      </button>
+                      {% comment %} Works without JavaScript too. {% endcomment %}
+                      <noscript>
+                        <a class="oblure-load-more__button" href="{{ paginate.next.url }}">{{ 'general.pagination.next' | t }}</a>
+                      </noscript>
+                    {%- endif -%}
+                  </oblure-load-more>
+                {%- endif -%}
+              </div>
+            {%- endif -%}
+          </div>
+        </div>
+      </div>
+    {%- endpaginate -%}
+  </div>
+</collection-component>
+
+{% schema %}
+{
+  "name": "Oblure product grid",
+  "tag": "section",
+  "class": "section oblure-product-grid-section",
+  "enabled_on": {
+    "templates": ["collection"]
+  },
+  "settings": [
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "min": 4,
+      "max": 48,
+      "step": 1,
+      "label": "Products loaded at a time",
+      "info": "Shown first, then again with every \"Show more\".",
+      "default": 12
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Columns"
+    },
+    {
+      "type": "range",
+      "id": "grid_max_width",
+      "min": 800,
+      "max": 1800,
+      "step": 20,
+      "unit": "px",
+      "label": "Grid max width",
+      "info": "Smaller keeps more products visible on screen, like the old site (about 1200px).",
+      "default": 1200
+    },
+    {
+      "type": "range",
+      "id": "column_gap",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Space between products",
+      "default": 16
+    },
+    {
+      "type": "select",
+      "id": "default_density",
+      "label": "Default columns",
+      "options": [
+        {
+          "value": "compact",
+          "label": "3 on desktop, 2 on mobile"
+        },
+        {
+          "value": "comfortable",
+          "label": "2 on desktop, 1 on mobile"
+        }
+      ],
+      "default": "compact"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_density_switch",
+      "label": "Let visitors switch columns",
+      "info": "Their choice is remembered on their device.",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "label_fewer_columns",
+      "label": "Fewer columns button label",
+      "info": "Read out by screen readers.",
+      "default": "Show fewer columns",
+      "visible_if": "{{ section.settings.show_density_switch }}"
+    },
+    {
+      "type": "text",
+      "id": "label_more_columns",
+      "label": "More columns button label",
+      "info": "Read out by screen readers.",
+      "default": "Show more columns",
+      "visible_if": "{{ section.settings.show_density_switch }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_wide",
+      "label": "Show full-width products",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "wide_every_rows",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "label": "Full-width product after every … rows",
+      "default": 1,
+      "visible_if": "{{ section.settings.enable_wide }}"
+    },
+    {
+      "type": "header",
+      "content": "Product cards"
+    },
+    {
+      "type": "color",
+      "id": "image_background",
+      "label": "Image background color",
+      "info": "Shown behind transparent product images.",
+      "default": "#cdd7d9"
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "Image ratio",
+      "options": [
+        {
+          "value": "portrait",
+          "label": "Portrait (3:4)"
+        },
+        {
+          "value": "portrait-4-5",
+          "label": "Portrait (4:5)"
+        },
+        {
+          "value": "square",
+          "label": "Square"
+        }
+      ],
+      "default": "square"
+    },
+    {
+      "type": "select",
+      "id": "wide_image_ratio",
+      "label": "Full-width image ratio",
+      "options": [
+        {
+          "value": "2-1",
+          "label": "2:1"
+        },
+        {
+          "value": "16-9",
+          "label": "16:9"
+        },
+        {
+          "value": "21-9",
+          "label": "21:9"
+        }
+      ],
+      "default": "2-1",
+      "visible_if": "{{ section.settings.enable_wide }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_secondary_image",
+      "label": "Show second image on hover (light on / light off)",
+      "info": "Upload the lamp switched on as the product's first image and switched off as its second. Products with one image don't change.",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "hover_effect",
+      "label": "Switch effect",
+      "options": [
+        {
+          "value": "fade",
+          "label": "Fade"
+        },
+        {
+          "value": "flicker",
+          "label": "Flicker, like a light switch"
+        }
+      ],
+      "default": "fade",
+      "visible_if": "{{ section.settings.show_secondary_image }}"
+    },
+    {
+      "type": "font_picker",
+      "id": "price_font",
+      "label": "Price font",
+      "info": "Shown in italic.",
+      "default": "playfair_display_n4"
+    },
+    {
+      "type": "text",
+      "id": "new_tag",
+      "label": "NEW badge product tag",
+      "info": "Products with this tag get the badge. Leave empty to turn it off.",
+      "default": "new"
+    },
+    {
+      "type": "text",
+      "id": "new_label",
+      "label": "NEW badge text",
+      "default": "New"
+    },
+    {
+      "type": "color",
+      "id": "new_badge_color",
+      "label": "NEW badge color",
+      "default": "#e3000f"
+    },
+    {
+      "type": "text",
+      "id": "swatch_option_names",
+      "label": "Color option names",
+      "info": "Comma-separated. The first matching product option is shown as swatches.",
+      "default": "Color, Colour, Färg"
+    },
+    {
+      "type": "range",
+      "id": "max_swatches",
+      "min": 2,
+      "max": 10,
+      "step": 1,
+      "label": "Swatches shown before \"+N\"",
+      "default": 6
+    },
+    {
+      "type": "header",
+      "content": "Filtering and sorting"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_filtering",
+      "label": "t:sections.main-collection-product-grid.settings.enable_filtering.label",
+      "info": "t:sections.main-collection-product-grid.settings.enable_filtering.info",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "filter_type",
+      "options": [
+        {
+          "value": "horizontal",
+          "label": "t:sections.main-collection-product-grid.settings.filter_type.options__1.label"
+        },
+        {
+          "value": "vertical",
+          "label": "t:sections.main-collection-product-grid.settings.filter_type.options__2.label"
+        },
+        {
+          "value": "drawer",
+          "label": "t:sections.main-collection-product-grid.settings.filter_type.options__3.label"
+        }
+      ],
+      "default": "drawer",
+      "label": "t:sections.main-collection-product-grid.settings.filter_type.label",
+      "info": "t:sections.main-collection-product-grid.settings.filter_type.info"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_sorting",
+      "label": "t:sections.main-collection-product-grid.settings.enable_sorting.label",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 64
+    }
+  ],
+  "presets": [
+    {
+      "name": "Oblure product grid"
+    }
+  ]
+}
+{% endschema %}
