@@ -1,17 +1,24 @@
 /**
  * <oblure-card-media>
  *
- * Video playback for snippets/oblure-card-product.liquid (only rendered when a card has a
- * Shopify-hosted video; see snippets/oblure-card-video.liquid).
+ * Video playback for the Oblure card (snippets/oblure-card-product.liquid) and Dawn's card
+ * (snippets/card-product.liquid). Only rendered when a card has a Shopify-hosted video;
+ * see snippets/oblure-card-video.liquid. Loaded globally in layout/theme.liquid, because
+ * Dawn inserts some cards later (e.g. product recommendations).
+ *
+ * Attributes:
+ * - data-has-secondary: the card shows a second media on hover.
+ * - data-hover-media:   media query for when that hover swap happens (default "(hover: hover)";
+ *                       Dawn's card only swaps from 990px wide).
+ *
  * - A first-media video (`data-oblure-card-video="visible"`) plays while the card is on
  *   screen and pauses while the second media is shown on hover or the card scrolls away.
  * - A second-media video (`data-oblure-card-video="hover"`) restarts and plays on hover.
  * - Nothing plays for visitors who prefer reduced motion; the poster frames stay.
- * - Devices without hover never show the second media (same as the CSS).
+ * - Outside data-hover-media the second media never shows, so nothing plays for it.
  */
 if (!customElements.get('oblure-card-media')) {
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const canHover = window.matchMedia('(hover: hover)');
 
   class OblureCardMedia extends HTMLElement {
     #abortController = null;
@@ -20,10 +27,11 @@ if (!customElements.get('oblure-card-media')) {
     #isHovered = false;
 
     connectedCallback() {
-      this.card = this.closest('.oblure-card') ?? this;
+      this.card = this.closest('.oblure-card, .card-wrapper') ?? this;
       this.visibleVideo = this.querySelector('video[data-oblure-card-video="visible"]');
       this.hoverVideo = this.querySelector('video[data-oblure-card-video="hover"]');
-      this.hasSecondary = this.card.classList.contains('oblure-card--has-secondary');
+      this.hasSecondary = this.hasAttribute('data-has-secondary');
+      this.hoverQuery = window.matchMedia(this.dataset.hoverMedia || '(hover: hover)');
 
       this.#abortController = new AbortController();
       const { signal } = this.#abortController;
@@ -45,6 +53,13 @@ if (!customElements.get('oblure-card-media')) {
       }
 
       reducedMotion.addEventListener('change', () => this.#update(), { signal });
+      this.hoverQuery.addEventListener(
+        'change',
+        () => {
+          if (!this.hoverQuery.matches) this.#setHovered(false);
+        },
+        { signal }
+      );
     }
 
     disconnectedCallback() {
@@ -55,11 +70,9 @@ if (!customElements.get('oblure-card-media')) {
     }
 
     #setHovered(isHovered) {
-      if (!canHover.matches) return;
-
-      this.#isHovered = isHovered;
+      this.#isHovered = isHovered && this.hoverQuery.matches;
       // Each hover starts the second video from the beginning.
-      if (isHovered && this.hoverVideo) this.hoverVideo.currentTime = 0;
+      if (this.#isHovered && this.hoverVideo) this.hoverVideo.currentTime = 0;
       this.#update();
     }
 

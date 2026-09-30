@@ -1,0 +1,45 @@
+/*
+ * Oblure additions to Dawn's product card (snippets/card-product.liquid).
+ * Loaded by that snippet; Dawn's own base.css and component-card.css stay unchanged.
+ */
+
+/* ---------------------------------------------------------------------------
+ * Product videos (snippets/oblure-card-video.liquid)
+ * Dawn's first/second image swap only targets <img>; these rules give a <video>
+ * the same look and behaviour.
+ * ------------------------------------------------------------------------ */
+
+.media > video.oblure-card__video {
+  object-fit: cover;
+  object-position: center center;
+  transition: opacity 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* The second media starts hidden, whichever of the two is a video. */
+.media.media--hover-effect > video + img,
+.media.media--hover-effect > :is(img, video) + video {
+  opacity: 0;
+}
+
+@media screen and (min-width: 990px) {
+  .card-wrapper:hover .media.media--hover-effect > video:first-child:not(:only-child) {
+    opacity: 0;
+  }
+
+  .card-wrapper:hover .media.media--hover-effect > video + img,
+  .card-wrapper:hover .media.media--hover-effect > :is(img, video) + video {
+    opacity: 1;
+  }
+
+  /* ---------------------------------------------------------------------------
+   * No zoom on hover
+   * Cancels Dawn's scale(1.03) (component-card.css). One class more specific than
+   * Dawn's selectors, so it wins even if component-card.css is loaded again later.
+   * ------------------------------------------------------------------------ */
+
+  .product-card-wrapper .card:hover .media.media--hover-effect > img:first-child:only-child,
+  .card-wrapper.product-card-wrapper:hover .media.media--hover-effect > img:first-child:only-child,
+  .card-wrapper.product-card-wrapper:hover .media.media--hover-effect > img + img {
+    transform: none;
+  }
+}

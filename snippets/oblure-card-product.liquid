@@ -101,7 +101,12 @@
 
   <product-component view-event-payload="{{ card_product | standard_event_data: 'view', context: product_view_context | escape }}">
     <article class="oblure-card{% if secondary_media %} oblure-card--has-secondary oblure-card--effect-{{ hover_effect }}{% endif %}{% unless card_product.available %} oblure-card--sold-out{% endunless %}">
-      <{{ media_tag }} class="oblure-card__media">
+      <{{ media_tag }}
+        class="oblure-card__media"
+        {% if media_tag != 'div' and secondary_media %}
+          data-has-secondary
+        {% endif %}
+      >
         {%- if card_product.featured_media -%}
           {%- liquid
             assign image_loading = 'lazy'

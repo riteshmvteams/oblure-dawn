@@ -17,9 +17,6 @@
 {{ 'template-collection.css' | asset_url | stylesheet_tag }}
 {{ 'oblure-product-grid.css' | asset_url | stylesheet_tag }}
 <script src="{{ 'oblure-product-grid.js' | asset_url }}" defer="defer"></script>
-{%- if section.settings.enable_video -%}
-  <script src="{{ 'oblure-card-media.js' | asset_url }}" defer="defer"></script>
-{%- endif -%}
 
 {%- liquid
   assign price_font_italic = section.settings.price_font | font_modify: 'style', 'italic'

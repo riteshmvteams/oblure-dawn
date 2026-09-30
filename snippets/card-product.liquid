@@ -27,6 +27,7 @@
   {{ 'component-price.css' | asset_url | stylesheet_tag }}
   {{ 'quick-order-list.css' | asset_url | stylesheet_tag }}
   {{ 'quantity-popover.css' | asset_url | stylesheet_tag }}
+  {{ 'oblure-dawn-card.css' | asset_url | stylesheet_tag }}
 {%- endunless -%}
 {%- if card_product and card_product != empty -%}
   {%- liquid
@@ -38,6 +39,28 @@
     endif
     if ratio == 0 or ratio == null
       assign ratio = 1
+    endif
+
+    # Oblure: Shopify-hosted product videos play in the card (snippets/oblure-card-video.liquid,
+    # assets/oblure-card-media.js): a first-media video while the card is on screen,
+    # a second-media video on hover (desktop only, like Dawn's second image).
+    assign card_primary_video = false
+    if card_product.featured_media.media_type == 'video'
+      assign card_primary_video = true
+    endif
+
+    assign card_has_secondary = false
+    assign card_secondary_video = false
+    if card_product.media[1] != null and show_secondary_image
+      assign card_has_secondary = true
+      if card_product.media[1].media_type == 'video'
+        assign card_secondary_video = true
+      endif
+    endif
+
+    assign card_media_tag = 'div'
+    if card_primary_video or card_secondary_video
+      assign card_media_tag = 'oblure-card-media'
     endif
   -%}
 
@@ -61,7 +84,22 @@
         >
           {%- if card_product.featured_media -%}
             <div class="card__media{% if image_shape and image_shape != 'default' %} shape--{{ image_shape }} color-{{ settings.card_color_scheme }} gradient{% endif %}">
-              <div class="media media--transparent media--hover-effect">
+              <{{ card_media_tag }}
+                class="media media--transparent media--hover-effect"
+                {% if card_media_tag != 'div' %}
+                  data-hover-media="(hover: hover) and (min-width: 990px)"
+                  {% if card_has_secondary %}
+                    data-has-secondary
+                  {% endif %}
+                {% endif %}
+              >
+                {%- if card_primary_video -%}
+                  {%- render 'oblure-card-video',
+                    media: card_product.featured_media,
+                    class: 'motion-reduce',
+                    playback: 'visible'
+                  -%}
+                {%- else -%}
                 {% comment %}theme-check-disable ImgLazyLoading{% endcomment %}
                 <img
                   srcset="
@@ -84,8 +122,15 @@
                   height="{{ card_product.featured_media.height }}"
                 >
                 {% comment %}theme-check-enable ImgLazyLoading{% endcomment %}
+                {%- endif -%}
 
-                {%- if card_product.media[1] != null and show_secondary_image -%}
+                {%- if card_secondary_video -%}
+                  {%- render 'oblure-card-video',
+                    media: card_product.media[1],
+                    class: 'motion-reduce',
+                    playback: 'hover'
+                  -%}
+                {%- elsif card_product.media[1] != null and show_secondary_image -%}
                   <img
                     srcset="
                       {%- if card_product.media[1].width >= 165 -%}{{ card_product.media[1] | image_url: width: 165 }} 165w,{%- endif -%}
@@ -105,7 +150,7 @@
                     height="{{ card_product.media[1].height }}"
                   >
                 {%- endif -%}
-              </div>
+              </{{ card_media_tag }}>
             </div>
           {%- endif -%}
           <div class="card__content">
