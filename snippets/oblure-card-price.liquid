@@ -1,0 +1,46 @@
+{% doc %}
+  Price markup of the Oblure product card, formatted like Dawn's snippets/price.liquid:
+  sale price + struck-through compare-at price, "From …" when prices vary, and "Sold out".
+  Used for the product's own price and, per color, for the selected variant's price.
+
+  @param {number} price - Price in cents.
+  @param {number} [compare_at_price] - Compare-at price in cents.
+  @param {boolean} [price_varies] - Show "From …".
+  @param {boolean} [available] - False shows "Sold out".
+
+  @example
+  {% render 'oblure-card-price', price: product.price, compare_at_price: product.compare_at_price, price_varies: product.price_varies, available: product.available %}
+{% enddoc %}
+
+{%- liquid
+  assign on_sale = false
+  if compare_at_price > price
+    assign on_sale = true
+  endif
+
+  if settings.currency_code_enabled
+    assign money_price = price | money_with_currency
+    assign money_compare = compare_at_price | money_with_currency
+  else
+    assign money_price = price | money
+    assign money_compare = compare_at_price | money
+  endif
+
+  if price_varies
+    assign money_price = 'products.product.price.from_price_html' | t: price: money_price
+  endif
+-%}
+
+{%- if on_sale -%}
+  <span class="visually-hidden">{{ 'products.product.price.sale_price' | t }}</span>
+  <span class="oblure-card__price-current oblure-card__price-current--sale">{{ money_price }}</span>
+  <span class="visually-hidden">{{ 'products.product.price.regular_price' | t }}</span>
+  <s class="oblure-card__price-compare">{{ money_compare }}</s>
+{%- else -%}
+  <span class="visually-hidden">{{ 'products.product.price.regular_price' | t }}</span>
+  <span class="oblure-card__price-current">{{ money_price }}</span>
+{%- endif -%}
+
+{%- if available == false -%}
+  <span class="oblure-card__sold-out">{{ 'products.product.sold_out' | t }}</span>
+{%- endif -%}

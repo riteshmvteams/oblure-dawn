@@ -80,22 +80,10 @@
       endif
     endfor
 
-    # Price, formatted like Dawn's snippets/price.liquid.
-    assign on_sale = false
-    if card_product.compare_at_price > card_product.price
-      assign on_sale = true
-    endif
-
-    if settings.currency_code_enabled
-      assign money_price = card_product.price | money_with_currency
-      assign money_compare = card_product.compare_at_price | money_with_currency
-    else
-      assign money_price = card_product.price | money
-      assign money_compare = card_product.compare_at_price | money
-    endif
-
-    if card_product.price_varies
-      assign money_price = 'products.product.price.from_price_html' | t: price: money_price
+    # The first color starts selected: the card opens with its variant's price and link.
+    assign initial_variant = null
+    if color_option
+      assign initial_variant = color_option.values.first.variant
     endif
   -%}
 
@@ -165,55 +153,113 @@
         <div class="oblure-card__text">
           <h3 class="oblure-card__title">
             {% comment %} Stretched over the whole card, see .oblure-card__link::after. {% endcomment %}
-            <a href="{{ card_product.url }}" class="oblure-card__link">
+            <a href="{{ initial_variant.url | default: card_product.url }}" class="oblure-card__link">
               {{- card_product.title | escape -}}
             </a>
           </h3>
 
-          <div class="oblure-card__price">
-            {%- if on_sale -%}
-              <span class="visually-hidden">{{ 'products.product.price.sale_price' | t }}</span>
-              <span class="oblure-card__price-current oblure-card__price-current--sale">{{ money_price }}</span>
-              <span class="visually-hidden">{{ 'products.product.price.regular_price' | t }}</span>
-              <s class="oblure-card__price-compare">{{ money_compare }}</s>
+          {% comment %} Updated with the selected color's price, see assets/oblure-card-swatches.js. {% endcomment %}
+          <div class="oblure-card__price" aria-live="polite" data-oblure-card-price>
+            {%- if initial_variant -%}
+              {%- render 'oblure-card-price',
+                price: initial_variant.price,
+                compare_at_price: initial_variant.compare_at_price,
+                available: initial_variant.available
+              -%}
             {%- else -%}
-              <span class="visually-hidden">{{ 'products.product.price.regular_price' | t }}</span>
-              <span class="oblure-card__price-current">{{ money_price }}</span>
+              {%- render 'oblure-card-price',
+                price: card_product.price,
+                compare_at_price: card_product.compare_at_price,
+                price_varies: card_product.price_varies,
+                available: card_product.available
+              -%}
             {%- endif -%}
-
-            {%- unless card_product.available -%}
-              <span class="oblure-card__sold-out">{{ 'products.product.sold_out' | t }}</span>
-            {%- endunless -%}
           </div>
         </div>
 
         {%- if color_option and color_option.values.size > 0 -%}
-          <ul class="oblure-card__swatches list-unstyled" role="list" aria-label="{{ color_option.name | escape }}">
-            {%- for value in color_option.values limit: max_swatches -%}
-              {%- liquid
-                assign swatch_background = null
-                if value.swatch.image
-                  assign swatch_image_url = value.swatch.image | image_url: width: 40
-                  assign swatch_background = 'url(' | append: swatch_image_url | append: ') center / cover'
-                elsif value.swatch.color
-                  assign swatch_background = 'rgb(' | append: value.swatch.color.rgb | append: ')'
-                endif
-              -%}
-              <li
-                class="oblure-card__swatch{% unless swatch_background %} oblure-card__swatch--empty{% endunless %}"
-                title="{{ value | escape }}"
-                {% if swatch_background %}
-                  style="--oblure-swatch: {{ swatch_background }};"
-                {% endif %}
-              >
-                <span class="visually-hidden">{{ value | escape }}</span>
-              </li>
-            {%- endfor -%}
+          {% comment %}
+            One color is always selected (the first by default); selecting another shows that
+            color's variant image and price and links the card to it (assets/oblure-card-swatches.js).
+          {% endcomment %}
+          <oblure-card-swatches class="oblure-card__swatches-wrapper">
+            <ul class="oblure-card__swatches list-unstyled" role="list" aria-label="{{ color_option.name | escape }}">
+              {%- for value in color_option.values limit: max_swatches -%}
+                {%- capture swatch_background -%}
+                  {%- render 'oblure-swatch-background', value: value, product: card_product -%}
+                {%- endcapture -%}
+                <li class="oblure-card__swatch-item">
+                  <button
+                    type="button"
+                    class="oblure-card__swatch{% if swatch_background == blank %} oblure-card__swatch--empty{% endif %}"
+                    title="{{ value | escape }}"
+                    aria-pressed="{% if forloop.first and value.variant %}true{% else %}false{% endif %}"
+                    data-value="{{ value | escape }}"
+                    {% if swatch_background != blank %}
+                      style="--oblure-swatch: {{ swatch_background }};"
+                    {% endif %}
+                    {% if value.variant == null %}
+                      disabled
+                    {% endif %}
+                  >
+                    <span class="visually-hidden">{{ color_option.name | escape }}: {{ value | escape }}</span>
+                  </button>
+                </li>
+              {%- endfor -%}
 
-            {%- if color_option.values.size > max_swatches -%}
-              <li class="oblure-card__swatch-more">+{{ color_option.values.size | minus: max_swatches }}</li>
-            {%- endif -%}
-          </ul>
+              {%- if color_option.values.size > max_swatches -%}
+                <li class="oblure-card__swatch-more">+{{ color_option.values.size | minus: max_swatches }}</li>
+              {%- endif -%}
+            </ul>
+
+            {% comment %}
+              Per color: the variant's link, image (null when it is the product's main image or
+              has none) and price markup.
+            {% endcomment %}
+            {%- assign srcset_widths = '533,720,1066,1400,1800' | split: ',' -%}
+            <script type="application/json" data-oblure-card-variants>
+              {
+                {%- for value in color_option.values limit: max_swatches -%}
+                  {%- liquid
+                    assign swatch_variant = value.variant
+                    assign variant_media = swatch_variant.featured_media
+                    if variant_media.id == card_product.featured_media.id
+                      assign variant_media = null
+                    endif
+                  -%}
+                  {%- capture variant_srcset -%}
+                    {%- if variant_media -%}
+                      {%- for width in srcset_widths -%}
+                        {%- assign width_px = width | plus: 0 -%}
+                        {{ variant_media | image_url: width: width_px }} {{ width_px }}w
+                        {%- unless forloop.last %}, {% endunless -%}
+                      {%- endfor -%}
+                    {%- endif -%}
+                  {%- endcapture -%}
+                  {%- capture variant_price -%}
+                    {%- render 'oblure-card-price',
+                      price: swatch_variant.price,
+                      compare_at_price: swatch_variant.compare_at_price,
+                      available: swatch_variant.available
+                    -%}
+                  {%- endcapture -%}
+                  {{ value.name | json }}: {
+                    "url": {{ swatch_variant.url | default: card_product.url | json }},
+                    "priceHtml": {{ variant_price | strip | json }},
+                    "image": {%- if variant_media -%}
+                      {
+                        "src": {{ variant_media | image_url: width: 1066 | json }},
+                        "srcset": {{ variant_srcset | strip | json }},
+                        "alt": {{ variant_media.alt | default: card_product.title | json }}
+                      }
+                    {%- else -%}
+                      null
+                    {%- endif -%}
+                  }{% unless forloop.last %},{% endunless %}
+                {%- endfor -%}
+              }
+            </script>
+          </oblure-card-swatches>
         {%- endif -%}
       </div>
     </article>
