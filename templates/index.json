@@ -339,6 +339,25 @@
         "show_text_below": false
       }
     },
+    "oblure_rich_text_KfAjRC": {
+      "type": "oblure-rich-text",
+      "name": "Oblure rich text",
+      "settings": {
+        "heading": "Scandinavian lighting",
+        "heading_size": "large",
+        "heading_tag": "h2",
+        "text": "<p>Oblure is a Swedish lighting brand from Gothenburg. Our collection brings together pendant, floor, wall and table lamps by emerging talent and internationally recognized designers: sculptural pieces that merge art, craftsmanship and emotion, made to light everyday rooms and remarkable spaces alike. Together, we create A Life Extraordinary.</p>",
+        "button_label": "",
+        "button_link": "",
+        "button_style": "outline",
+        "alignment": "center",
+        "max_width": 520,
+        "text_font": "playfair_display_n4",
+        "color_scheme": "scheme-1",
+        "padding_top": 80,
+        "padding_bottom": 80
+      }
+    },
     "media_with_text_cQUQUV": {
       "type": "media-with-text",
       "blocks": {
@@ -403,6 +422,7 @@
     "image_banner_Ydk3ah",
     "side_by_side_image_mT9typ",
     "custom_video_9nDc8e",
+    "oblure_rich_text_KfAjRC",
     "media_with_text_cQUQUV"
   ]
 }

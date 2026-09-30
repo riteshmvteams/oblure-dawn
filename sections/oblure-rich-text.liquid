@@ -1,0 +1,233 @@
+{% comment %}
+  Oblure rich text
+
+  A short block of copy - heading, text and an optional button - e.g. the SEO text under
+  a collection's products. Heading and text accept dynamic sources (metafields), so one
+  template can show each collection's own copy.
+
+  Styles live in assets/oblure-rich-text.css.
+{% endcomment %}
+
+{{ 'oblure-rich-text.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign accent_font_italic = section.settings.text_font | font_modify: 'style', 'italic'
+  assign text_font = accent_font_italic | default: section.settings.text_font
+
+  assign has_button = false
+  if section.settings.button_label != blank
+    assign has_button = true
+  endif
+-%}
+
+{%- style -%}
+  {{ text_font | font_face: font_display: 'swap' }}
+
+  #shopify-section-{{ section.id }} {
+    --oblure-rich-text-font-family: {{ text_font.family }}, {{ text_font.fallback_families }};
+    --oblure-rich-text-font-style: {{ text_font.style }};
+    --oblure-rich-text-font-weight: {{ text_font.weight }};
+    --oblure-rich-text-max-width: {{ section.settings.max_width }}px;
+    --oblure-rich-text-padding-top: {{ section.settings.padding_top | times: 0.75 | round }}px;
+    --oblure-rich-text-padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    #shopify-section-{{ section.id }} {
+      --oblure-rich-text-padding-top: {{ section.settings.padding_top }}px;
+      --oblure-rich-text-padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
+
+{%- if section.settings.heading != blank or section.settings.text != blank or has_button -%}
+  <div class="oblure-rich-text color-{{ section.settings.color_scheme }} gradient oblure-rich-text--{{ section.settings.alignment }}">
+    <div class="oblure-rich-text__inner">
+      {%- if section.settings.heading != blank -%}
+        <{{ section.settings.heading_tag }} class="oblure-rich-text__heading oblure-rich-text__heading--{{ section.settings.heading_size }}">
+          {{- section.settings.heading -}}
+        </{{ section.settings.heading_tag }}>
+      {%- endif -%}
+
+      {%- if section.settings.text != blank -%}
+        <div class="oblure-rich-text__text rte">{{ section.settings.text }}</div>
+      {%- endif -%}
+
+      {%- if has_button -%}
+        <a
+          class="oblure-rich-text__button oblure-rich-text__button--{{ section.settings.button_style }}"
+          {% if section.settings.button_link != blank %}
+            href="{{ section.settings.button_link }}"
+          {% else %}
+            role="link" aria-disabled="true"
+          {% endif %}
+        >
+          {{- section.settings.button_label | escape -}}
+        </a>
+      {%- endif -%}
+    </div>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Oblure rich text",
+  "tag": "section",
+  "class": "section oblure-rich-text-section",
+  "disabled_on": {
+    "groups": ["header", "footer", "aside"]
+  },
+  "settings": [
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Scandinavian designer lighting"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Heading size",
+      "options": [
+        {
+          "value": "small",
+          "label": "Small"
+        },
+        {
+          "value": "medium",
+          "label": "Medium"
+        },
+        {
+          "value": "large",
+          "label": "Large"
+        }
+      ],
+      "default": "medium"
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Heading HTML tag",
+      "info": "Use H2 for a heading under the page's main title.",
+      "options": [
+        {
+          "value": "h2",
+          "label": "H2"
+        },
+        {
+          "value": "h3",
+          "label": "H3"
+        },
+        {
+          "value": "p",
+          "label": "Paragraph"
+        }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Oblure is a Swedish lighting brand from Gothenburg. Our collection brings together pendant, floor, wall and table lamps by emerging talent and internationally recognized designers: sculptural pieces that merge art, craftsmanship and emotion, made to light everyday rooms and remarkable spaces alike. Together, we create A Life Extraordinary.</p>"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "info": "Leave empty to hide the button.",
+      "default": "Explore the collection"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link",
+      "default": "/collections/all"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Button style",
+      "options": [
+        {
+          "value": "outline",
+          "label": "Outline"
+        },
+        {
+          "value": "link",
+          "label": "Underlined link"
+        }
+      ],
+      "default": "outline"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "Alignment",
+      "options": [
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "left",
+          "label": "Left"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 300,
+      "max": 900,
+      "step": 20,
+      "unit": "px",
+      "label": "Text max width",
+      "default": 520
+    },
+    {
+      "type": "font_picker",
+      "id": "text_font",
+      "label": "Text font",
+      "info": "Shown in italic.",
+      "default": "playfair_display_n4"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 72
+    }
+  ],
+  "presets": [
+    {
+      "name": "Oblure rich text"
+    }
+  ]
+}
+{% endschema %}
