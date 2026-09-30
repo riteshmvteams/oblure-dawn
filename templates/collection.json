@@ -26,7 +26,6 @@
         "overlay_text_color": "#ffffff",
         "all_products_title": "Shop",
         "all_products_description": "<p>Our collection contains work from emerging talent and internationally recognized designers. Together, we create A Life Extraordinary.</p>",
-        "all_products_image": "",
         "padding_top": 56,
         "padding_bottom": 48
       }
@@ -43,7 +42,7 @@
         "label_fewer_columns": "Show fewer columns",
         "label_more_columns": "Show more columns",
         "enable_wide": true,
-        "wide_layout": "one",
+        "wide_layout": "two",
         "wide_every_rows": 1,
         "image_background": "#cdd7d9",
         "image_ratio": "square",

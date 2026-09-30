@@ -72,7 +72,7 @@
   display: flex;
   align-items: center;
   gap: 1.2rem;
-  margin-bottom: 1.6rem;
+  margin-bottom: 0.6rem;
 }
 
 .oblure-product-grid__controls:not(:has(.facets-wrapper)) {
@@ -90,6 +90,58 @@
 .oblure-product-grid__toolbar {
   display: flex;
   flex-shrink: 0;
+}
+
+/*
+ * Drawer filters: Sort by + product count on the left, column switch + Filter on the right,
+ * active filter pills on their own line below. Dawn's wrappers become layout-transparent
+ * (display: contents) so their parts can be ordered within this row; markup unchanged.
+ */
+.oblure-product-grid__controls--drawer {
+  flex-wrap: wrap;
+  row-gap: 0.8rem;
+}
+
+.oblure-product-grid__controls--drawer .facets-wrapper,
+.oblure-product-grid__controls--drawer .facets-container {
+  display: contents;
+}
+
+.oblure-product-grid__controls--drawer facet-filters-form.facets:not(.facets-pill) {
+  order: 1;
+}
+
+.oblure-product-grid__controls--drawer .facets-container-drawer .product-count {
+  order: 2;
+  margin: 0;
+}
+
+.oblure-product-grid__controls--drawer .oblure-product-grid__toolbar {
+  order: 3;
+  margin-left: auto;
+}
+
+.oblure-product-grid__controls--drawer .facets-container-drawer .mobile-facets__wrapper {
+  order: 4;
+  flex-grow: 0;
+  margin: 0;
+}
+
+.oblure-product-grid__controls--drawer .facets-pill {
+  order: 5;
+  flex-basis: 100%;
+}
+
+.oblure-product-grid__controls .facet-filters { 
+  padding-left: 0;
+}
+
+.oblure-product-grid__controls .facets__form {
+  margin-bottom: 0;
+}
+
+.oblure-product-grid__controls .product-count.light {
+  margin-left: 1rem;
 }
 
 /* Vertical filters: the switch sits above the grid instead. */

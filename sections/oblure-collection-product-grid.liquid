@@ -248,7 +248,7 @@
           {{ filters }}
         {%- else -%}
           {% comment %} Column switch sits next to the Filter button. {% endcomment %}
-          <div class="oblure-product-grid__controls oblure-product-grid__container">
+          <div class="oblure-product-grid__controls oblure-product-grid__container oblure-product-grid__controls--{{ section.settings.filter_type }}">
             {{ density_switch }}
             {{ filters }}
           </div>
