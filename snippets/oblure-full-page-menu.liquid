@@ -17,6 +17,10 @@
 
 {{ 'oblure-full-page-menu.css' | asset_url | stylesheet_tag }}
 <script src="{{ 'oblure-full-page-menu.js' | asset_url }}" defer="defer"></script>
+{%- if show_search -%}
+  {{ 'oblure-predictive-search.css' | asset_url | stylesheet_tag }}
+  <script src="{{ 'oblure-predictive-search.js' | asset_url }}" defer="defer"></script>
+{%- endif -%}
 
 <oblure-full-page-menu class="oblure-fpm">
   <button
@@ -37,19 +41,32 @@
   <div id="OblureFullPageMenu" class="oblure-fpm__panel" inert data-oblure-fpm-panel>
     <div class="oblure-fpm__inner page-width">
       {%- if show_search -%}
-        <form action="{{ routes.search_url }}" method="get" role="search" class="oblure-fpm__search">
-          <label class="visually-hidden" for="OblureFullPageMenuSearch">{{ 'general.search.search' | t }}</label>
-          <input
-            id="OblureFullPageMenuSearch"
-            class="oblure-fpm__search-input"
-            type="search"
-            name="q"
-            value="{{ search.terms | escape }}"
-            placeholder="{{ 'general.search.search' | t }}"
-            autocomplete="off"
-          >
-          <input type="hidden" name="options[prefix]" value="last">
-        </form>
+        {% comment %} Live product results while typing: assets/oblure-predictive-search.js. {% endcomment %}
+        <oblure-predictive-search class="oblure-fpm__search">
+          <form action="{{ routes.search_url }}" method="get" role="search">
+            <label class="visually-hidden" for="OblureFullPageMenuSearch">{{ 'general.search.search' | t }}</label>
+            <input
+              id="OblureFullPageMenuSearch"
+              class="oblure-fpm__search-input"
+              type="search"
+              name="q"
+              value="{{ search.terms | escape }}"
+              placeholder="{{ 'general.search.search' | t }}"
+              role="combobox"
+              aria-expanded="false"
+              aria-controls="OblurePredictiveSearchResults"
+              aria-autocomplete="list"
+              aria-haspopup="listbox"
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="off"
+              spellcheck="false"
+            >
+            <input type="hidden" name="options[prefix]" value="last">
+          </form>
+          <div class="oblure-predictive-search__results" data-oblure-search-results hidden></div>
+          <p class="visually-hidden" role="status" aria-live="polite" data-oblure-search-status-live></p>
+        </oblure-predictive-search>
       {%- endif -%}
 
       <nav class="oblure-fpm__nav" aria-label="{{ 'sections.header.menu' | t }}" data-oblure-fpm-nav>

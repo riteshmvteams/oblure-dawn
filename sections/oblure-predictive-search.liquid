@@ -1,0 +1,100 @@
+{% comment %}
+  Oblure predictive search results
+
+  Not placed on templates: assets/oblure-predictive-search.js fetches it through
+  Shopify's predictive search endpoint
+  (/search/suggest?q=…&resources[type]=product&section_id=oblure-predictive-search)
+  and shows the markup in the search dropdown of the full page menu.
+{% endcomment %}
+
+{%- if predictive_search.performed -%}
+  {%- liquid
+    assign products = predictive_search.resources.products
+    assign escaped_terms = predictive_search.terms | escape
+  -%}
+
+  <div class="oblure-search-results">
+    {%- if products.size > 0 -%}
+      <ul
+        id="OblurePredictiveSearchResults"
+        class="oblure-search-results__list list-unstyled"
+        role="listbox"
+        aria-label="{{ 'templates.search.products' | t }}"
+      >
+        {%- for product in products -%}
+          {%- liquid
+            if settings.currency_code_enabled
+              assign money_price = product.price | money_with_currency
+            else
+              assign money_price = product.price | money
+            endif
+            if product.price_varies
+              assign money_price = 'products.product.price.from_price_html' | t: price: money_price
+            endif
+          -%}
+          <li
+            id="OblurePredictiveSearchOption-{{ forloop.index }}"
+            class="oblure-search-results__item"
+            role="option"
+            aria-selected="false"
+          >
+            <a class="oblure-search-results__link" href="{{ product.url }}" tabindex="-1">
+              <span class="oblure-search-results__media">
+                {%- if product.featured_media -%}
+                  {{
+                    product.featured_media
+                    | image_url: width: 160
+                    | image_tag:
+                      class: 'oblure-search-results__image',
+                      widths: '80, 160',
+                      sizes: '56px',
+                      loading: 'lazy',
+                      alt: ''
+                  }}
+                {%- endif -%}
+              </span>
+              <span class="oblure-search-results__text">
+                <span class="oblure-search-results__title">{{ product.title | escape }}</span>
+                <span class="oblure-search-results__price">{{ money_price }}</span>
+              </span>
+            </a>
+          </li>
+        {%- endfor -%}
+
+        <li
+          id="OblurePredictiveSearchOption-all"
+          class="oblure-search-results__item oblure-search-results__item--all"
+          role="option"
+          aria-selected="false"
+        >
+          <a
+            class="oblure-search-results__link oblure-search-results__link--all"
+            href="{{ routes.search_url }}?q={{ predictive_search.terms | url_encode }}&options%5Bprefix%5D=last"
+            tabindex="-1"
+          >
+            {{ 'templates.search.search_for' | t: terms: escaped_terms }}
+          </a>
+        </li>
+      </ul>
+    {%- else -%}
+      <p class="oblure-search-results__empty">
+        {{ 'templates.search.no_results' | t: terms: escaped_terms }}
+      </p>
+    {%- endif -%}
+
+    {% comment %} Read out by the search's live region (see the script). {% endcomment %}
+    <p class="visually-hidden" data-oblure-search-status>
+      {%- if products.size > 0 -%}
+        {{ 'templates.search.results_with_count' | t: terms: escaped_terms, count: products.size }}
+      {%- else -%}
+        {{ 'templates.search.no_results' | t: terms: escaped_terms }}
+      {%- endif -%}
+    </p>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Oblure predictive search"
+}
+{% endschema %}
