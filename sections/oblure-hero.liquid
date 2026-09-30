@@ -47,6 +47,15 @@
 {{ 'oblure-hero.css' | asset_url | stylesheet_tag }}
 <script src="{{ 'oblure-hero.js' | asset_url }}" defer="defer"></script>
 
+{%- if section.settings.enable_reveal -%}
+  {{ 'oblure-reveal.css' | asset_url | stylesheet_tag }}
+  <script src="{{ 'oblure-reveal.js' | asset_url }}" defer="defer"></script>
+  {% comment %} Lets the reveal hide content only when JavaScript runs; set before the content is painted. {% endcomment %}
+  <script>
+    document.documentElement.classList.add('oblure-js');
+  </script>
+{%- endif -%}
+
 {%- style -%}
   {{ accent_font | font_face: font_display: 'swap' }}
   {{ heading_font_bold | font_face: font_display: 'swap' }}
@@ -162,13 +171,23 @@
   </div>
 
   {%- if content_blocks_count > 0 -%}
+    {%- liquid
+      assign content_tag = 'div'
+      if section.settings.enable_reveal
+        assign content_tag = 'oblure-reveal'
+      endif
+      # Stagger order of the rendered content blocks (heading, text, button...).
+      assign reveal_order = 0
+    -%}
     <div class="oblure-hero__container">
-      <div class="oblure-hero__content">
+      <{{ content_tag }} class="oblure-hero__content">
         {%- for block in section.blocks -%}
           {%- case block.type -%}
             {%- when 'heading' -%}
               <{{ block.settings.heading_tag }}
                 class="oblure-hero__title {{ block.settings.heading_size }}"
+                data-oblure-reveal-item
+                style="--oblure-reveal-order: {{ reveal_order }};"
                 {{ block.shopify_attributes }}
               >
                 {%- if block.settings.title_primary != blank -%}
@@ -180,16 +199,27 @@
                   <span class="oblure-hero__title-line">{{ block.settings.title_secondary | escape }}</span>
                 {%- endif -%}
               </{{ block.settings.heading_tag }}>
+              {%- assign reveal_order = reveal_order | plus: 1 -%}
 
             {%- when 'text' -%}
               {%- if block.settings.text != blank -%}
-                <p class="oblure-hero__text" {{ block.shopify_attributes }}>{{ block.settings.text }}</p>
+                <p
+                  class="oblure-hero__text"
+                  data-oblure-reveal-item
+                  style="--oblure-reveal-order: {{ reveal_order }};"
+                  {{ block.shopify_attributes }}
+                >
+                  {{- block.settings.text -}}
+                </p>
+                {%- assign reveal_order = reveal_order | plus: 1 -%}
               {%- endif -%}
 
             {%- when 'button' -%}
               {%- if block.settings.label != blank -%}
                 <a
                   class="oblure-hero__cta color-{{ block.settings.color_scheme }}"
+                  data-oblure-reveal-item
+                  style="--oblure-reveal-order: {{ reveal_order }};"
                   {% if block.settings.link != blank %}
                     href="{{ block.settings.link }}"
                   {% else %}
@@ -199,10 +229,11 @@
                 >
                   {{- block.settings.label | escape -}}
                 </a>
+                {%- assign reveal_order = reveal_order | plus: 1 -%}
               {%- endif -%}
           {%- endcase -%}
         {%- endfor -%}
-      </div>
+      </{{ content_tag }}>
     </div>
   {%- endif -%}
 </oblure-hero>
@@ -409,6 +440,13 @@
       "label": "Text font",
       "info": "Shown in italic.",
       "default": "playfair_display_n4"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_reveal",
+      "label": "Animate content in",
+      "info": "Heading, text and button rise in from below, one after the other, when the hero comes into view.",
+      "default": true
     }
   ],
   "blocks": [

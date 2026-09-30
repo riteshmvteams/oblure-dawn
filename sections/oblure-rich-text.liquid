@@ -5,10 +5,22 @@
   a collection's products. Heading and text accept dynamic sources (metafields), so one
   template can show each collection's own copy.
 
+  Optional reveal on scroll (heading, text and button rise in one after the other):
+  assets/oblure-reveal.js + assets/oblure-reveal.css.
+
   Styles live in assets/oblure-rich-text.css.
 {% endcomment %}
 
 {{ 'oblure-rich-text.css' | asset_url | stylesheet_tag }}
+
+{%- if section.settings.enable_reveal -%}
+  {{ 'oblure-reveal.css' | asset_url | stylesheet_tag }}
+  <script src="{{ 'oblure-reveal.js' | asset_url }}" defer="defer"></script>
+  {% comment %} Lets the reveal hide content only when JavaScript runs; set before the content is painted. {% endcomment %}
+  <script>
+    document.documentElement.classList.add('oblure-js');
+  </script>
+{%- endif -%}
 
 {%- liquid
   assign accent_font_italic = section.settings.text_font | font_modify: 'style', 'italic'
@@ -17,6 +29,11 @@
   assign has_button = false
   if section.settings.button_label != blank
     assign has_button = true
+  endif
+
+  assign wrapper_tag = 'div'
+  if section.settings.enable_reveal
+    assign wrapper_tag = 'oblure-reveal'
   endif
 -%}
 
@@ -42,20 +59,28 @@
 
 {%- if section.settings.heading != blank or section.settings.text != blank or has_button -%}
   <div class="oblure-rich-text color-{{ section.settings.color_scheme }} gradient oblure-rich-text--{{ section.settings.alignment }}">
-    <div class="oblure-rich-text__inner">
+    <{{ wrapper_tag }} class="oblure-rich-text__inner">
       {%- if section.settings.heading != blank -%}
-        <{{ section.settings.heading_tag }} class="oblure-rich-text__heading oblure-rich-text__heading--{{ section.settings.heading_size }}">
+        <{{ section.settings.heading_tag }}
+          class="oblure-rich-text__heading oblure-rich-text__heading--{{ section.settings.heading_size }}"
+          data-oblure-reveal-item
+          style="--oblure-reveal-order: 0;"
+        >
           {{- section.settings.heading -}}
         </{{ section.settings.heading_tag }}>
       {%- endif -%}
 
       {%- if section.settings.text != blank -%}
-        <div class="oblure-rich-text__text rte">{{ section.settings.text }}</div>
+        <div class="oblure-rich-text__text rte" data-oblure-reveal-item style="--oblure-reveal-order: 1;">
+          {{- section.settings.text -}}
+        </div>
       {%- endif -%}
 
       {%- if has_button -%}
         <a
           class="oblure-rich-text__button oblure-rich-text__button--{{ section.settings.button_style }}"
+          data-oblure-reveal-item
+          style="--oblure-reveal-order: 2;"
           {% if section.settings.button_link != blank %}
             href="{{ section.settings.button_link }}"
           {% else %}
@@ -65,7 +90,7 @@
           {{- section.settings.button_label | escape -}}
         </a>
       {%- endif -%}
-    </div>
+    </{{ wrapper_tag }}>
   </div>
 {%- endif -%}
 
@@ -163,6 +188,13 @@
     {
       "type": "header",
       "content": "Layout"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_reveal",
+      "label": "Animate in on scroll",
+      "info": "Heading, text and button rise in from below when the section comes into view.",
+      "default": true
     },
     {
       "type": "select",

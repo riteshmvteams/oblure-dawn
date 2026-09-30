@@ -250,6 +250,19 @@ body:has(.section-header .drawer-menu) .oblure-hero--align-header .oblure-hero__
   color: rgb(var(--color-background));
 }
 
+/* Reveal on scroll (assets/oblure-reveal.css) plus the button's own hover transitions;
+   only the reveal part is delayed. */
+@media (prefers-reduced-motion: no-preference) {
+  .oblure-js oblure-reveal .oblure-hero__cta[data-oblure-reveal-item] {
+    transition:
+      opacity 0.8s ease,
+      transform 1s cubic-bezier(0.22, 1, 0.36, 1),
+      background-color var(--duration-default) ease,
+      color var(--duration-default) ease;
+    transition-delay: calc(var(--oblure-reveal-order, 0) * 0.15s), calc(var(--oblure-reveal-order, 0) * 0.15s), 0s, 0s;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .oblure-header-overlay .section-header .header-wrapper,
   .oblure-hero .oblure-hero__cta {
