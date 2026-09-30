@@ -5,7 +5,11 @@
  * Columns come from `data-density` on .oblure-product-grid:
  *   comfortable: 1 column on mobile, 2 on desktop
  *   compact:     2 columns on mobile, 3 on desktop
- * Items flagged --wide-2 / --wide-3 span the full row in the 2- / 3-column layouts.
+ * Featured row, "1 full-width product" (--wide-one): items flagged --wide-2 / --wide-3 span
+ * the full row in the 2- / 3-column layouts.
+ * Featured row, "2 products, 50% / 50%" (--wide-two): in the 3-column layout the grid uses
+ * 6 tracks, regular items span 2 and items flagged --half-3 span 3. With 2 columns a pair
+ * already fills a row, so nothing changes there.
  */
 
 /* --oblure-grid-max-width and --oblure-grid-column-gap come from the section settings. */
@@ -52,7 +56,7 @@
 }
 
 /* A spanning item also switches its image to the wide ratio. */
-.oblure-product-grid--wide-cards[data-density='compact'] .oblure-product-grid__item--wide-2 {
+.oblure-product-grid--wide-one[data-density='compact'] .oblure-product-grid__item--wide-2 {
   --oblure-card-ratio: var(--oblure-card-wide-ratio);
 
   grid-column: 1 / -1;
@@ -511,17 +515,31 @@
     --oblure-grid-columns: 3;
   }
 
-  .oblure-product-grid--wide-cards[data-density='compact'] .oblure-product-grid__item--wide-2 {
+  .oblure-product-grid--wide-one[data-density='compact'] .oblure-product-grid__item--wide-2 {
     --oblure-card-ratio: inherit;
 
     grid-column: auto;
   }
 
-  .oblure-product-grid--wide-cards[data-density='compact'] .oblure-product-grid__item--wide-3,
-  .oblure-product-grid--wide-cards[data-density='comfortable'] .oblure-product-grid__item--wide-2 {
+  .oblure-product-grid--wide-one[data-density='compact'] .oblure-product-grid__item--wide-3,
+  .oblure-product-grid--wide-one[data-density='comfortable'] .oblure-product-grid__item--wide-2 {
     --oblure-card-ratio: var(--oblure-card-wide-ratio);
 
     grid-column: 1 / -1;
+  }
+
+  .oblure-product-grid--wide-two[data-density='compact'] .oblure-product-grid__list {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .oblure-product-grid--wide-two[data-density='compact'] .oblure-product-grid__item {
+    grid-column: span 2;
+  }
+
+  .oblure-product-grid--wide-two[data-density='compact'] .oblure-product-grid__item--half-3 {
+    --oblure-card-ratio: var(--oblure-card-half-ratio);
+
+    grid-column: span 3;
   }
 
   .oblure-product-grid__density-icon--mobile {

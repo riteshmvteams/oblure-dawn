@@ -3,7 +3,7 @@
 
   Product grid for collection pages with Oblure product cards (snippets/oblure-card-product.liquid):
   - 2/3 columns on desktop (1/2 on mobile), switchable by the visitor and remembered.
-  - Optionally one full-width product after every N rows.
+  - Optionally a featured row after every N rows: one full-width product, or two at 50% / 50%.
   - Optional second image on hover ("light off").
   - "Show more" button with an "8 of 24 products" count instead of page links.
 
@@ -23,10 +23,16 @@
   assign price_font_italic = section.settings.price_font | font_modify: 'style', 'italic'
   assign price_font = price_font_italic | default: section.settings.price_font
 
-  # A full-width card follows every `wide_every_rows` rows, so it is every (columns × rows + 1)th product.
+  # Featured row after every `wide_every_rows` rows:
+  # - 'one': a full-width card, i.e. every (columns × rows + 1)th product.
+  # - 'two': two half-width cards, i.e. products (3 × rows + 1) and (3 × rows + 2) of every
+  #   (3 × rows + 2) in the 3-column layout. With 2 columns a pair is a normal row already.
+  assign wide_layout = section.settings.wide_layout
   assign wide_rows = section.settings.wide_every_rows
   assign wide_every_3 = 3 | times: wide_rows | plus: 1
   assign wide_every_2 = 2 | times: wide_rows | plus: 1
+  assign half_cycle_3 = 3 | times: wide_rows | plus: 2
+  assign half_first_3 = 3 | times: wide_rows | plus: 1
 
   # Image sizes for the capped grid width.
   assign grid_max_width = section.settings.grid_max_width
@@ -34,6 +40,8 @@
   assign column_width_3 = grid_max_width | divided_by: 3
   assign card_sizes = '(min-width: ' | append: grid_breakpoint | append: 'px) ' | append: column_width_3 | append: 'px, (min-width: 990px) 33vw, (min-width: 750px) 50vw, 100vw'
   assign wide_sizes = '(min-width: ' | append: grid_breakpoint | append: 'px) ' | append: grid_max_width | append: 'px, 100vw'
+  assign column_width_half = grid_max_width | divided_by: 2
+  assign half_sizes = '(min-width: ' | append: grid_breakpoint | append: 'px) ' | append: column_width_half | append: 'px, (min-width: 750px) 50vw, 100vw'
 
   case section.settings.image_ratio
     when 'square'
@@ -52,6 +60,17 @@
     else
       assign wide_ratio = '2 / 1'
   endcase
+
+  case section.settings.half_image_ratio
+    when '4-3'
+      assign half_ratio = '4 / 3'
+    when '3-2'
+      assign half_ratio = '3 / 2'
+    when '16-9'
+      assign half_ratio = '16 / 9'
+    else
+      assign half_ratio = card_ratio
+  endcase
 -%}
 
 {%- style -%}
@@ -62,6 +81,7 @@
     --oblure-grid-column-gap: {{ section.settings.column_gap }}px;
     --oblure-card-ratio: {{ card_ratio }};
     --oblure-card-wide-ratio: {{ wide_ratio }};
+    --oblure-card-half-ratio: {{ half_ratio }};
     --oblure-card-badge-color: {{ section.settings.new_badge_color | default: '#e3000f' }};
     --oblure-card-image-background: {{ section.settings.image_background | default: 'transparent' }};
     --oblure-card-price-family: {{ price_font.family }}, {{ price_font.fallback_families }};
@@ -84,7 +104,7 @@
   data-collection-id="{{ collection.id }}"
 >
   <div
-    class="oblure-product-grid color-{{ section.settings.color_scheme }} gradient{% if section.settings.enable_wide %} oblure-product-grid--wide-cards{% endif %}"
+    class="oblure-product-grid color-{{ section.settings.color_scheme }} gradient{% if section.settings.enable_wide %} oblure-product-grid--wide-{{ wide_layout }}{% endif %}"
     data-density="{{ section.settings.default_density }}"
     data-oblure-product-grid
   >
@@ -270,7 +290,13 @@
                       assign position = paginate.current_offset | plus: forloop.index
                       assign wide_in_3 = false
                       assign wide_in_2 = false
-                      if section.settings.enable_wide
+                      assign half_in_3 = false
+                      if section.settings.enable_wide and wide_layout == 'two'
+                        assign remainder_half = position | modulo: half_cycle_3
+                        if remainder_half == 0 or remainder_half == half_first_3
+                          assign half_in_3 = true
+                        endif
+                      elsif section.settings.enable_wide
                         assign remainder_3 = position | modulo: wide_every_3
                         assign remainder_2 = position | modulo: wide_every_2
                         if remainder_3 == 0
@@ -284,6 +310,8 @@
                       assign image_sizes = card_sizes
                       if wide_in_3 or wide_in_2
                         assign image_sizes = wide_sizes
+                      elsif half_in_3
+                        assign image_sizes = half_sizes
                       endif
 
                       assign lazy_load = true
@@ -292,7 +320,7 @@
                       endif
                     -%}
                     <li
-                      class="oblure-product-grid__item{% if wide_in_3 %} oblure-product-grid__item--wide-3{% endif %}{% if wide_in_2 %} oblure-product-grid__item--wide-2{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+                      class="oblure-product-grid__item{% if wide_in_3 %} oblure-product-grid__item--wide-3{% endif %}{% if wide_in_2 %} oblure-product-grid__item--wide-2{% endif %}{% if half_in_3 %} oblure-product-grid__item--half-3{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
                       {% if settings.animations_reveal_on_scroll %}
                         data-cascade
                         style="--animation-order: {{ forloop.index }};"
@@ -447,8 +475,26 @@
     {
       "type": "checkbox",
       "id": "enable_wide",
-      "label": "Show full-width products",
+      "label": "Show a featured row",
+      "info": "A row with bigger products between the regular rows.",
       "default": true
+    },
+    {
+      "type": "select",
+      "id": "wide_layout",
+      "label": "Featured row layout",
+      "options": [
+        {
+          "value": "one",
+          "label": "1 full-width product"
+        },
+        {
+          "value": "two",
+          "label": "2 products, 50% / 50%"
+        }
+      ],
+      "default": "one",
+      "visible_if": "{{ section.settings.enable_wide }}"
     },
     {
       "type": "range",
@@ -456,7 +502,7 @@
       "min": 1,
       "max": 5,
       "step": 1,
-      "label": "Full-width product after every … rows",
+      "label": "Featured row after every … rows",
       "default": 1,
       "visible_if": "{{ section.settings.enable_wide }}"
     },
@@ -510,7 +556,32 @@
         }
       ],
       "default": "2-1",
-      "visible_if": "{{ section.settings.enable_wide }}"
+      "visible_if": "{{ section.settings.enable_wide and section.settings.wide_layout == 'one' }}"
+    },
+    {
+      "type": "select",
+      "id": "half_image_ratio",
+      "label": "50% / 50% image ratio",
+      "options": [
+        {
+          "value": "same",
+          "label": "Same as other products"
+        },
+        {
+          "value": "4-3",
+          "label": "4:3"
+        },
+        {
+          "value": "3-2",
+          "label": "3:2"
+        },
+        {
+          "value": "16-9",
+          "label": "16:9"
+        }
+      ],
+      "default": "same",
+      "visible_if": "{{ section.settings.enable_wide and section.settings.wide_layout == 'two' }}"
     },
     {
       "type": "checkbox",
