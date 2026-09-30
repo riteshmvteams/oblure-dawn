@@ -1,0 +1,540 @@
+{{ 'section-image-banner.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+
+  #Banner-{{ section.id }}::after {
+    opacity: {{ section.settings.video_overlay_opacity | divided_by: 100.0 }};
+  }
+
+  #Banner-{{ section.id }} .video-banner__media {
+    overflow: hidden;
+  }
+
+  #Banner-{{ section.id }} .video-banner__media video {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+  }
+
+  /* Video height */
+
+  #Banner-{{ section.id }}.banner--small {
+    min-height: 400px;
+  }
+
+  #Banner-{{ section.id }}.banner--medium {
+    min-height: 550px;
+  }
+
+  #Banner-{{ section.id }}.banner--large {
+    min-height: 700px;
+  }
+
+  /* Mobile */
+
+  @media screen and (max-width: 749px) {
+
+    #Banner-{{ section.id }}.banner--small {
+      min-height: 350px;
+    }
+
+    #Banner-{{ section.id }}.banner--medium {
+      min-height: 500px;
+    }
+
+    #Banner-{{ section.id }}.banner--large {
+      min-height: 650px;
+    }
+
+    #Banner-{{ section.id }} .video-banner__media video {
+      min-height: 100%;
+    }
+
+  }
+
+{%- endstyle -%}
+
+
+<div
+  id="Banner-{{ section.id }}"
+  class="{{ section.settings.unique_class }} banner banner--content-align-{{ section.settings.desktop_content_alignment }} banner--content-align-mobile-{{ section.settings.mobile_content_alignment }} banner--{{ section.settings.video_height }}{% if section.settings.show_text_box == false %} banner--desktop-transparent{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}"
+>
+
+  {%- comment -%}
+    VIDEO
+  {%- endcomment -%}
+
+  <div class="banner__media media video-banner__media">
+    {%- if section.settings.video != blank -%}
+      {{
+        section.settings.video
+        | video_tag:
+          autoplay: true,
+          loop: true,
+          muted: true,
+          controls: false,
+          playsinline: true
+      }}
+    {%- else -%}
+      {{ 'lifestyle-2' | placeholder_svg_tag: 'placeholder-svg' }}
+    {%- endif -%}
+  </div>
+
+  {%- comment -%}
+    CONTENT
+  {%- endcomment -%}
+
+  <div
+    class="banner__content banner__content--{{ section.settings.desktop_content_position }} page-width{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+  >
+    <div class="banner__box content-container content-container--full-width-mobile color-{{ section.settings.color_scheme }} gradient">
+      {%- for block in section.blocks -%}
+        {%- case block.type -%}
+          {%- when 'heading' -%}
+            <h2
+              class="banner__heading inline-richtext {{ block.settings.heading_size }}"
+              {{ block.shopify_attributes }}
+            >
+              {{ block.settings.heading }}
+            </h2>
+          {%- when 'text' -%}
+            <div
+              class="banner__text rte {{ block.settings.text_style }}"
+              {{ block.shopify_attributes }}
+            >
+              {{ block.settings.text }}
+            </div>
+          {%- when 'buttons' -%}
+            <div
+              class="banner__buttons{% if block.settings.button_label_1 != blank and block.settings.button_label_2 != blank %} banner__buttons--multiple{% endif %}"
+              {{ block.shopify_attributes }}
+            >
+              {%- if block.settings.button_label_1 != blank -%}
+                <a
+                  {% if block.settings.button_link_1 == blank %}
+                    role="link"
+                    aria-disabled="true"
+                  {% else %}
+                    href="{{ block.settings.button_link_1 }}"
+                  {% endif %}
+                  class="button{% if block.settings.button_style_secondary_1 %} button--secondary{% else %} button--primary{% endif %}"
+                >
+                  {{- block.settings.button_label_1 | escape -}}
+                </a>
+              {%- endif -%}
+              {%- if block.settings.button_label_2 != blank -%}
+                <a
+                  {% if block.settings.button_link_2 == blank %}
+                    role="link"
+                    aria-disabled="true"
+                  {% else %}
+                    href="{{ block.settings.button_link_2 }}"
+                  {% endif %}
+                  class="button{% if block.settings.button_style_secondary_2 %} button--secondary{% else %} button--primary{% endif %}"
+                >
+                  {{- block.settings.button_label_2 | escape -}}
+                </a>
+              {%- endif -%}
+            </div>
+        {%- endcase -%}
+      {%- endfor -%}
+    </div>
+  </div>
+</div>
+
+
+
+
+{% comment %} --------------animation test css----------------- {% endcomment %}
+<style>
+  /* Featured video content animation */
+
+  .featured-video .banner__box {
+    opacity: 0;
+    transform: translateY(35px);
+    transition:
+      opacity 0.9s ease,
+      transform 1s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .featured-video.is-visible .banner__box {
+    opacity: 1;
+    transform: translateY(0);
+  }
+</style>
+
+
+
+
+{% schema %}
+{
+  "name": "Video Banner",
+  "tag": "section",
+  "class": "section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+
+  "settings": [
+
+    {
+      "type": "text",
+      "id": "unique_class",
+      "label": "Unique class"
+    },
+
+    {
+      "type": "video",
+      "id": "video",
+      "label": "Video"
+    },
+
+    {
+      "type": "range",
+      "id": "video_overlay_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 10,
+      "unit": "%",
+      "label": "Video overlay opacity",
+      "default": 0
+    },
+
+    {
+      "type": "select",
+      "id": "video_height",
+      "options": [
+        {
+          "value": "small",
+          "label": "Small"
+        },
+        {
+          "value": "medium",
+          "label": "Medium"
+        },
+        {
+          "value": "large",
+          "label": "Large"
+        }
+      ],
+      "default": "medium",
+      "label": "Video height"
+    },
+
+    {
+      "type": "header",
+      "content": "Content"
+    },
+
+    {
+      "type": "select",
+      "id": "desktop_content_position",
+      "options": [
+        {
+          "value": "top-left",
+          "label": "Top left"
+        },
+        {
+          "value": "top-center",
+          "label": "Top center"
+        },
+        {
+          "value": "top-right",
+          "label": "Top right"
+        },
+        {
+          "value": "middle-left",
+          "label": "Middle left"
+        },
+        {
+          "value": "middle-center",
+          "label": "Middle center"
+        },
+        {
+          "value": "middle-right",
+          "label": "Middle right"
+        },
+        {
+          "value": "bottom-left",
+          "label": "Bottom left"
+        },
+        {
+          "value": "bottom-center",
+          "label": "Bottom center"
+        },
+        {
+          "value": "bottom-right",
+          "label": "Bottom right"
+        }
+      ],
+      "default": "middle-center",
+      "label": "Desktop content position"
+    },
+
+    {
+      "type": "select",
+      "id": "desktop_content_alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "center",
+      "label": "Desktop content alignment"
+    },
+
+    {
+      "type": "checkbox",
+      "id": "show_text_box",
+      "default": true,
+      "label": "Show text box"
+    },
+
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+
+    {
+      "type": "header",
+      "content": "Mobile"
+    },
+
+    {
+      "type": "select",
+      "id": "mobile_content_alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "center",
+      "label": "Mobile content alignment"
+    },
+
+    {
+      "type": "checkbox",
+      "id": "show_text_below",
+      "default": false,
+      "label": "Show content below video on mobile"
+    }
+
+  ],
+
+  "blocks": [
+
+    {
+      "type": "heading",
+      "name": "Heading",
+      "limit": 1,
+
+      "settings": [
+
+        {
+          "type": "inline_richtext",
+          "id": "heading",
+          "default": "Video banner heading",
+          "label": "Heading"
+        },
+
+        {
+          "type": "select",
+          "id": "heading_size",
+          "options": [
+            {
+              "value": "h2",
+              "label": "Small"
+            },
+            {
+              "value": "h1",
+              "label": "Medium"
+            },
+            {
+              "value": "h0",
+              "label": "Large"
+            },
+            {
+              "value": "hxl",
+              "label": "Extra large"
+            },
+            {
+              "value": "hxxl",
+              "label": "Extra extra large"
+            }
+          ],
+          "default": "h1",
+          "label": "Heading size"
+        }
+
+      ]
+    },
+
+
+    {
+      "type": "text",
+      "name": "Description",
+      "limit": 2,
+
+      "settings": [
+
+        {
+          "type": "richtext",
+          "id": "text",
+          "default": "<p>Tell your story with a beautiful video banner.</p>",
+          "label": "Description"
+        },
+
+        {
+          "type": "select",
+          "id": "text_style",
+          "options": [
+            {
+              "value": "body",
+              "label": "Body"
+            },
+            {
+              "value": "subtitle",
+              "label": "Subtitle"
+            },
+            {
+              "value": "caption-with-letter-spacing",
+              "label": "Caption"
+            }
+          ],
+          "default": "body",
+          "label": "Text style"
+        }
+
+      ]
+    },
+
+
+    {
+      "type": "buttons",
+      "name": "Buttons",
+      "limit": 1,
+
+      "settings": [
+
+        {
+          "type": "header",
+          "content": "Button 1"
+        },
+
+        {
+          "type": "text",
+          "id": "button_label_1",
+          "default": "Shop now",
+          "label": "Button label"
+        },
+
+        {
+          "type": "url",
+          "id": "button_link_1",
+          "label": "Button link"
+        },
+
+        {
+          "type": "checkbox",
+          "id": "button_style_secondary_1",
+          "default": false,
+          "label": "Use secondary button style"
+        },
+
+
+        {
+          "type": "header",
+          "content": "Button 2"
+        },
+
+        {
+          "type": "text",
+          "id": "button_label_2",
+          "default": "Learn more",
+          "label": "Button label"
+        },
+
+        {
+          "type": "url",
+          "id": "button_link_2",
+          "label": "Button link"
+        },
+
+        {
+          "type": "checkbox",
+          "id": "button_style_secondary_2",
+          "default": false,
+          "label": "Use secondary button style"
+        }
+
+      ]
+    }
+
+  ],
+
+  "presets": [
+
+    {
+      "name": "Video Banner",
+
+      "blocks": [
+        {
+          "type": "heading"
+        },
+        {
+          "type": "text"
+        },
+        {
+          "type": "buttons"
+        }
+      ]
+    }
+
+  ]
+}
+{% endschema %}
+
+
+{% comment %} --------------animation test js----------------- {% endcomment %}
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const sections = document.querySelectorAll('.featured-video');
+
+    const observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, {
+      threshold: 0.7
+    });
+
+    sections.forEach(function (section) {
+      observer.observe(section);
+    });
+  });
+</script>

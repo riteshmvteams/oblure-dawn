@@ -1,0 +1,725 @@
+{{ 'section-image-banner.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+
+  /* =========================
+     MAIN LAYOUT
+  ========================= */
+
+  #MediaText-{{ section.id }} {
+    display: flex;
+    width: 100%;
+    overflow: hidden;
+	  flex-direction: {{ section.settings.media_position }};
+  }
+/* 
+  #MediaText-{{ section.id }} .media- {
+    flex-direction: {{ section.settings.media_position }};
+  } */
+/* 
+  #MediaText-{{ section.id }} .text-first {
+    flex-direction: row-reverse;
+  } */
+
+
+  /* =========================
+     MEDIA + CONTENT
+  ========================= */
+
+  #MediaText-{{ section.id }} .media-text__media,
+  #MediaText-{{ section.id }} .media-text__content {
+    width: 50%;
+    min-width: 0;
+  }
+
+
+  /* =========================
+     MEDIA
+  ========================= */
+
+  #MediaText-{{ section.id }} .media-text__media {
+    position: relative;
+    overflow: hidden;
+  }
+
+  #MediaText-{{ section.id }} .media-text__media img,
+  #MediaText-{{ section.id }} .media-text__media video {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+  }
+
+
+  /* =========================
+     MEDIA HEIGHT
+  ========================= */
+
+  #MediaText-{{ section.id }}.media-height-small {
+    min-height: 400px;
+  }
+
+  #MediaText-{{ section.id }}.media-height-medium {
+    min-height: 550px;
+  }
+
+  #MediaText-{{ section.id }}.media-height-large {
+    min-height: 700px;
+  }
+
+  #MediaText-{{ section.id }} .media-text__media {
+    min-height: inherit;
+  }
+
+
+  /* =========================
+     TEXT CONTENT
+  ========================= */
+
+  #MediaText-{{ section.id }} .media-text__content {
+    display: flex;
+	  background-color: {{ section.settings.text_background_color }};
+  }
+
+  #MediaText-{{ section.id }} .banner__box {
+    width: 100%;
+    /* max-width: 700px; */
+    padding: 4rem;
+    color:{{ section.settings.text_color }};
+  }
+
+   #MediaText-{{ section.id }} .banner__box h2{
+		color:{{ section.settings.text_color }};
+	}
+
+	#MediaText-{{ section.id }} .banner__box .button{
+		color:{{ section.settings.button_text_color }};
+		background:{{ section.settings.button_background_color }};
+	}
+
+	#MediaText-{{ section.id }} .banner__box .button:after{
+		 box-shadow:
+			0 0 0 1px
+			{{ section.settings.button_border_color  }},
+			0 0 0 1px
+			{{ section.settings.button_border_color }};
+	}
+
+	#MediaText-{{ section.id }} .banner__box {
+		max-width: 66rem;
+		margin-inline: auto;
+	}
+
+
+  /* =========================
+     CONTENT POSITION
+  ========================= */
+
+  #MediaText-{{ section.id }}.content-position-top
+  .media-text__content {
+    align-items: flex-start;
+  }
+
+  #MediaText-{{ section.id }}.content-position-middle
+  .media-text__content {
+    align-items: center;
+  }
+
+  #MediaText-{{ section.id }}.content-position-bottom
+  .media-text__content {
+    align-items: flex-end;
+  }
+
+
+  /* =========================
+     TEXT ALIGNMENT
+  ========================= */
+
+  #MediaText-{{ section.id }}.content-align-left .banner__box {
+    text-align: left;
+  }
+
+  #MediaText-{{ section.id }}.content-align-center .banner__box {
+    text-align: center;
+  }
+
+  #MediaText-{{ section.id }}.content-align-right .banner__box {
+    text-align: right;
+  }
+
+
+  /* =========================
+     TEXT ANIMATION
+  ========================= */
+
+  #MediaText-{{ section.id }} .banner__heading,
+  #MediaText-{{ section.id }} .banner__text,
+  #MediaText-{{ section.id }} .banner__buttons {
+    opacity: 0;
+    transform: translateY(35px);
+    transition:
+      opacity 0.8s ease,
+      transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  #MediaText-{{ section.id }}.is-visible .banner__heading {
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: 0.1s;
+  }
+
+  #MediaText-{{ section.id }}.is-visible .banner__text {
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: 0.25s;
+  }
+
+  #MediaText-{{ section.id }}.is-visible .banner__buttons {
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: 0.4s;
+  }
+
+
+  /* =========================
+     MOBILE
+  ========================= */
+
+  @media screen and (max-width: 749px) {
+
+    #MediaText-{{ section.id }} {
+      flex-direction: column !important;
+    }
+
+    #MediaText-{{ section.id }} .media-text__media,
+    #MediaText-{{ section.id }} .media-text__content {
+      width: 100%;
+    }
+
+    #MediaText-{{ section.id }} .media-text__media {
+      min-height: 350px;
+    }
+
+    #MediaText-{{ section.id }}.media-height-small,
+    #MediaText-{{ section.id }}.media-height-medium,
+    #MediaText-{{ section.id }}.media-height-large {
+      min-height: auto;
+    }
+
+    #MediaText-{{ section.id }} .banner__box {
+      max-width: none;
+      padding: 3rem 2rem;
+    }
+
+    #MediaText-{{ section.id }}.mobile-align-left .banner__box {
+      text-align: left;
+    }
+
+    #MediaText-{{ section.id }}.mobile-align-center .banner__box {
+      text-align: center;
+    }
+
+    #MediaText-{{ section.id }}.mobile-align-right .banner__box {
+      text-align: right;
+    }
+
+  }
+
+{%- endstyle -%}
+
+
+<div
+  id="MediaText-{{ section.id }}"
+  class="
+    {{ section.settings.unique_class }}
+    media-text
+    media-{{ section.settings.media_position }}
+    media-height-{{ section.settings.media_height }}
+    content-align-{{ section.settings.desktop_content_alignment }}
+    content-position-{{ section.settings.desktop_content_position }}
+    mobile-align-{{ section.settings.mobile_content_alignment }}
+  "
+>
+
+  {%- comment -%}
+    MEDIA
+  {%- endcomment -%}
+
+  <div class="media-text__media">
+    {%- if section.settings.media_type == 'image' -%}
+      {%- if section.settings.image != blank -%}
+        {{
+          section.settings.image
+          | image_url: width: 2000
+          | image_tag:
+            loading: 'lazy',
+            widths: '550, 750, 1100, 1500, 2000',
+            sizes: '(min-width: 750px) 50vw, 100vw'
+        }}
+      {%- else -%}
+        {{ 'lifestyle-2' | placeholder_svg_tag: 'placeholder-svg' }}
+      {%- endif -%}
+    {%- elsif section.settings.media_type == 'video' -%}
+      {%- if section.settings.video != blank -%}
+        {{
+          section.settings.video
+          | video_tag:
+            autoplay: true,
+            loop: true,
+            muted: true,
+            controls: false,
+            playsinline: true
+        }}
+      {%- else -%}
+        {{ 'lifestyle-2' | placeholder_svg_tag: 'placeholder-svg' }}
+      {%- endif -%}
+    {%- endif -%}
+  </div>
+
+  {%- comment -%}
+    TEXT CONTENT
+  {%- endcomment -%}
+
+  <div class="media-text__content">
+    <div class="banner__box">
+      {%- for block in section.blocks -%}
+        {%- case block.type -%}
+          {%- when 'heading' -%}
+            <h2
+              class="banner__heading inline-richtext {{ block.settings.heading_size }}"
+              {{ block.shopify_attributes }}
+            >
+              {{ block.settings.heading }}
+            </h2>
+          {%- when 'text' -%}
+            <div
+              class="banner__text rte {{ block.settings.text_style }}"
+              {{ block.shopify_attributes }}
+            >
+              {{ block.settings.text }}
+            </div>
+          {%- when 'buttons' -%}
+            <div
+              class="banner__buttons{% if block.settings.button_label_1 != blank and block.settings.button_label_2 != blank %} banner__buttons--multiple{% endif %}"
+              {{ block.shopify_attributes }}
+            >
+              {%- if block.settings.button_label_1 != blank -%}
+                <a
+                  {% if block.settings.button_link_1 == blank %}
+                    role="link"
+                    aria-disabled="true"
+                  {% else %}
+                    href="{{ block.settings.button_link_1 }}"
+                  {% endif %}
+                  class="button{% if block.settings.button_style_secondary_1 %} button--secondary{% else %} button--primary{% endif %}"
+                >
+                  {{- block.settings.button_label_1 | escape -}}
+                </a>
+              {%- endif -%}
+              {%- if block.settings.button_label_2 != blank -%}
+                <a
+                  {% if block.settings.button_link_2 == blank %}
+                    role="link"
+                    aria-disabled="true"
+                  {% else %}
+                    href="{{ block.settings.button_link_2 }}"
+                  {% endif %}
+                  class="button{% if block.settings.button_style_secondary_2 %} button--secondary{% else %} button--primary{% endif %}"
+                >
+                  {{- block.settings.button_label_2 | escape -}}
+                </a>
+              {%- endif -%}
+            </div>
+        {%- endcase -%}
+      {%- endfor -%}
+    </div>
+  </div>
+</div>
+
+
+{% comment %}
+  -------------- Animation JS -----------------
+{% endcomment %}
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const section = document.querySelector(
+      '#MediaText-{{ section.id }}'
+    );
+    if (!section) return;
+    const observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, {
+      threshold: 0.5
+    });
+    observer.observe(section);
+  });
+</script>
+
+
+{% schema %}
+
+{
+  "name": "Media with Text",
+  "tag": "section",
+  "class": "section",
+
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+
+  "settings": [
+
+    {
+      "type": "text",
+      "id": "unique_class",
+      "label": "Unique class"
+    },
+
+    {
+      "type": "select",
+      "id": "media_type",
+      "label": "Media type",
+      "options": [
+        {
+          "value": "image",
+          "label": "Image"
+        },
+        {
+          "value": "video",
+          "label": "Video"
+        }
+      ],
+      "default": "image"
+    },
+
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+
+    {
+      "type": "video",
+      "id": "video",
+      "label": "Video"
+    },
+
+    {
+      "type": "select",
+      "id": "media_position",
+      "label": "Media position",
+      "options": [
+        {
+          "value": "row",
+          "label": "Media first"
+        },
+        {
+          "value": "row-reverse",
+          "label": "Text first"
+        }
+      ],
+      "default": "row-reverse"
+    },
+
+    {
+      "type": "select",
+      "id": "media_height",
+      "label": "Media height",
+      "options": [
+        {
+          "value": "small",
+          "label": "Small"
+        },
+        {
+          "value": "medium",
+          "label": "Medium"
+        },
+        {
+          "value": "large",
+          "label": "Large"
+        }
+      ],
+      "default": "medium"
+    },
+
+    {
+      "type": "color",
+      "id": "text_background_color",
+      "label": "Text background color",
+      "default": "#F1E2A3"
+    },
+	 {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color"
+    },
+	 {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button Text color"
+    },
+	 {
+      "type": "color",
+      "id": "button_background_color",
+      "label": "Button background color"
+    },
+	 {
+      "type": "color",
+      "id": "button_border_color",
+      "label": "Button border color"
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+
+    {
+      "type": "select",
+      "id": "desktop_content_position",
+      "label": "Content position",
+      "options": [
+        {
+          "value": "top",
+          "label": "Top"
+        },
+        {
+          "value": "middle",
+          "label": "Middle"
+        },
+        {
+          "value": "bottom",
+          "label": "Bottom"
+        }
+      ],
+      "default": "middle"
+    },
+
+    {
+      "type": "select",
+      "id": "desktop_content_alignment",
+      "label": "Content alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "center"
+    },
+
+    {
+      "type": "header",
+      "content": "Mobile"
+    },
+
+    {
+      "type": "select",
+      "id": "mobile_content_alignment",
+      "label": "Mobile content alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "center"
+    }
+
+  ],
+
+  "blocks": [
+
+    {
+      "type": "heading",
+      "name": "Heading",
+      "limit": 1,
+
+      "settings": [
+
+        {
+          "type": "inline_richtext",
+          "id": "heading",
+          "default": "Media with text heading",
+          "label": "Heading"
+        },
+
+        {
+          "type": "select",
+          "id": "heading_size",
+          "options": [
+            {
+              "value": "h2",
+              "label": "Small"
+            },
+            {
+              "value": "h1",
+              "label": "Medium"
+            },
+            {
+              "value": "h0",
+              "label": "Large"
+            },
+            {
+              "value": "hxl",
+              "label": "Extra large"
+            },
+            {
+              "value": "hxxl",
+              "label": "Extra extra large"
+            }
+          ],
+          "default": "h1",
+          "label": "Heading size"
+        }
+
+      ]
+    },
+
+
+    {
+      "type": "text",
+      "name": "Description",
+      "limit": 2,
+
+      "settings": [
+
+        {
+          "type": "richtext",
+          "id": "text",
+          "default": "<p>Tell your story with beautiful media and text.</p>",
+          "label": "Description"
+        },
+
+        {
+          "type": "select",
+          "id": "text_style",
+          "options": [
+            {
+              "value": "body",
+              "label": "Body"
+            },
+            {
+              "value": "subtitle",
+              "label": "Subtitle"
+            },
+            {
+              "value": "caption-with-letter-spacing",
+              "label": "Caption"
+            }
+          ],
+          "default": "body",
+          "label": "Text style"
+        }
+
+      ]
+    },
+
+
+    {
+      "type": "buttons",
+      "name": "Buttons",
+      "limit": 1,
+
+      "settings": [
+
+        {
+          "type": "header",
+          "content": "Button 1"
+        },
+
+        {
+          "type": "text",
+          "id": "button_label_1",
+          "default": "Shop now",
+          "label": "Button label"
+        },
+
+        {
+          "type": "url",
+          "id": "button_link_1",
+          "label": "Button link"
+        },
+
+        {
+          "type": "checkbox",
+          "id": "button_style_secondary_1",
+          "default": false,
+          "label": "Use secondary button style"
+        },
+
+
+        {
+          "type": "header",
+          "content": "Button 2"
+        },
+
+        {
+          "type": "text",
+          "id": "button_label_2",
+          "default": "Learn more",
+          "label": "Button label"
+        },
+
+        {
+          "type": "url",
+          "id": "button_link_2",
+          "label": "Button link"
+        },
+
+        {
+          "type": "checkbox",
+          "id": "button_style_secondary_2",
+          "default": false,
+          "label": "Use secondary button style"
+        }
+
+      ]
+    }
+
+  ],
+
+  "presets": [
+
+    {
+      "name": "Media with Text",
+
+      "blocks": [
+        {
+          "type": "heading"
+        },
+        {
+          "type": "text"
+        },
+        {
+          "type": "buttons"
+        }
+      ]
+    }
+
+  ]
+
+}
+
+{% endschema %}

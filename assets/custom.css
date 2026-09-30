@@ -141,6 +141,22 @@
 		font-weight: 600;
 	}
 
+/* ---------------featured video-------------- */
+	.featured-video .page-width{
+		max-width: unset;
+	}
+
+	.featured-video .banner__box{
+		padding: 0;
+	}
+
+	.featured-video  .banner__content{
+		padding: 0 0 29px 19px;
+	}
+
+
+
+
 
 
 

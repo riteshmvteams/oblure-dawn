@@ -128,7 +128,7 @@
     "cart_drawer_collection": "",
     "cart_color_scheme": "scheme-1",
     "customer_account_menu": "customer-account-main-menu",
-    "oblure_page_theme_all_products": "blue",
+    "oblure_page_theme_all_products": "ice-blue",
     "sections": {
       "main-password-header": {
         "type": "main-password-header",
@@ -197,6 +197,17 @@
           "button": "#ffffff",
           "button_label": "#334fb4",
           "secondary_button_label": "#ffffff",
+          "shadow": "#121212"
+        }
+      },
+      "scheme-8c830d34-f820-4cde-bd3a-fcce97c43ff9": {
+        "settings": {
+          "background": "#F3EFDF",
+          "background_gradient": "",
+          "text": "#121212",
+          "button": "#F3EFDF",
+          "button_label": "#121212",
+          "secondary_button_label": "#121212",
           "shadow": "#121212"
         }
       }

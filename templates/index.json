@@ -43,8 +43,8 @@
           "type": "button",
           "settings": {
             "label": "Shop",
-            "link": "",
-            "color_scheme": ""
+            "link": "shopify://collections/all",
+            "color_scheme": "scheme-8c830d34-f820-4cde-bd3a-fcce97c43ff9"
           }
         }
       },
@@ -125,8 +125,8 @@
       ],
       "name": "Oblure scrolling text",
       "settings": {
-        "color_scheme": "",
-        "font_size": 17,
+        "color_scheme": "scheme-8c830d34-f820-4cde-bd3a-fcce97c43ff9",
+        "font_size": 24,
         "uppercase": true,
         "letter_spacing": 12,
         "accent_font": "playfair_display_n4",
@@ -142,7 +142,6 @@
       }
     },
     "image_banner": {
-      "disabled": true,
       "type": "image-banner",
       "blocks": {
         "heading": {
@@ -168,6 +167,7 @@
         "heading",
         "button"
       ],
+      "disabled": true,
       "settings": {
         "unique_class": "",
         "image_overlay_opacity": 40,
@@ -310,6 +310,87 @@
         "left_heading": "DESIGNER",
         "right_heading": "ABOUT"
       }
+    },
+    "custom_video_9nDc8e": {
+      "type": "custom-video",
+      "blocks": {
+        "text_WFEGY6": {
+          "type": "text",
+          "settings": {
+            "text": "<h2>BALANCE |<strong> VICTOR CASTANERA</strong></h2>",
+            "text_style": "body"
+          }
+        }
+      },
+      "block_order": [
+        "text_WFEGY6"
+      ],
+      "name": "Video Banner",
+      "settings": {
+        "unique_class": "featured-video",
+        "video": "shopify://files/videos/balance_video_oblure_hq_compressed.mp4",
+        "video_overlay_opacity": 0,
+        "video_height": "large",
+        "desktop_content_position": "bottom-left",
+        "desktop_content_alignment": "left",
+        "show_text_box": false,
+        "color_scheme": "scheme-4",
+        "mobile_content_alignment": "center",
+        "show_text_below": false
+      }
+    },
+    "media_with_text_cQUQUV": {
+      "type": "media-with-text",
+      "blocks": {
+        "heading_DKLbM3": {
+          "type": "heading",
+          "settings": {
+            "heading": "&nbsp;<strong>About</strong> Oblure&nbsp;",
+            "heading_size": "h1"
+          }
+        },
+        "text_LEHQYB": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Oblure is a Swedish lighting brand known for merging art and function through contemporary Scandinavian design. Our collection includes pendant lamps, wall lamps, table lamps, and floor lamps – each crafted in collaboration with international designers. Every piece is made to illuminate modern interiors, from private homes to architectural spaces, with timeless craftsmanship and sculptural elegance.</p>",
+            "text_style": "body"
+          }
+        },
+        "buttons_kK6mB9": {
+          "type": "buttons",
+          "settings": {
+            "button_label_1": "Read our story",
+            "button_link_1": "#",
+            "button_style_secondary_1": false,
+            "button_label_2": "",
+            "button_link_2": "",
+            "button_style_secondary_2": false
+          }
+        }
+      },
+      "block_order": [
+        "heading_DKLbM3",
+        "text_LEHQYB",
+        "buttons_kK6mB9"
+      ],
+      "disabled": true,
+      "name": "Media with Text",
+      "settings": {
+        "unique_class": "",
+        "media_type": "video",
+        "image": "shopify://shop_images/balance_brass.jpg",
+        "video": "shopify://files/videos/arch_repaintable_compressed.mp4",
+        "media_position": "row-reverse",
+        "media_height": "medium",
+        "text_background_color": "#343952",
+        "text_color": "#ffffff",
+        "button_text_color": "#ffffff",
+        "button_background_color": "#343952",
+        "button_border_color": "#ffffff",
+        "desktop_content_position": "middle",
+        "desktop_content_alignment": "center",
+        "mobile_content_alignment": "center"
+      }
     }
   },
   "order": [
@@ -320,6 +401,8 @@
     "rich_text_873Ubd",
     "featured_collection",
     "image_banner_Ydk3ah",
-    "side_by_side_image_mT9typ"
+    "side_by_side_image_mT9typ",
+    "custom_video_9nDc8e",
+    "media_with_text_cQUQUV"
   ]
 }
