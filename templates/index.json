@@ -170,7 +170,7 @@
       ],
       "disabled": true,
       "settings": {
-        "unique_class": "",
+        "unique_class": "none",
         "image_overlay_opacity": 40,
         "image_height": "large",
         "image_behavior": "none",
@@ -187,7 +187,6 @@
       "type": "image_gallery_with_text",
       "name": "Image gallery with text",
       "settings": {
-        "unique_class": "image-gallery",
         "heading": "STORIES",
         "left_image": "shopify://shop_images/Obure_Lightbone_Blue_Lifestyle_3.png",
         "left_image_url": "",
@@ -305,7 +304,6 @@
       "type": "side-by-side-image",
       "name": "Side by side image",
       "settings": {
-        "unique_class": "side-by-side-image",
         "left_image": "shopify://shop_images/VictorCastanera_BALANCE.jpg",
         "right_image": "shopify://shop_images/Oblure_mondo_large_pendant_costum_1.png",
         "left_url": "#",
@@ -330,7 +328,6 @@
       ],
       "name": "Video Banner",
       "settings": {
-        "unique_class": "featured-video",
         "video": "shopify://files/videos/balance_video_oblure_hq_compressed.mp4",
         "video_overlay_opacity": 0,
         "video_height": "large",
@@ -399,7 +396,6 @@
       "disabled": true,
       "name": "Media with Text",
       "settings": {
-        "unique_class": "",
         "media_type": "video",
         "image": "shopify://shop_images/balance_brass.jpg",
         "video": "shopify://files/videos/arch_repaintable_compressed.mp4",

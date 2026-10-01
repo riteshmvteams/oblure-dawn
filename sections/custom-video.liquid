@@ -58,7 +58,7 @@
 
 <div
   id="Banner-{{ section.id }}"
-  class="{{ section.settings.unique_class }} banner banner--content-align-{{ section.settings.desktop_content_alignment }} banner--content-align-mobile-{{ section.settings.mobile_content_alignment }} banner--{{ section.settings.video_height }}{% if section.settings.show_text_box == false %} banner--desktop-transparent{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}"
+  class="featured-video banner banner--content-align-{{ section.settings.desktop_content_alignment }} banner--content-align-mobile-{{ section.settings.mobile_content_alignment }} banner--{{ section.settings.video_height }}{% if section.settings.show_text_box == false %} banner--desktop-transparent{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}"
 >
 
   {%- comment -%}
@@ -177,12 +177,6 @@
   },
 
   "settings": [
-
-    {
-      "type": "text",
-      "id": "unique_class",
-      "label": "Unique class"
-    },
 
     {
       "type": "video",

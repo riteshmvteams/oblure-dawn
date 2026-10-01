@@ -65,7 +65,7 @@
 -%}
 
 <div
-  class="{{ section.settings.unique_class }} color-{{ section.settings.color_scheme }} isolate gradient"
+  class="{% if section.settings.unique_class != 'none' %}{{ section.settings.unique_class }} {% endif %}color-{{ section.settings.color_scheme }} isolate gradient"
 >
   <div
     class="collection{% if section.settings.quick_add == 'bulk' %} collection-quick-add-bulk{% endif %} section-{{ section.id }}-padding{% if section.settings.full_width %} collection--full-width{% endif %}"
@@ -225,9 +225,21 @@
   },
   "settings": [
     {
-      "type": "inline_richtext",
+      "type": "select",
       "id": "unique_class",
-      "label": "Unique class"
+      "label": "Custom style",
+      "info": "Applies a homepage style from assets/custom.css. A dropdown (not a text field) so translation apps can't change it.",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "homepage-collection",
+          "label": "Homepage collection"
+        }
+      ],
+      "default": "none"
     },
     {
       "type": "collection",

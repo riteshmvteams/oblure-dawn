@@ -233,6 +233,9 @@
   font-size: clamp(1.7rem, 1.6vw, 2rem);
   line-height: 1.25;
   letter-spacing: 0.04rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .oblure-fpm__sublist {

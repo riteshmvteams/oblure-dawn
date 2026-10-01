@@ -14,7 +14,7 @@
   }
 {%- endstyle -%}
 
-<div class="{{ section.settings.unique_class }} isolate{% unless section.settings.full_width %} page-width{% endunless %}">
+<div class="{% if section.settings.unique_class != 'none' %}{{ section.settings.unique_class }} {% endif %}isolate{% unless section.settings.full_width %} page-width{% endunless %}">
   <div class="rich-text content-container color-{{ section.settings.color_scheme }} gradient{% if section.settings.full_width %} rich-text--full-width content-container--full-width{% endif %} section-{{ section.id }}-padding">
     <div class="rich-text__wrapper rich-text__wrapper--{{ section.settings.desktop_content_position }}{% if section.settings.full_width %} page-width{% endif %}">
       <div class="rich-text__blocks {{ section.settings.content_alignment }}">
@@ -127,9 +127,21 @@
   },
   "settings": [
     {
-      "type": "text",
+      "type": "select",
       "id": "unique_class",
-      "label": "Unique class"
+      "label": "Custom style",
+      "info": "Applies a homepage style from assets/custom.css. A dropdown (not a text field) so translation apps can't change it.",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "text-above-collection",
+          "label": "Text above collection (homepage)"
+        }
+      ],
+      "default": "none"
     },
     {
       "type": "select",
