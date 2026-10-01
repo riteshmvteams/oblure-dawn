@@ -58,7 +58,8 @@
         "max_swatches": 6,
         "enable_filtering": true,
         "filter_type": "drawer",
-        "enable_sorting": true,
+        "enable_sorting": false,
+        "show_product_count": false,
         "padding_top": 32,
         "padding_bottom": 64
       }

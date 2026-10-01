@@ -102,7 +102,7 @@
   data-collection-id="{{ collection.id }}"
 >
   <div
-    class="oblure-product-grid color-{{ section.settings.color_scheme }} gradient{% if section.settings.enable_wide %} oblure-product-grid--wide-{{ wide_layout }}{% endif %}"
+    class="oblure-product-grid color-{{ section.settings.color_scheme }} gradient{% if section.settings.enable_wide %} oblure-product-grid--wide-{{ wide_layout }}{% endif %}{% unless section.settings.show_product_count %} oblure-product-grid--hide-count{% endunless %}"
     data-density="{{ section.settings.default_density }}"
     data-oblure-product-grid
   >
@@ -679,6 +679,13 @@
       "type": "checkbox",
       "id": "enable_sorting",
       "label": "t:sections.main-collection-product-grid.settings.enable_sorting.label",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_product_count",
+      "label": "Show product count",
+      "info": "When hidden, screen readers still announce the count after filtering.",
       "default": true
     },
     {

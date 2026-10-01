@@ -137,6 +137,19 @@
   margin-left: 1rem;
 }
 
+/* "Show product count" off: hidden visually only; Dawn's facets.js keeps updating it
+   (role="status"), so screen readers still hear the count after filtering. */
+.oblure-product-grid.oblure-product-grid--hide-count .product-count,
+.oblure-product-grid.oblure-product-grid--hide-count .product-count-vertical {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
 /* Vertical filters: the switch sits above the grid instead. */
 .oblure-product-grid__main > .oblure-product-grid__toolbar {
   justify-content: flex-end;
