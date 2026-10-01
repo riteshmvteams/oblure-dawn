@@ -48,7 +48,13 @@ if (!customElements.get('oblure-card-media')) {
       }
 
       if (this.hasSecondary) {
-        this.card.addEventListener('pointerenter', () => this.#setHovered(true), { signal });
+        // Hovering the Oblure card's color swatches doesn't count: the selected color's image
+        // stays (same rule as the CSS). pointerover fires again for each child entered.
+        this.card.addEventListener(
+          'pointerover',
+          (event) => this.#setHovered(!event.target.closest?.('.oblure-card__swatches-wrapper')),
+          { signal }
+        );
         this.card.addEventListener('pointerleave', () => this.#setHovered(false), { signal });
       }
 
@@ -70,7 +76,10 @@ if (!customElements.get('oblure-card-media')) {
     }
 
     #setHovered(isHovered) {
+      const wasHovered = this.#isHovered;
       this.#isHovered = isHovered && this.hoverQuery.matches;
+      if (this.#isHovered === wasHovered) return;
+
       // Each hover starts the second video from the beginning.
       if (this.#isHovered && this.hoverVideo) this.hoverVideo.currentTime = 0;
       this.#update();

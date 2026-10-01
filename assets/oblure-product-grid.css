@@ -416,12 +416,15 @@
   background-color: var(--oblure-card-image-background);
 }
 
+/* Not while the pointer is on the color swatches: there the selected color's image stays. */
 @media (hover: hover) {
-  .oblure-card--has-secondary:hover .oblure-card__image--secondary {
+  .oblure-card--has-secondary:hover:not(:has(.oblure-card__swatches-wrapper:hover))
+    .oblure-card__image--secondary {
     opacity: 1;
   }
 
-  .oblure-card--effect-flicker:hover .oblure-card__image--secondary {
+  .oblure-card--effect-flicker:hover:not(:has(.oblure-card__swatches-wrapper:hover))
+    .oblure-card__image--secondary {
     animation: oblure-light-flicker 0.6s linear;
   }
 }
