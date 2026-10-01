@@ -1,0 +1,160 @@
+/*
+ * Oblure rich text
+ * Used by sections/oblure-rich-text.liquid.
+ */
+
+.oblure-rich-text {
+  padding: var(--oblure-rich-text-padding-top) 3rem var(--oblure-rich-text-padding-bottom);
+}
+
+/* The page's light background from its color theme (snippets/oblure-page-color-theme.liquid),
+   otherwise the section's color scheme. Two classes to win over `.gradient`. */
+.oblure-rich-text.oblure-rich-text {
+  background: var(--oblure-page-background-light, var(--gradient-background));
+}
+
+.oblure-rich-text__inner {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 910px;
+}
+
+.oblure-rich-text--center .oblure-rich-text__inner {
+  align-items: center;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.oblure-rich-text--left .oblure-rich-text__inner {
+  align-items: flex-start;
+  text-align: start;
+}
+
+.oblure-rich-text .oblure-rich-text__heading {
+  margin: 0;
+  color: rgb(var(--color-foreground));
+  font-family: var(--font-body-family);
+  font-size: var(--oblure-rich-text-heading-size);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.oblure-rich-text__heading--small {
+  --oblure-rich-text-heading-size: 1.6rem;
+}
+
+.oblure-rich-text__heading--medium {
+  --oblure-rich-text-heading-size: 2rem;
+}
+
+.oblure-rich-text__heading--large {
+  --oblure-rich-text-heading-size: 2.6rem;
+}
+
+.oblure-rich-text__text {
+  color: rgb(var(--color-foreground));
+  font-family: var(--oblure-rich-text-font-family);
+  font-style: var(--oblure-rich-text-font-style);
+  font-weight: var(--oblure-rich-text-font-weight);
+  font-size: 1.3rem;
+  line-height: 1.6;
+  letter-spacing: 0;
+}
+
+.oblure-rich-text__text > * {
+  margin: 0;
+}
+
+.oblure-rich-text__text > * + * {
+  margin-top: 0.8rem;
+}
+
+.oblure-rich-text__text a {
+  color: inherit;
+}
+
+/* Button */
+.oblure-rich-text__button {
+  margin-top: 0.8rem;
+  color: rgb(var(--color-foreground));
+  font-family: var(--font-body-family);
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0.12rem;
+  text-decoration: none;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    text-decoration-color 0.3s ease;
+}
+
+.oblure-rich-text__button--outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 4.4rem;
+  padding: 1.2rem 3.2rem;
+  border: 0.1rem solid rgb(var(--color-foreground));
+}
+
+.oblure-rich-text__button--outline:not([aria-disabled='true']):hover {
+  background-color: rgb(var(--color-foreground));
+  color: rgb(var(--color-background));
+}
+
+.oblure-rich-text__button--link {
+  text-decoration: underline;
+  text-decoration-thickness: 0.1rem;
+  text-underline-offset: 0.4rem;
+}
+
+.oblure-rich-text__button--link:not([aria-disabled='true']):hover {
+  text-decoration-color: transparent;
+}
+
+/* Reveal on scroll (assets/oblure-reveal.css) plus the button's own hover transitions;
+   only the reveal part is delayed. */
+@media (prefers-reduced-motion: no-preference) {
+  .oblure-js oblure-reveal .oblure-rich-text__button[data-oblure-reveal-item] {
+    transition:
+      opacity 0.8s ease,
+      transform 1s cubic-bezier(0.22, 1, 0.36, 1),
+      background-color 0.3s ease,
+      color 0.3s ease,
+      text-decoration-color 0.3s ease;
+    transition-delay: calc(var(--oblure-reveal-order, 0) * 0.15s), calc(var(--oblure-reveal-order, 0) * 0.15s), 0s, 0s, 0s;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .oblure-rich-text__button {
+    transition: none;
+  }
+}
+
+@media screen and (min-width: 750px) {
+  .oblure-rich-text {
+    padding-inline: 3.2rem;
+  }
+
+  .oblure-rich-text__heading--small {
+    --oblure-rich-text-heading-size: 1.8rem;
+  }
+
+  .oblure-rich-text__heading--medium {
+    --oblure-rich-text-heading-size: 2.4rem;
+  }
+
+  .oblure-rich-text__heading--large {
+    --oblure-rich-text-heading-size: 3.2rem;
+  }
+
+  .oblure-rich-text__text {
+    font-size: 1.4rem;
+  }
+}

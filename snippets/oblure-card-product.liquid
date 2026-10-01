@@ -1,0 +1,267 @@
+{% doc %}
+  Oblure product card, used by sections/oblure-collection-product-grid.liquid.
+  Based on Dawn's snippets/card-product.liquid (left unchanged), redesigned for Oblure:
+  image with an optional NEW badge, title and price on the left, color swatches on the right.
+  Styles: assets/oblure-product-grid.css.
+
+  @param {object} card_product - The product to render.
+  @param {boolean} [lazy_load] - Lazy load the image. Default: true.
+  @param {string} [image_sizes] - The image `sizes` attribute. Default: '(min-width: 750px) 50vw, 100vw'.
+  @param {string} [new_tag] - Products with this tag get the NEW badge (compared case-insensitively).
+  @param {string} [new_label] - Text of the NEW badge.
+  @param {string} [swatch_option_names] - Comma-separated option names that hold colors, e.g. 'Color, Colour, Färg'.
+  @param {number} [max_swatches] - How many swatches to show before "+N". Default: 6.
+  @param {boolean} [show_secondary_image] - On hover, switch to the product's second image ("light off").
+  @param {string} [hover_effect] - 'fade' or 'flicker'; how the second image comes in. Default: 'fade'.
+  @param {boolean} [enable_video] - Play Shopify-hosted videos: a first-media video plays (muted, looping)
+    while the card is on screen, a second-media video plays on hover. Needs assets/oblure-card-media.js.
+    Off, or for YouTube/Vimeo, the video's preview image is shown instead.
+  @param {string} [product_view_context] - Context for the standard "view" event.
+
+  @example
+  {% render 'oblure-card-product', card_product: product, new_tag: 'new', new_label: 'New' %}
+{% enddoc %}
+
+{%- if card_product and card_product != empty -%}
+  {%- liquid
+    assign max_swatches = max_swatches | default: 6
+    assign image_sizes = image_sizes | default: '(min-width: 750px) 50vw, 100vw'
+    assign hover_effect = hover_effect | default: 'fade'
+
+    assign secondary_media = null
+    if show_secondary_image and card_product.media.size > 1
+      assign secondary_media = card_product.media[1]
+    endif
+
+    # Only Shopify-hosted videos can play here; other media types show their preview image.
+    assign primary_is_video = false
+    assign secondary_is_video = false
+    if enable_video
+      if card_product.featured_media.media_type == 'video'
+        assign primary_is_video = true
+      endif
+      if secondary_media.media_type == 'video'
+        assign secondary_is_video = true
+      endif
+    endif
+
+    assign media_tag = 'div'
+    if primary_is_video or secondary_is_video
+      assign media_tag = 'oblure-card-media'
+    endif
+
+    # NEW badge: tag match, ignoring case and spacing.
+    assign is_new = false
+    assign new_tag_handle = new_tag | handle
+    if new_tag_handle != blank
+      for tag in card_product.tags
+        assign tag_handle = tag | handle
+        if tag_handle == new_tag_handle
+          assign is_new = true
+          break
+        endif
+      endfor
+    endif
+
+    # Color option: the first option whose name is in swatch_option_names.
+    assign color_option = null
+    assign swatch_names = swatch_option_names | downcase | split: ','
+    for option in card_product.options_with_values
+      assign option_name = option.name | downcase | strip
+      for swatch_name in swatch_names
+        assign swatch_name_clean = swatch_name | strip
+        if option_name == swatch_name_clean
+          assign color_option = option
+          break
+        endif
+      endfor
+      if color_option
+        break
+      endif
+    endfor
+
+    # The first color starts selected: the card opens with its variant's price and link.
+    assign initial_variant = null
+    if color_option
+      assign initial_variant = color_option.values.first.variant
+    endif
+  -%}
+
+  <product-component view-event-payload="{{ card_product | standard_event_data: 'view', context: product_view_context | escape }}">
+    <article class="oblure-card{% if secondary_media %} oblure-card--has-secondary oblure-card--effect-{{ hover_effect }}{% endif %}{% unless card_product.available %} oblure-card--sold-out{% endunless %}">
+      <{{ media_tag }}
+        class="oblure-card__media"
+        {% if media_tag != 'div' and secondary_media %}
+          data-has-secondary
+        {% endif %}
+      >
+        {%- if card_product.featured_media -%}
+          {%- liquid
+            assign image_loading = 'lazy'
+            if lazy_load == false
+              assign image_loading = 'eager'
+            endif
+          -%}
+          {%- if primary_is_video -%}
+            {%- render 'oblure-card-video',
+              media: card_product.featured_media,
+              class: 'oblure-card__image oblure-card__image--primary',
+              playback: 'visible'
+            -%}
+          {%- else -%}
+            {{
+              card_product.featured_media
+              | image_url: width: 2400
+              | image_tag:
+                class: 'oblure-card__image oblure-card__image--primary',
+                widths: '360, 533, 720, 940, 1066, 1400, 1800, 2400',
+                sizes: image_sizes,
+                loading: image_loading,
+                alt: card_product.featured_media.alt
+            }}
+          {%- endif -%}
+
+          {%- if secondary_is_video -%}
+            {%- render 'oblure-card-video',
+              media: secondary_media,
+              class: 'oblure-card__image oblure-card__image--secondary',
+              playback: 'hover'
+            -%}
+          {%- elsif secondary_media -%}
+            {% comment %} "Light off" image, revealed on hover; decorative (empty alt), so screen readers skip it. {% endcomment %}
+            {{
+              secondary_media
+              | image_url: width: 2400
+              | image_tag:
+                class: 'oblure-card__image oblure-card__image--secondary',
+                widths: '360, 533, 720, 940, 1066, 1400, 1800, 2400',
+                sizes: image_sizes,
+                loading: 'lazy',
+                alt: ''
+            }}
+          {%- endif -%}
+        {%- else -%}
+          {{ 'product-apparel-2' | placeholder_svg_tag: 'oblure-card__image oblure-card__image--placeholder' }}
+        {%- endif -%}
+
+        {%- if is_new and new_label != blank -%}
+          <span class="oblure-card__badge">{{ new_label | escape }}</span>
+        {%- endif -%}
+      </{{ media_tag }}>
+
+      <div class="oblure-card__info">
+        <div class="oblure-card__text">
+          <h3 class="oblure-card__title">
+            {% comment %} Stretched over the whole card, see .oblure-card__link::after. {% endcomment %}
+            <a href="{{ initial_variant.url | default: card_product.url }}" class="oblure-card__link">
+              {{- card_product.title | escape -}}
+            </a>
+          </h3>
+
+          {% comment %} Updated with the selected color's price, see assets/oblure-card-swatches.js. {% endcomment %}
+          <div class="oblure-card__price" aria-live="polite" data-oblure-card-price>
+            {%- if initial_variant -%}
+              {%- render 'oblure-card-price',
+                price: initial_variant.price,
+                compare_at_price: initial_variant.compare_at_price,
+                available: initial_variant.available
+              -%}
+            {%- else -%}
+              {%- render 'oblure-card-price',
+                price: card_product.price,
+                compare_at_price: card_product.compare_at_price,
+                price_varies: card_product.price_varies,
+                available: card_product.available
+              -%}
+            {%- endif -%}
+          </div>
+        </div>
+
+        {%- if color_option and color_option.values.size > 0 -%}
+          {% comment %}
+            One color is always selected (the first by default); selecting another shows that
+            color's variant image and price and links the card to it (assets/oblure-card-swatches.js).
+          {% endcomment %}
+          <oblure-card-swatches class="oblure-card__swatches-wrapper">
+            <ul class="oblure-card__swatches list-unstyled" role="list" aria-label="{{ color_option.name | escape }}">
+              {%- for value in color_option.values limit: max_swatches -%}
+                {%- capture swatch_background -%}
+                  {%- render 'oblure-swatch-background', value: value, product: card_product -%}
+                {%- endcapture -%}
+                <li class="oblure-card__swatch-item">
+                  <button
+                    type="button"
+                    class="oblure-card__swatch{% if swatch_background == blank %} oblure-card__swatch--empty{% endif %}"
+                    title="{{ value | escape }}"
+                    aria-pressed="{% if forloop.first and value.variant %}true{% else %}false{% endif %}"
+                    data-value="{{ value | escape }}"
+                    {% if swatch_background != blank %}
+                      style="--oblure-swatch: {{ swatch_background }};"
+                    {% endif %}
+                    {% if value.variant == null %}
+                      disabled
+                    {% endif %}
+                  >
+                    <span class="visually-hidden">{{ color_option.name | escape }}: {{ value | escape }}</span>
+                  </button>
+                </li>
+              {%- endfor -%}
+
+              {%- if color_option.values.size > max_swatches -%}
+                <li class="oblure-card__swatch-more">+{{ color_option.values.size | minus: max_swatches }}</li>
+              {%- endif -%}
+            </ul>
+
+            {% comment %}
+              Per color: the variant's link, image (null when it is the product's main image or
+              has none) and price markup.
+            {% endcomment %}
+            {%- assign srcset_widths = '533,720,1066,1400,1800' | split: ',' -%}
+            <script type="application/json" data-oblure-card-variants>
+              {
+                {%- for value in color_option.values limit: max_swatches -%}
+                  {%- liquid
+                    assign swatch_variant = value.variant
+                    assign variant_media = swatch_variant.featured_media
+                    if variant_media.id == card_product.featured_media.id
+                      assign variant_media = null
+                    endif
+                  -%}
+                  {%- capture variant_srcset -%}
+                    {%- if variant_media -%}
+                      {%- for width in srcset_widths -%}
+                        {%- assign width_px = width | plus: 0 -%}
+                        {{ variant_media | image_url: width: width_px }} {{ width_px }}w
+                        {%- unless forloop.last %}, {% endunless -%}
+                      {%- endfor -%}
+                    {%- endif -%}
+                  {%- endcapture -%}
+                  {%- capture variant_price -%}
+                    {%- render 'oblure-card-price',
+                      price: swatch_variant.price,
+                      compare_at_price: swatch_variant.compare_at_price,
+                      available: swatch_variant.available
+                    -%}
+                  {%- endcapture -%}
+                  {{ value.name | json }}: {
+                    "url": {{ swatch_variant.url | default: card_product.url | json }},
+                    "priceHtml": {{ variant_price | strip | json }},
+                    "image": {%- if variant_media -%}
+                      {
+                        "src": {{ variant_media | image_url: width: 1066 | json }},
+                        "srcset": {{ variant_srcset | strip | json }},
+                        "alt": {{ variant_media.alt | default: card_product.title | json }}
+                      }
+                    {%- else -%}
+                      null
+                    {%- endif -%}
+                  }{% unless forloop.last %},{% endunless %}
+                {%- endfor -%}
+              }
+            </script>
+          </oblure-card-swatches>
+        {%- endif -%}
+      </div>
+    </article>
+  </product-component>
+{%- endif -%}

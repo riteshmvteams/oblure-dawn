@@ -153,7 +153,7 @@
         "type": "range",
         "id": "page_width",
         "min": 1000,
-        "max": 1600,
+        "max": 1900,
         "step": 100,
         "default": 1200,
         "unit": "px",
@@ -1464,6 +1464,51 @@
         "id": "customer_account_menu",
         "default": "customer-account-main-menu",
         "label": "t:settings_schema.customer_accounts.settings.customer_account_menu.label"
+      }
+    ]
+  },
+  {
+    "name": "Page color themes",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Pages, collections, products, blogs and articles use the color theme set in their own \"Page color theme\" metafield. These pages have no metafield, so choose their theme here. It colors the header and footer, and the full page menu when hovering a link to that page."
+      },
+      {
+        "type": "metaobject",
+        "id": "oblure_page_theme_home",
+        "metaobject_type": "page_color_theme",
+        "label": "Home page"
+      },
+      {
+        "type": "metaobject",
+        "id": "oblure_page_theme_search",
+        "metaobject_type": "page_color_theme",
+        "label": "Search page"
+      },
+      {
+        "type": "metaobject",
+        "id": "oblure_page_theme_all_products",
+        "metaobject_type": "page_color_theme",
+        "label": "All products (/collections/all)"
+      },
+      {
+        "type": "metaobject",
+        "id": "oblure_page_theme_collections",
+        "metaobject_type": "page_color_theme",
+        "label": "Collections list (/collections)"
+      },
+      {
+        "type": "metaobject",
+        "id": "oblure_page_theme_cart",
+        "metaobject_type": "page_color_theme",
+        "label": "Cart page"
+      },
+      {
+        "type": "metaobject",
+        "id": "oblure_page_theme_404",
+        "metaobject_type": "page_color_theme",
+        "label": "404 page"
       }
     ]
   }

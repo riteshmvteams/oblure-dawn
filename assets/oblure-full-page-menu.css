@@ -1,0 +1,311 @@
+/*
+ * Oblure full page menu
+ * Used by snippets/oblure-full-page-menu.liquid ("Full page" menu type of the header).
+ *
+ * The panel is fixed to the viewport behind the header's content (z-index -1 inside the
+ * header section's stacking context). While it is open, `.oblure-fpm-open` on
+ * `.section-header` makes the header transparent so the panel color shows through it.
+ * `--oblure-fpm-background` is replaced by the script with the hovered link's color.
+ */
+
+.oblure-fpm {
+  --oblure-fpm-background: var(--oblure-page-background, rgb(var(--color-background)));
+  --oblure-fpm-transition: 0.35s ease;
+
+  display: flex;
+  align-items: center;
+  justify-self: start;
+}
+
+/* ---------------------------------------------------------------------------
+ * Header while the menu is open
+ * The custom properties neutralise the Oblure hero's transparent-header colors, if any.
+ * ------------------------------------------------------------------------ */
+
+.section-header.oblure-fpm-open .header-wrapper {
+  --oblure-header-text-rgb: var(--color-foreground);
+  --oblure-header-scrolled-text-rgb: var(--color-foreground);
+  --oblure-header-scrolled-background: transparent;
+
+  background: transparent;
+  border-bottom-color: transparent;
+}
+
+.shopify-section-header-hidden.oblure-fpm-open {
+  top: 0;
+}
+
+/* ---------------------------------------------------------------------------
+ * Header side padding
+ * With this menu type the header uses Dawn's .page-width padding (1.5rem, 5rem from 750px)
+ * instead of its own (3rem / 3.2rem), so the Menu button lines up with page content.
+ * ------------------------------------------------------------------------ */
+
+.header.drawer-menu.page-width {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+@media screen and (min-width: 750px) {
+  .header.drawer-menu.page-width {
+    padding-left: 5rem;
+    padding-right: 5rem;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Toggle
+ * ------------------------------------------------------------------------ */
+
+.oblure-fpm__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  min-height: 4.4rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: rgb(var(--color-foreground));
+  font-family: var(--font-body-family);
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: 0.06rem;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.oblure-fpm__toggle-icons {
+  position: relative;
+  display: inline-flex;
+  width: 1.8rem;
+  height: 1.8rem;
+}
+
+.oblure-fpm__toggle-icons .icon {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.oblure-fpm__toggle .icon-close,
+.oblure-fpm__toggle-label--close,
+.oblure-fpm[open] .oblure-fpm__toggle .icon-hamburger,
+.oblure-fpm[open] .oblure-fpm__toggle-label--open {
+  display: none;
+}
+
+.oblure-fpm[open] .oblure-fpm__toggle .icon-close,
+.oblure-fpm[open] .oblure-fpm__toggle-label--close {
+  display: block;
+}
+
+/* ---------------------------------------------------------------------------
+ * Panel
+ * ------------------------------------------------------------------------ */
+
+.oblure-fpm__panel {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  display: flex;
+  flex-direction: column;
+  /* Bottom edge of the header, measured by the script when the menu opens. */
+  padding-top: var(--oblure-fpm-offset, 8rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background-color: var(--oblure-fpm-background);
+  color: rgb(var(--color-foreground));
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-3rem);
+  transition:
+    opacity var(--oblure-fpm-transition),
+    transform var(--oblure-fpm-transition),
+    visibility 0s linear 0.35s,
+    background-color 0.4s ease;
+}
+
+.oblure-fpm[open] .oblure-fpm__panel {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition:
+    opacity var(--oblure-fpm-transition),
+    transform var(--oblure-fpm-transition),
+    visibility 0s,
+    background-color 0.4s ease;
+}
+
+/* Same width and side padding as Dawn's header in drawer layout, so it lines up with "Menu". */
+/* Side padding and max width come from Dawn's .page-width (class in the markup). */
+.oblure-fpm__inner {
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+  width: 100%;
+  padding-block: 2rem 3rem;
+}
+
+/* Search */
+.oblure-fpm__search {
+  width: min(100%, 36rem);
+  margin-bottom: 3.2rem;
+}
+
+.oblure-fpm__search-input {
+  width: 100%;
+  padding: 0.4rem 0 0.6rem;
+  border: 0;
+  border-bottom: 0.1rem solid rgb(var(--color-foreground));
+  border-radius: 0;
+  background: transparent;
+  color: rgb(var(--color-foreground));
+  font-family: var(--font-body-family);
+  font-size: 1.8rem;
+  font-style: italic;
+  appearance: none;
+}
+
+.oblure-fpm__search-input::placeholder {
+  color: rgb(var(--color-foreground));
+  opacity: 1;
+}
+
+/* No focus box (Dawn's global :focus-visible ring); the underline thickens instead. */
+.oblure-fpm__search-input:focus,
+.oblure-fpm__search-input:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.oblure-fpm__search-input:focus-visible {
+  padding-bottom: 0.5rem;
+  border-bottom-width: 0.2rem;
+}
+
+/* The browser's own clear (x) button, sized to the field. */
+.oblure-fpm__search-input::-webkit-search-cancel-button {
+  cursor: pointer;
+}
+
+/* Menus */
+.oblure-fpm__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 3.2rem;
+}
+
+.oblure-fpm__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.2rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: rgba(var(--color-foreground), 0.55);
+  font: inherit;
+  letter-spacing: inherit;
+  text-align: start;
+  text-decoration: none;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color var(--duration-short) ease;
+}
+
+.oblure-fpm__link:hover,
+.oblure-fpm__link:focus-visible,
+.oblure-fpm__link--active,
+.oblure-fpm__link[aria-expanded='true'] {
+  color: rgb(var(--color-foreground));
+}
+
+.oblure-fpm__list--primary {
+  font-family: var(--font-heading-family);
+  font-size: clamp(2.8rem, 3.2vw, 3.6rem);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.04rem;
+}
+
+.oblure-fpm__list--secondary {
+  font-family: var(--font-body-family);
+  font-size: clamp(1.7rem, 1.6vw, 2rem);
+  line-height: 1.25;
+  letter-spacing: 0.04rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.oblure-fpm__sublist {
+  padding: 0.4rem 0 1.2rem;
+}
+
+.oblure-fpm__list--primary .oblure-fpm__sublist {
+  font-family: var(--font-body-family);
+  font-size: 1.8rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.oblure-fpm__sublist--nested {
+  padding: 0 0 0.4rem 1.6rem;
+  font-size: 0.9em;
+}
+
+/* Plus that turns into a minus when the accordion is open. */
+.oblure-fpm__toggle-icon {
+  position: relative;
+  flex-shrink: 0;
+  width: 0.5em;
+  height: 0.5em;
+}
+
+.oblure-fpm__toggle-icon::before,
+.oblure-fpm__toggle-icon::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 0.2rem;
+  margin-top: -0.1rem;
+  background-color: currentColor;
+  transition: transform var(--duration-short) ease;
+}
+
+.oblure-fpm__toggle-icon::after {
+  transform: rotate(90deg);
+}
+
+.oblure-fpm__link[aria-expanded='true'] .oblure-fpm__toggle-icon::after {
+  transform: rotate(0deg);
+}
+
+/* Social links */
+.oblure-fpm__footer {
+  margin-top: auto;
+  padding-top: 4rem;
+}
+
+.oblure-fpm__social {
+  justify-content: center;
+  padding-top: 1.2rem;
+  border-top: 0.1rem solid rgb(var(--color-foreground));
+}
+
+.oblure-fpm__social .list-social__link {
+  color: rgb(var(--color-foreground));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .oblure-fpm__panel,
+  .oblure-fpm[open] .oblure-fpm__panel {
+    transform: none;
+    transition: none;
+  }
+}
+
+@media screen and (min-width: 750px) {
+}

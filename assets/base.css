@@ -91,9 +91,9 @@ body:has(.section-header .drawer-menu) .announcement-bar-section .page-width {
   max-width: 100%;
 }
 
-.page-width.drawer-menu {
+/* .page-width.drawer-menu {
   max-width: 100%;
-}
+} */
 
 .page-width-desktop {
   padding: 0;

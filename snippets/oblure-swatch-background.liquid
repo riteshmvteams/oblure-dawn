@@ -1,0 +1,46 @@
+{% doc %}
+  Outputs a CSS `background` value for a color option value's swatch, or nothing.
+
+  Looks, in order, for:
+  1. The option value's own swatch, when the option is linked to Shopify's Color metafield
+     in the admin: its image, otherwise its color.
+  2. The product's Color metafield (`shopify.color-pattern`, a list of "Color" entries), for
+     options that aren't linked: the entry whose label matches the value name ("Blue" ->
+     the "Blue" entry), its image, otherwise its (first) color.
+
+  @param {object} value - A product option value (e.g. from `option.values`).
+  @param {object} product - The product the value belongs to.
+
+  @example
+  {%- capture swatch_background -%}{% render 'oblure-swatch-background', value: value, product: product %}{%- endcapture -%}
+{% enddoc %}
+
+{%- liquid
+  assign swatch_image = value.swatch.image
+  assign swatch_color = value.swatch.color
+
+  if swatch_image == blank and swatch_color == blank
+    assign value_handle = value.name | handle
+    assign color_entries = product.metafields.shopify['color-pattern'].value
+
+    for entry in color_entries
+      assign entry_handle = entry.label.value | handle
+      if entry_handle == value_handle
+        assign swatch_image = entry.image.value
+        assign swatch_color = entry.color.value
+        # The Color field can hold several colors (multicolor); use the first.
+        if swatch_color.first
+          assign swatch_color = swatch_color.first
+        endif
+        break
+      endif
+    endfor
+  endif
+
+  if swatch_image != blank
+    assign swatch_image_url = swatch_image | image_url: width: 40
+    echo 'url(' | append: swatch_image_url | append: ') center / cover'
+  elsif swatch_color != blank
+    echo 'rgb(' | append: swatch_color.rgb | append: ')'
+  endif
+-%}

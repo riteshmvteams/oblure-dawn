@@ -14,7 +14,7 @@
   }
 {%- endstyle -%}
 
-<div class="isolate{% unless section.settings.full_width %} page-width{% endunless %}">
+<div class="{% if section.settings.unique_class != 'none' %}{{ section.settings.unique_class }} {% endif %}isolate{% unless section.settings.full_width %} page-width{% endunless %}">
   <div class="rich-text content-container color-{{ section.settings.color_scheme }} gradient{% if section.settings.full_width %} rich-text--full-width content-container--full-width{% endif %} section-{{ section.id }}-padding">
     <div class="rich-text__wrapper rich-text__wrapper--{{ section.settings.desktop_content_position }}{% if section.settings.full_width %} page-width{% endif %}">
       <div class="rich-text__blocks {{ section.settings.content_alignment }}">
@@ -94,6 +94,29 @@
   </div>
 </div>
 
+
+{% comment %} --------------animation test css----------------- {% endcomment %}
+<style>
+  .text-above-collection .rich-text__heading {
+    visibility: hidden;
+  }
+
+  .text-above-collection.is-typing .rich-text__heading {
+    visibility: visible;
+  }
+
+  .text-above-collection .rich-text__heading .typing-char {
+    opacity: 0;
+  }
+
+  .text-above-collection.is-typing .rich-text__heading .typing-char {
+    opacity: 1;
+  }
+</style>
+
+
+
+
 {% schema %}
 {
   "name": "t:sections.rich-text.name",
@@ -103,6 +126,23 @@
     "groups": ["header", "footer"]
   },
   "settings": [
+    {
+      "type": "select",
+      "id": "unique_class",
+      "label": "Custom style",
+      "info": "Applies a homepage style from assets/custom.css. A dropdown (not a text field) so translation apps can't change it.",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "text-above-collection",
+          "label": "Text above collection (homepage)"
+        }
+      ],
+      "default": "none"
+    },
     {
       "type": "select",
       "id": "desktop_content_position",
@@ -187,7 +227,7 @@
       "limit": 3,
       "settings": [
         {
-          "type": "inline_richtext",
+          "type": "richtext",
           "id": "heading",
           "default": "t:sections.rich-text.blocks.heading.settings.heading.default",
           "label": "t:sections.rich-text.blocks.heading.settings.heading.label"
@@ -353,3 +393,69 @@
   ]
 }
 {% endschema %}
+
+
+
+
+{% comment %} --------------animation test js----------------- {% endcomment %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const sections = document.querySelectorAll('.text-above-collection');
+
+    sections.forEach(function (section) {
+      const heading = section.querySelector('.rich-text__heading');
+
+      if (!heading) return;
+
+      const walker = document.createTreeWalker(
+        heading,
+        NodeFilter.SHOW_TEXT
+      );
+
+      const textNodes = [];
+      let node;
+
+      while (node = walker.nextNode()) {
+        textNodes.push(node);
+      }
+
+      textNodes.forEach(function (textNode) {
+        const fragment = document.createDocumentFragment();
+
+        [...textNode.textContent].forEach(function (char) {
+          const span = document.createElement('span');
+
+          span.className = 'typing-char';
+          span.textContent = char;
+
+          fragment.appendChild(span);
+        });
+
+        textNode.parentNode.replaceChild(fragment, textNode);
+      });
+
+      const chars = heading.querySelectorAll('.typing-char');
+
+      const observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+
+          if (entry.isIntersecting) {
+            section.classList.add('is-typing');
+
+            chars.forEach(function (char, index) {
+              char.style.transition =
+                'opacity 0.03s linear ' + (index * 0.03) + 's';
+            });
+
+            observer.unobserve(section);
+          }
+
+        });
+      }, {
+        threshold: 0.5
+      });
+
+      observer.observe(section);
+    });
+  });
+</script>

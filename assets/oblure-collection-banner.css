@@ -1,0 +1,164 @@
+/*
+ * Oblure collection banner
+ * Used by sections/oblure-collection-banner.liquid.
+ */
+
+/* Two classes so this wins over the color scheme's own background. */
+.oblure-collection-banner.oblure-collection-banner {
+  background: var(--oblure-page-background, rgb(var(--color-background)));
+  color: rgb(var(--color-foreground));
+}
+
+/* Width and side padding come from Dawn's .page-width (class in the markup), like the
+   header and the product grid. */
+.oblure-collection-banner__container {
+  width: 100%;
+  padding-block: var(--oblure-banner-padding-top) var(--oblure-banner-padding-bottom);
+}
+
+.oblure-collection-banner .oblure-collection-banner__title {
+  margin: 0;
+  color: inherit;
+  font-weight: var(--font-heading-weight);
+  line-height: 1.1;
+}
+
+.oblure-collection-banner__title--uppercase {
+  text-transform: uppercase;
+}
+
+.oblure-collection-banner__description {
+  max-width: var(--oblure-banner-text-max-width);
+  margin-top: 1.6rem;
+  color: inherit;
+  font-family: var(--oblure-banner-accent-family);
+  font-style: var(--oblure-banner-accent-style);
+  font-weight: var(--oblure-banner-accent-weight);
+  font-size: 1.6rem;
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+
+.oblure-collection-banner__description > * {
+  margin: 0;
+}
+
+.oblure-collection-banner__description > * + * {
+  margin-top: 0.8rem;
+}
+
+/* ---------------------------------------------------------------------------
+ * Collection image
+ * ------------------------------------------------------------------------ */
+
+.oblure-collection-banner__media {
+  position: relative;
+  overflow: hidden;
+}
+
+.oblure-collection-banner__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Image below the text */
+.oblure-collection-banner--height-adapt .oblure-collection-banner__media--below .oblure-collection-banner__image {
+  height: auto;
+}
+
+.oblure-collection-banner--height-small .oblure-collection-banner__media--below {
+  height: 28rem;
+}
+
+.oblure-collection-banner--height-medium .oblure-collection-banner__media--below {
+  height: 40rem;
+}
+
+.oblure-collection-banner--height-large .oblure-collection-banner__media--below {
+  height: 52rem;
+}
+
+/* Inside .page-width (markup) like the text, with the section's bottom padding under it. */
+.oblure-collection-banner__media--contained {
+  margin-bottom: var(--oblure-banner-padding-bottom);
+}
+
+/* Image as background, text over it */
+.oblure-collection-banner--image-background {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.oblure-collection-banner--image-background.oblure-collection-banner {
+  color: var(--oblure-banner-overlay-text);
+}
+
+.oblure-collection-banner--image-background.oblure-collection-banner--content-end {
+  justify-content: flex-end;
+}
+
+.oblure-collection-banner--image-background.oblure-collection-banner--height-adapt {
+  aspect-ratio: var(--oblure-banner-image-ratio, 16 / 9);
+}
+
+.oblure-collection-banner--image-background.oblure-collection-banner--height-small {
+  min-height: 30rem;
+}
+
+.oblure-collection-banner--image-background.oblure-collection-banner--height-medium {
+  min-height: 40rem;
+}
+
+.oblure-collection-banner--image-background.oblure-collection-banner--height-large {
+  min-height: 52rem;
+}
+
+.oblure-collection-banner__media--background {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+
+.oblure-collection-banner__media--background::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: #000;
+  opacity: var(--oblure-banner-overlay-opacity);
+  pointer-events: none;
+}
+
+@media screen and (min-width: 750px) {
+  .oblure-collection-banner--height-small .oblure-collection-banner__media--below {
+    height: 40rem;
+  }
+
+  .oblure-collection-banner--height-medium .oblure-collection-banner__media--below {
+    height: 56rem;
+  }
+
+  .oblure-collection-banner--height-large .oblure-collection-banner__media--below {
+    height: 72rem;
+  }
+
+  .oblure-collection-banner--image-background.oblure-collection-banner--height-small {
+    min-height: 40rem;
+  }
+
+  .oblure-collection-banner--image-background.oblure-collection-banner--height-medium {
+    min-height: 56rem;
+  }
+
+  .oblure-collection-banner--image-background.oblure-collection-banner--height-large {
+    min-height: 72rem;
+  }
+
+  .oblure-collection-banner__description {
+    font-size: 1.8rem;
+  }
+}

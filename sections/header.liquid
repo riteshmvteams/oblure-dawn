@@ -1,3 +1,5 @@
+{%- render 'oblure-page-color-theme' -%}
+
 <link rel="stylesheet" href="{{ 'component-list-menu.css' | asset_url }}" media="print" onload="this.media='all'">
 <link rel="stylesheet" href="{{ 'component-search.css' | asset_url }}" media="print" onload="this.media='all'">
 <link rel="stylesheet" href="{{ 'component-menu-drawer.css' | asset_url }}" media="print" onload="this.media='all'">
@@ -164,14 +166,29 @@
       assign language_selector = true
     endif
   -%}
-  <header class="header header--{{ section.settings.logo_position }} header--mobile-{{ section.settings.mobile_logo_position }} page-width{% if section.settings.menu_type_desktop == 'drawer' %} drawer-menu{% endif %}{% if section.settings.menu != blank %} header--has-menu{% endif %}{% if has_app_block %} header--has-app{% endif %}{% if social_links %} header--has-social{% endif %}{% if shop.customer_accounts_enabled %} header--has-account{% endif %}{% if country_selector or language_selector %} header--has-localizations{% endif %}">
+  <header class="header header--{{ section.settings.logo_position }} header--mobile-{{ section.settings.mobile_logo_position }} page-width{% if section.settings.menu_type_desktop == 'drawer' or section.settings.menu_type_desktop == 'full-page' %} drawer-menu{% endif %}{% if section.settings.menu != blank %} header--has-menu{% endif %}{% if has_app_block %} header--has-app{% endif %}{% if social_links %} header--has-social{% endif %}{% if shop.customer_accounts_enabled %} header--has-account{% endif %}{% if country_selector or language_selector %} header--has-localizations{% endif %}">
     {%- liquid
       assign render_search_left = false
       if section.settings.logo_position == 'top-center' or section.settings.menu == blank or shop.customer_accounts_enabled
         assign render_search_left = true
       endif
 
-      if section.settings.menu != blank
+      if section.settings.menu_type_desktop == 'full-page'
+        assign full_page_show_social = false
+        if section.settings.full_page_show_social and social_links
+          assign full_page_show_social = true
+        endif
+
+        # Only one link_list setting is allowed per settings list, so the second menu lives in a block.
+        assign full_page_secondary_menu = null
+        for block in section.blocks
+          if block.type == 'oblure_secondary_menu'
+            assign full_page_secondary_menu = block.settings.menu
+          endif
+        endfor
+
+        render 'oblure-full-page-menu', primary_menu: section.settings.menu, secondary_menu: full_page_secondary_menu, show_search: section.settings.full_page_show_search, show_social: full_page_show_social
+      elsif section.settings.menu != blank
         render 'header-drawer', show_country_selector: country_selector, show_language_selector: language_selector, show_social_links: social_links
       endif
 
@@ -217,7 +234,7 @@
       if section.settings.menu != blank
         if section.settings.menu_type_desktop == 'dropdown'
           render 'header-dropdown-menu'
-        elsif section.settings.menu_type_desktop != 'drawer'
+        elsif section.settings.menu_type_desktop == 'mega'
           render 'header-mega-menu'
         endif
       endif
@@ -549,7 +566,8 @@
       "type": "link_list",
       "id": "menu",
       "default": "main-menu",
-      "label": "t:sections.header.settings.menu.label"
+      "label": "t:sections.header.settings.menu.label",
+      "info": "With the Full page menu type, this is the primary menu. Add a \"Full page: secondary menu\" block for the second menu."
     },
     {
       "type": "select",
@@ -566,10 +584,29 @@
         {
           "value": "drawer",
           "label": "t:sections.header.settings.menu_type_desktop.options__3.label"
+        },
+        {
+          "value": "full-page",
+          "label": "Full page"
         }
       ],
       "default": "dropdown",
       "label": "t:sections.header.settings.menu_type_desktop.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_page_show_search",
+      "label": "Show search in the menu",
+      "default": true,
+      "visible_if": "{{ section.settings.menu_type_desktop == 'full-page' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_page_show_social",
+      "label": "Show social links in the menu",
+      "info": "Links come from Theme settings > Social media.",
+      "default": true,
+      "visible_if": "{{ section.settings.menu_type_desktop == 'full-page' }}"
     },
     {
       "type": "select",
@@ -681,6 +718,22 @@
   "blocks": [
     {
       "type": "@app"
+    },
+    {
+      "type": "oblure_secondary_menu",
+      "name": "Full page: secondary menu",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Shown smaller, below the primary menu, when the menu type is Full page."
+        },
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "Menu"
+        }
+      ]
     }
   ]
 }

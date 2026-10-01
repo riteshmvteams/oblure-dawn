@@ -1,0 +1,105 @@
+{% doc %}
+  Renders one menu of the full page menu (see snippets/oblure-full-page-menu.liquid).
+
+  Top-level links with children become accordion toggles; their children (and any
+  grandchildren, listed under each child) are revealed below them.
+  Every item carries the hover background of the page it links to
+  (see snippets/oblure-link-hover-background.liquid).
+
+  @param {object} menu - The link list to render.
+  @param {string} variant - 'primary' or 'secondary'; sets the text style.
+  @param {string} id_prefix - Unique prefix for the accordion panel ids.
+
+  @example
+  {% render 'oblure-full-page-menu-list', menu: primary_menu, variant: 'primary', id_prefix: 'OblureFpmPrimary' %}
+{% enddoc %}
+
+<ul class="oblure-fpm__list oblure-fpm__list--{{ variant }} list-unstyled" role="list">
+  {%- for link in menu.links -%}
+    {%- liquid
+      capture hover_background
+        render 'oblure-link-hover-background', link: link
+      endcapture
+      assign sublist_id = id_prefix | append: '-' | append: forloop.index
+    -%}
+    <li
+      class="oblure-fpm__item"
+      {% if hover_background != blank %}
+        data-hover-background="{{ hover_background }}"
+      {% endif %}
+    >
+      {%- if link.links != blank -%}
+        <button
+          type="button"
+          class="oblure-fpm__link oblure-fpm__link--toggle{% if link.child_active %} oblure-fpm__link--active{% endif %}"
+          aria-expanded="false"
+          aria-controls="{{ sublist_id }}"
+          data-oblure-fpm-accordion
+        >
+          {{- link.title | escape -}}
+          <span class="oblure-fpm__toggle-icon" aria-hidden="true"></span>
+        </button>
+
+        <ul id="{{ sublist_id }}" class="oblure-fpm__sublist list-unstyled" role="list" hidden>
+          {%- for child in link.links -%}
+            {%- capture child_background -%}
+              {%- render 'oblure-link-hover-background', link: child -%}
+            {%- endcapture -%}
+            <li
+              class="oblure-fpm__item"
+              {% if child_background != blank %}
+                data-hover-background="{{ child_background }}"
+              {% endif %}
+            >
+              <a
+                href="{{ child.url }}"
+                class="oblure-fpm__link oblure-fpm__link--child{% if child.current %} oblure-fpm__link--active{% endif %}"
+                {% if child.current %}
+                  aria-current="page"
+                {% endif %}
+              >
+                {{- child.title | escape -}}
+              </a>
+
+              {%- if child.links != blank -%}
+                <ul class="oblure-fpm__sublist oblure-fpm__sublist--nested list-unstyled" role="list">
+                  {%- for grandchild in child.links -%}
+                    {%- capture grandchild_background -%}
+                      {%- render 'oblure-link-hover-background', link: grandchild -%}
+                    {%- endcapture -%}
+                    <li
+                      class="oblure-fpm__item"
+                      {% if grandchild_background != blank %}
+                        data-hover-background="{{ grandchild_background }}"
+                      {% endif %}
+                    >
+                      <a
+                        href="{{ grandchild.url }}"
+                        class="oblure-fpm__link oblure-fpm__link--child{% if grandchild.current %} oblure-fpm__link--active{% endif %}"
+                        {% if grandchild.current %}
+                          aria-current="page"
+                        {% endif %}
+                      >
+                        {{- grandchild.title | escape -}}
+                      </a>
+                    </li>
+                  {%- endfor -%}
+                </ul>
+              {%- endif -%}
+            </li>
+          {%- endfor -%}
+        </ul>
+      {%- else -%}
+        <a
+          href="{{ link.url }}"
+          class="oblure-fpm__link{% if link.current %} oblure-fpm__link--active{% endif %}"
+          {% if link.current %}
+            aria-current="page"
+          {% endif %}
+        >
+          {{- link.title | escape -}}
+        </a>
+      {%- endif -%}
+    </li>
+  {%- endfor -%}
+</ul>

@@ -1,0 +1,326 @@
+{% comment %}
+  Oblure marquee
+
+  A strip of text items that scrolls in a continuous loop (CSS only), with an optional
+  separator between items, soft faded edges and a hover state that highlights one item.
+  Italic text in an item is set in the accent font (serif italic by default).
+  When it directly follows an Oblure hero set to "Full screen", that hero is shortened
+  by the strip's height so both fit on the first screen.
+
+  Styles live in assets/oblure-marquee.css.
+{% endcomment %}
+
+{{ 'oblure-marquee.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign font_size_mobile = section.settings.font_size | times: 0.85 | round
+  assign padding_mobile = section.settings.padding_block | times: 0.75 | round
+  assign gap_mobile = section.settings.item_gap | times: 0.5 | round
+
+  assign border_total = 0
+  if section.settings.show_borders
+    assign border_total = 2
+  endif
+
+  assign accent_font_italic = section.settings.accent_font | font_modify: 'style', 'italic'
+  assign accent_font = accent_font_italic | default: section.settings.accent_font
+
+  assign separator = section.settings.separator
+-%}
+
+{%- style -%}
+  {{ accent_font | font_face: font_display: 'swap' }}
+
+  #shopify-section-{{ section.id }} {
+    --oblure-marquee-font-size: {{ font_size_mobile }}px;
+    --oblure-marquee-padding: {{ padding_mobile }}px;
+    --oblure-marquee-gap: {{ gap_mobile }}px;
+    --oblure-marquee-duration: {{ section.settings.duration }}s;
+    --oblure-marquee-letter-spacing: {{ section.settings.letter_spacing | divided_by: 100.0 }}em;
+    --oblure-marquee-accent-family: {{ accent_font.family }}, {{ accent_font.fallback_families }};
+    --oblure-marquee-accent-style: {{ accent_font.style }};
+    --oblure-marquee-accent-weight: {{ accent_font.weight }};
+  }
+
+  @media screen and (min-width: 750px) {
+    #shopify-section-{{ section.id }} {
+      --oblure-marquee-font-size: {{ section.settings.font_size }}px;
+      --oblure-marquee-padding: {{ section.settings.padding_block }}px;
+      --oblure-marquee-gap: {{ section.settings.item_gap }}px;
+    }
+  }
+
+  {%- if section.settings.fit_with_hero and section.blocks.size > 0 %}
+    {% comment %}
+      Shortens a full-screen Oblure hero placed directly above this section.
+      Strip height = 2 × padding + font size × line height (1.3, see oblure-marquee.css) + borders.
+    {% endcomment %}
+    .oblure-hero-section:has(+ #shopify-section-{{ section.id }}) {
+      --oblure-marquee-height: calc(2 * {{ padding_mobile }}px + {{ font_size_mobile }}px * 1.3 + {{ border_total }}px);
+    }
+
+    @media screen and (min-width: 750px) {
+      .oblure-hero-section:has(+ #shopify-section-{{ section.id }}) {
+        --oblure-marquee-height: calc(2 * {{ section.settings.padding_block }}px + {{ section.settings.font_size }}px * 1.3 + {{ border_total }}px);
+      }
+    }
+
+    .oblure-hero-section:has(+ #shopify-section-{{ section.id }}) .oblure-hero--height-full {
+      min-height: calc(100vh - var(--oblure-marquee-height));
+      min-height: calc(100svh - var(--oblure-marquee-height));
+    }
+
+    {% comment %} Sits flush under the hero even if Theme settings add space between sections. {% endcomment %}
+    .oblure-hero-section + #shopify-section-{{ section.id }} {
+      margin-top: 0;
+    }
+  {%- endif %}
+{%- endstyle -%}
+
+{%- if section.blocks.size > 0 -%}
+  <div
+    class="oblure-marquee color-{{ section.settings.color_scheme }} gradient oblure-marquee--{{ section.settings.direction }}{% if section.settings.pause_on_hover %} oblure-marquee--pause-on-hover{% endif %}{% if section.settings.uppercase %} oblure-marquee--uppercase{% endif %}{% if section.settings.show_borders %} oblure-marquee--bordered{% endif %}{% if section.settings.soft_edges %} oblure-marquee--soft-edges{% endif %}"
+  >
+    <div class="oblure-marquee__track">
+      {%- comment -%}
+        Two identical groups move side by side so the loop is seamless.
+        The copy is hidden from assistive technology and removed from the tab order.
+        A separator follows every item (the last one too), so the spacing at the seam
+        between the groups matches the spacing inside them.
+      {%- endcomment -%}
+      {%- for copy in (1..2) -%}
+        <ul
+          class="oblure-marquee__group list-unstyled"
+          role="list"
+          {% unless forloop.first %}
+            aria-hidden="true"
+          {% endunless %}
+        >
+          {%- for block in section.blocks -%}
+            <li
+              class="oblure-marquee__item"
+              {% if forloop.parentloop.first %}
+                {{ block.shopify_attributes }}
+              {% endif %}
+            >
+              {%- if block.settings.link != blank -%}
+                <a
+                  class="oblure-marquee__text oblure-marquee__text--link"
+                  href="{{ block.settings.link }}"
+                  {% unless forloop.parentloop.first %}
+                    tabindex="-1"
+                  {% endunless %}
+                >
+                  {{- block.settings.text -}}
+                </a>
+              {%- else -%}
+                <span class="oblure-marquee__text">{{ block.settings.text }}</span>
+              {%- endif -%}
+            </li>
+
+            {%- if separator != 'none' -%}
+              <li class="oblure-marquee__separator oblure-marquee__separator--{{ separator }}" aria-hidden="true">
+                {%- if separator == 'star' -%}
+                  {{- 'oblure-icon-sparkle.svg' | inline_asset_content -}}
+                {%- endif -%}
+              </li>
+            {%- endif -%}
+          {%- endfor -%}
+        </ul>
+      {%- endfor -%}
+    </div>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Oblure scrolling text",
+  "tag": "section",
+  "class": "section oblure-marquee-section",
+  "disabled_on": {
+    "groups": ["header", "footer", "aside"]
+  },
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-2"
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "min": 12,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Text size",
+      "default": 17
+    },
+    {
+      "type": "checkbox",
+      "id": "uppercase",
+      "label": "Uppercase text",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "letter_spacing",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "label": "Letter spacing",
+      "default": 12
+    },
+    {
+      "type": "font_picker",
+      "id": "accent_font",
+      "label": "Italic accent font",
+      "info": "Used for text set in italic in an item.",
+      "default": "playfair_display_n4"
+    },
+    {
+      "type": "select",
+      "id": "separator",
+      "label": "Separator",
+      "options": [
+        {
+          "value": "star",
+          "label": "Sparkle"
+        },
+        {
+          "value": "dot",
+          "label": "Dot"
+        },
+        {
+          "value": "slash",
+          "label": "Slash"
+        },
+        {
+          "value": "line",
+          "label": "Line"
+        },
+        {
+          "value": "none",
+          "label": "None"
+        }
+      ],
+      "default": "star"
+    },
+    {
+      "type": "range",
+      "id": "padding_block",
+      "min": 8,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "label": "Top and bottom padding",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "item_gap",
+      "min": 20,
+      "max": 200,
+      "step": 10,
+      "unit": "px",
+      "label": "Space between items",
+      "default": 80
+    },
+    {
+      "type": "checkbox",
+      "id": "soft_edges",
+      "label": "Fade out at the edges",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_borders",
+      "label": "Show top and bottom lines",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Motion"
+    },
+    {
+      "type": "range",
+      "id": "duration",
+      "min": 10,
+      "max": 120,
+      "step": 5,
+      "unit": "s",
+      "label": "Time for one loop",
+      "info": "Higher is slower.",
+      "default": 40
+    },
+    {
+      "type": "select",
+      "id": "direction",
+      "label": "Direction",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "checkbox",
+      "id": "pause_on_hover",
+      "label": "Pause on hover",
+      "info": "It always pauses while a link has keyboard focus, and stays still for visitors who turn off motion.",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "checkbox",
+      "id": "fit_with_hero",
+      "label": "Fit with the hero on the first screen",
+      "info": "When placed directly below an Oblure hero set to \"Full screen\", the hero gets shorter so both are visible.",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Text item",
+      "settings": [
+        {
+          "type": "inline_richtext",
+          "id": "text",
+          "label": "Text",
+          "info": "Italic text uses the accent font.",
+          "default": "Discover the collection"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 20,
+  "presets": [
+    {
+      "name": "Oblure scrolling text",
+      "blocks": [
+        { "type": "item" },
+        { "type": "item" },
+        { "type": "item" },
+        { "type": "item" },
+        { "type": "item" }
+      ]
+    }
+  ]
+}
+{% endschema %}

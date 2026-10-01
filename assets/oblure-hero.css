@@ -1,0 +1,320 @@
+/*
+ * Oblure hero
+ * Used by sections/oblure-hero.liquid.
+ */
+
+/* ---------------------------------------------------------------------------
+ * Dawn header laid over the hero
+ * `.oblure-header-overlay` is set on <html> by the section; `.oblure-header--scrolled`
+ * is toggled on `.section-header` by assets/oblure-hero.js. Nothing in header.liquid changes.
+ * ------------------------------------------------------------------------ */
+
+:root{
+	--playfiar-font:"Playfair Display", serif;
+}
+.oblure-header-overlay .section-header .header-wrapper {
+  /* Keeps the header's own scheme color for the popups that don't set one (see below). */
+  --oblure-scheme-foreground: var(--color-foreground);
+
+  background: transparent;
+  border-bottom-color: transparent;
+  transition:
+    background-color var(--duration-default) ease,
+    border-color var(--duration-default) ease;
+}
+
+.oblure-header-overlay .section-header .header {
+  --color-foreground: var(--oblure-header-text-rgb);
+}
+
+/* Scrolled, or a menu / search / drawer is open: solid background for readability. */
+.oblure-header-overlay .section-header.oblure-header--scrolled .header-wrapper,
+.oblure-header-overlay .section-header.menu-open .header-wrapper,
+.oblure-header-overlay .section-header:has(details[open]) .header-wrapper {
+  background: var(--oblure-header-scrolled-background);
+}
+
+.oblure-header-overlay .section-header.oblure-header--scrolled .header,
+.oblure-header-overlay .section-header.menu-open .header,
+.oblure-header-overlay .section-header:has(details[open]) .header {
+  --color-foreground: var(--oblure-header-scrolled-text-rgb);
+}
+
+/* Dropdown menus, mega menu and menu drawer carry their own color scheme; these two don't. */
+.oblure-header-overlay .section-header .header .search-modal,
+.oblure-header-overlay .section-header .header .disclosure__list-wrapper {
+  --color-foreground: var(--oblure-scheme-foreground);
+}
+
+/* ---------------------------------------------------------------------------
+ * Hero
+ * ------------------------------------------------------------------------ */
+
+.oblure-hero {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 56rem;
+  overflow: hidden;
+  color: var(--oblure-hero-text);
+}
+
+.oblure-hero--height-full {
+  min-height: 100vh;
+  min-height: 100svh;
+}
+
+.oblure-hero--height-large {
+  min-height: 60rem;
+}
+
+.oblure-hero--height-medium {
+  min-height: 44rem;
+}
+
+.oblure-hero--content-end {
+  justify-content: flex-end;
+}
+
+.oblure-hero__media {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+
+.oblure-hero__media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  /* Above the slider, which Swiper puts on z-index 1. */
+  z-index: 2;
+  background-color: #000;
+  opacity: var(--oblure-hero-overlay-opacity);
+  pointer-events: none;
+}
+
+.oblure-hero__media picture {
+  display: block;
+  height: 100%;
+}
+
+.oblure-hero__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Slideshow (assets/oblure-hero-slider.js). Also holds a single, static slide. */
+.oblure-hero__slider {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.oblure-hero__slider .swiper-wrapper,
+.oblure-hero__slide {
+  height: 100%;
+}
+
+.oblure-hero__slide {
+  overflow: hidden;
+}
+
+/* Slow zoom, same values as the old site's Elementor "Ken Burns" (scale 1.3 over 20s). */
+.oblure-hero__slider[data-zoom] .oblure-hero__slide.is-zooming .oblure-hero__image {
+  transform: scale(1.3);
+  transition: transform 20s linear;
+}
+
+.oblure-hero__image--placeholder {
+  background-color: rgba(var(--color-foreground), 0.04);
+  fill: rgba(var(--color-foreground), 0.35);
+}
+
+.oblure-hero__container {
+  width: 100%;
+  /* Top padding keeps the content clear of the overlaid header (0 when there is none). */
+  padding-block: calc(var(--oblure-header-height, 0px) + 4rem) 4rem;
+}
+
+.oblure-hero__content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.2rem;
+  max-width: 100%;
+}
+
+/*
+ * Alignment "Header": the container gets Dawn's .page-width (in the section markup), the
+ * same container as the header, collection pages and other templates.
+ * The content is as wide as its widest line, so the button bar can follow it.
+ */
+.oblure-hero--align-header .oblure-hero__content {
+  width: fit-content;
+}
+
+/*
+ * Alignment "Screen edge": a fluid gutter from the hero's left edge, and the content
+ * takes a percentage of the hero width on desktop (--oblure-hero-content-width).
+ */
+.oblure-hero--align-edge {
+  --oblure-hero-gutter: clamp(2rem, 5vw, 7rem);
+}
+
+.oblure-hero--align-edge .oblure-hero__container {
+  padding-inline: var(--oblure-hero-gutter);
+}
+
+.oblure-hero--align-edge .oblure-hero__content {
+  width: 100%;
+}
+
+.oblure-hero .oblure-hero__title {
+  margin: 0;
+  color: inherit;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.oblure-hero__title-line {
+  display: block;
+}
+
+.oblure-hero__title-line--primary {
+  font-weight: var(--oblure-title-weight-primary);
+}
+
+.oblure-hero__text {
+  margin: 0;
+  max-width: var(--oblure-hero-text-max-width);
+  font-family: var(--oblure-accent-font-family);
+  font-style: var(--oblure-accent-font-style);
+  font-weight: var(--oblure-accent-font-weight);
+  font-size: 1.7rem;
+  line-height: 1.2;
+}
+
+/*
+ * Button bar: ends a little past the widest text line (--oblure-hero-cta-extension)
+ * and its ::before fills the space back to the hero's left edge (clipped by .oblure-hero).
+ */
+.oblure-hero .oblure-hero__cta {
+  position: relative;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-height: 4.8rem;
+  margin-top: 1.6rem;
+  margin-inline-end: calc(-1 * var(--oblure-hero-cta-extension));
+  padding: 1rem 2rem;
+  background-color: rgb(var(--color-background));
+  color: rgb(var(--color-foreground));
+  font-family: var(--font-body-family);
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 0.06rem;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition:
+    background-color var(--duration-default) ease,
+    color var(--duration-default) ease;
+}
+
+.oblure-hero--align-edge .oblure-hero__cta {
+  margin-inline-end: 0;
+}
+
+.oblure-hero .oblure-hero__cta::before {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  right: 100%;
+  width: 100vw;
+  background: inherit;
+}
+
+.oblure-hero .oblure-hero__cta:not([aria-disabled='true']):hover {
+  background-color: rgb(var(--color-foreground));
+  color: rgb(var(--color-background));
+}
+
+/* Reveal on scroll (assets/oblure-reveal.css) plus the button's own hover transitions;
+   only the reveal part is delayed. */
+@media (prefers-reduced-motion: no-preference) {
+  .oblure-js oblure-reveal .oblure-hero__cta[data-oblure-reveal-item] {
+    transition:
+      opacity 0.8s ease,
+      transform 1s cubic-bezier(0.22, 1, 0.36, 1),
+      background-color var(--duration-default) ease,
+      color var(--duration-default) ease;
+    transition-delay: calc(var(--oblure-reveal-order, 0) * 0.15s), calc(var(--oblure-reveal-order, 0) * 0.15s), 0s, 0s;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .oblure-header-overlay .section-header .header-wrapper,
+  .oblure-hero .oblure-hero__cta {
+    transition: none;
+  }
+
+  .oblure-hero__slider[data-zoom] .oblure-hero__slide.is-zooming .oblure-hero__image {
+    transform: none;
+  }
+}
+
+@media screen and (min-width: 750px) {
+  .oblure-hero {
+    min-height: 64rem;
+  }
+
+  .oblure-hero--height-full {
+    min-height: 100vh;
+    min-height: 100svh;
+  }
+
+  .oblure-hero--height-large {
+    min-height: 72rem;
+  }
+
+  .oblure-hero--height-medium {
+    min-height: 56rem;
+  }
+
+  .oblure-hero__container {
+    padding-bottom: 6rem;
+  }
+
+  .oblure-hero--align-edge .oblure-hero__content {
+    /* The gutter is part of the width so the column matches the percentage of the hero. */
+    width: calc(max(var(--oblure-hero-content-width), 36rem) - var(--oblure-hero-gutter));
+  }
+
+  .oblure-hero__text {
+    font-size: 2rem;
+  }
+}
+
+
+
+
+
+.template-index .oblure-hero__title {
+  font-size: 54px;
+}
+
+.oblure-hero__text{
+  font-size: 21px;
+  font-weight: 400;
+  line-height: 21px;
+  font-family: var(--playfiar-font);
+}
+
+.template-index .oblure-hero__cta{
+  font-size:27px;
+}
+
