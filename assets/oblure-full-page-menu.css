@@ -10,7 +10,6 @@
 
 .oblure-fpm {
   --oblure-fpm-background: var(--oblure-page-background, rgb(var(--color-background)));
-  --oblure-fpm-transition: 0.35s ease;
 
   display: flex;
   align-items: center;
@@ -116,25 +115,43 @@
   overscroll-behavior: contain;
   background-color: var(--oblure-fpm-background);
   color: rgb(var(--color-foreground));
-  opacity: 0;
+  /* Opening: the panel wipes in from the left (and back out when closing). */
+  clip-path: inset(0 100% 0 0);
   visibility: hidden;
-  transform: translateX(-3rem);
   transition:
-    opacity var(--oblure-fpm-transition),
-    transform var(--oblure-fpm-transition),
-    visibility 0s linear 0.35s,
+    clip-path 0.55s cubic-bezier(0.76, 0, 0.24, 1),
+    visibility 0s linear 0.55s,
     background-color 0.4s ease;
 }
 
 .oblure-fpm[open] .oblure-fpm__panel {
-  opacity: 1;
+  clip-path: inset(0 0 0 0);
   visibility: visible;
-  transform: none;
   transition:
-    opacity var(--oblure-fpm-transition),
-    transform var(--oblure-fpm-transition),
+    clip-path 0.75s cubic-bezier(0.76, 0, 0.24, 1),
     visibility 0s,
     background-color 0.4s ease;
+}
+
+/* Then search, each link and the social links rise in one after the other
+   (--oblure-fpm-order is set by the script); closing hides them together. */
+@media (prefers-reduced-motion: no-preference) {
+  .oblure-fpm__stagger {
+    opacity: 0;
+    transform: translateY(2rem);
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  .oblure-fpm[open] .oblure-fpm__stagger {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 0.6s ease,
+      transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: calc(0.35s + var(--oblure-fpm-order, 0) * 0.05s);
+  }
 }
 
 /* Same width and side padding as Dawn's header in drawer layout, so it lines up with "Menu". */
@@ -210,7 +227,16 @@
   text-decoration: none;
   text-transform: uppercase;
   cursor: pointer;
-  transition: color var(--duration-short) ease;
+  /* Hover underline, drawn from left to right. */
+  background: linear-gradient(currentColor, currentColor) no-repeat 0 100% / 0 0.08em;
+  transition:
+    color var(--duration-short) ease,
+    background-size 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.oblure-fpm__link:hover,
+.oblure-fpm__link:focus-visible {
+  background-size: 100% 0.08em;
 }
 
 .oblure-fpm__link:hover,
@@ -301,8 +327,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .oblure-fpm__panel,
-  .oblure-fpm[open] .oblure-fpm__panel {
-    transform: none;
+  .oblure-fpm[open] .oblure-fpm__panel,
+  .oblure-fpm__link {
     transition: none;
   }
 }

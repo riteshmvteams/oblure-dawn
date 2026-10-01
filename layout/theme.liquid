@@ -60,6 +60,35 @@
     <script src="{{ 'standard-actions-override.js' | asset_url }}" defer="defer"></script>
     {% comment %} Oblure: product-card video playback, for cards rendered at any time (e.g. recommendations). {% endcomment %}
     <script src="{{ 'oblure-card-media.js' | asset_url }}" defer="defer"></script>
+    {% comment %}
+      Oblure: shared motion (reveal on scroll, expand on scroll, lamp glow). `oblure-js` lets
+      animations hide content only when JavaScript runs; the <noscript> style shows content
+      that sections hide until revealed.
+    {% endcomment %}
+    <script>
+      document.documentElement.classList.add('oblure-js');
+      {%- if settings.oblure_smooth_scroll %}
+        document.documentElement.dataset.oblureSmoothScroll = '';
+      {%- endif %}
+      {%- if settings.oblure_hover_roll %}
+        document.documentElement.dataset.oblureHoverRoll = '';
+      {%- endif %}
+    </script>
+    {%- if settings.oblure_smooth_scroll -%}
+      {{ 'lenis.css' | asset_url | stylesheet_tag }}
+      <script src="{{ 'lenis.min.js' | asset_url }}" defer="defer"></script>
+    {%- endif -%}
+    <script src="{{ 'oblure-animations.js' | asset_url }}" defer="defer"></script>
+    <noscript>
+      <style>
+        [data-oblure-reveal] * {
+          opacity: 1 !important;
+          transform: none !important;
+          clip-path: none !important;
+          visibility: visible !important;
+        }
+      </style>
+    </noscript>
 
     {%- if settings.animations_reveal_on_scroll -%}
       <script src="{{ 'animations.js' | asset_url }}" defer="defer"></script>
@@ -281,6 +310,7 @@
     {% endstyle %}
 
     {{ 'base.css' | asset_url | stylesheet_tag }}
+    {{ 'oblure-animations.css' | asset_url | stylesheet_tag }}
     <link rel="stylesheet" href="{{ 'component-cart-items.css' | asset_url }}" media="print" onload="this.media='all'">
 
     {%- if settings.cart_type == 'drawer' -%}

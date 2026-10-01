@@ -6,21 +6,12 @@
   template can show each collection's own copy.
 
   Optional reveal on scroll (heading, text and button rise in one after the other):
-  assets/oblure-reveal.js + assets/oblure-reveal.css.
+  <oblure-reveal> from assets/oblure-animations.js (loaded in layout/theme.liquid).
 
   Styles live in assets/oblure-rich-text.css.
 {% endcomment %}
 
 {{ 'oblure-rich-text.css' | asset_url | stylesheet_tag }}
-
-{%- if section.settings.enable_reveal -%}
-  {{ 'oblure-reveal.css' | asset_url | stylesheet_tag }}
-  <script src="{{ 'oblure-reveal.js' | asset_url }}" defer="defer"></script>
-  {% comment %} Lets the reveal hide content only when JavaScript runs; set before the content is painted. {% endcomment %}
-  <script>
-    document.documentElement.classList.add('oblure-js');
-  </script>
-{%- endif -%}
 
 {%- liquid
   assign accent_font_italic = section.settings.text_font | font_modify: 'style', 'italic'

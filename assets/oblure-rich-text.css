@@ -117,7 +117,7 @@
   text-decoration-color: transparent;
 }
 
-/* Reveal on scroll (assets/oblure-reveal.css) plus the button's own hover transitions;
+/* Reveal on scroll (assets/oblure-animations.css) plus the button's own hover transitions;
    only the reveal part is delayed. */
 @media (prefers-reduced-motion: no-preference) {
   .oblure-js oblure-reveal .oblure-rich-text__button[data-oblure-reveal-item] {

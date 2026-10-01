@@ -51,8 +51,15 @@
   endif
 -%}
 
+{% comment %} Oblure: `.is-visible` is added by assets/oblure-animations.js (data-oblure-reveal = visible share that triggers it). {% endcomment %}
 <div
   id="Banner-{{ section.id }}"
+  {% if section.settings.unique_class == 'featured-image' %}
+    data-oblure-reveal="0.6"
+  {% endif %}
+  {% if section.settings.oblure_glow %}
+    data-oblure-glow
+  {% endif %}
   class="{% if section.settings.unique_class != 'none' %}{{ section.settings.unique_class }} {% endif %}banner banner--content-align-{{ section.settings.desktop_content_alignment }} banner--content-align-mobile-{{ section.settings.mobile_content_alignment }} banner--{{ section.settings.image_height }}{% if section.settings.stack_images_on_mobile and section.settings.image != blank and section.settings.image_2 != blank %} banner--stacked{% endif %}{% if section.settings.image_height == 'adapt' and section.settings.image != blank %} banner--adapt{% endif %}{% if section.settings.show_text_below %} banner--mobile-bottom{%- endif -%}{% if section.settings.show_text_box == false %} banner--desktop-transparent{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}"
 >
   {%- if section.settings.image != blank -%}
@@ -341,6 +348,13 @@
       "label": "t:sections.all.animation.image_behavior.label"
     },
     {
+      "type": "checkbox",
+      "id": "oblure_glow",
+      "label": "Lamp glow on hover",
+      "info": "A soft warm light follows the mouse (desktop).",
+      "default": false
+    },
+    {
       "type": "header",
       "content": "t:sections.image-banner.settings.content.content"
     },
@@ -602,30 +616,3 @@
   ]
 }
 {% endschema %}
-
-
-
-
-{% comment %} --------------animation test js----------------- {% endcomment %}
-
-
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const sections = document.querySelectorAll('.featured-image');
-
-    const observer = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-visible');
-          observer.unobserve(entry.target);
-        }
-      });
-    }, {
-      threshold: 0.6
-    });
-
-    sections.forEach(function (section) {
-      observer.observe(section);
-    });
-  });
-</script>

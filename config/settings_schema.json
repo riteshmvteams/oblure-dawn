@@ -1511,5 +1511,24 @@
         "label": "404 page"
       }
     ]
+  },
+  {
+    "name": "Oblure animations",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "oblure_smooth_scroll",
+        "label": "Smooth scrolling",
+        "info": "Softer, gliding page scroll on desktop (Lenis). Off for visitors who turn off motion and in the theme editor.",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "oblure_hover_roll",
+        "label": "Rolling text on hover",
+        "info": "Button and footer link labels roll up to a copy of themselves on hover.",
+        "default": true
+      }
+    ]
   }
 ]

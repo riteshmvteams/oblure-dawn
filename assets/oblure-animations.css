@@ -1,0 +1,151 @@
+/*
+ * Oblure animations, shared styles. Loaded once in layout/theme.liquid; behaviour in
+ * assets/oblure-animations.js. Everything that hides content is scoped to `.oblure-js`
+ * (set when JavaScript runs) and to motion being allowed.
+ */
+
+/* ---------------------------------------------------------------------------
+ * Scroll performance: Dawn's .gradient sets `background-attachment: fixed` (base.css) so a
+ * color scheme *gradient* spans the page. Fixed backgrounds are repainted on every scroll
+ * frame, which makes scrolling (smooth scrolling especially) stutter. This store's color
+ * schemes are plain colors, where `scroll` looks identical. If a gradient scheme is added
+ * later, its gradient will span each section instead of the page.
+ * ------------------------------------------------------------------------ */
+
+.gradient {
+  background-attachment: scroll;
+}
+
+/* ---------------------------------------------------------------------------
+ * Reveal items: <oblure-reveal> children rise in one after the other
+ * (--oblure-reveal-order: 0, 1, 2 ...).
+ * ------------------------------------------------------------------------ */
+
+oblure-reveal {
+  display: block;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .oblure-js oblure-reveal [data-oblure-reveal-item] {
+    opacity: 0;
+    transform: translateY(3rem);
+    transition:
+      opacity 0.8s ease,
+      transform 1s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: calc(var(--oblure-reveal-order, 0) * 0.15s);
+  }
+
+  .oblure-js oblure-reveal.is-visible [data-oblure-reveal-item] {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Reduced motion: sections that animate on `.is-visible` show their end state at once. */
+@media (prefers-reduced-motion: reduce) {
+  [data-oblure-reveal],
+  [data-oblure-reveal] * {
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Expand on scroll: [data-oblure-expand] grows from an inset, rounded frame to full width
+ * while it scrolls into view (CSS scroll-driven animation; browsers without support show
+ * it full width).
+ * ------------------------------------------------------------------------ */
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    [data-oblure-expand] {
+      animation: oblure-expand linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 45%;
+    }
+  }
+}
+
+@keyframes oblure-expand {
+  from {
+    clip-path: inset(0 8% round 2.4rem);
+  }
+
+  to {
+    clip-path: inset(0 0 round 0);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Rolling text on hover: the label (.oblure-roll__text, wrapped by the script) moves up and
+ * its copy (::after) rolls in from below. Theme settings > Oblure animations.
+ * ------------------------------------------------------------------------ */
+
+.oblure-roll {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+}
+
+.oblure-roll__text {
+  position: relative;
+  display: inline-block;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.oblure-roll__text::after {
+  content: attr(data-text);
+  /* Hidden from screen readers where supported: the label is already read once. */
+  content: attr(data-text) / '';
+  position: absolute;
+  top: 100%;
+  left: 0;
+  white-space: nowrap;
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  :is(a, button):hover > .oblure-roll > .oblure-roll__text,
+  :is(a, button):focus-visible > .oblure-roll > .oblure-roll__text {
+    transform: translateY(-100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .oblure-roll__text {
+    transition: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Lamp glow: a soft warm light following the pointer over [data-oblure-glow] (the light
+ * element is added by the script). Sits above the image and its dark overlay, under text.
+ * ------------------------------------------------------------------------ */
+
+.oblure-glow {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    circle var(--oblure-glow-size, 34rem) at var(--oblure-glow-x, 50%) var(--oblure-glow-y, 50%),
+    rgba(255, 220, 170, 0.38),
+    rgba(255, 196, 128, 0.14) 40%,
+    transparent 70%
+  );
+  mix-blend-mode: screen;
+  /* Hidden (not just transparent) while idle, so the blended layer costs nothing. */
+  visibility: hidden;
+  transition:
+    opacity 0.6s ease,
+    visibility 0s linear 0.6s;
+}
+
+.is-glowing > .oblure-glow {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 0.6s ease,
+    visibility 0s;
+}

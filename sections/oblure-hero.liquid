@@ -47,15 +47,6 @@
 {{ 'oblure-hero.css' | asset_url | stylesheet_tag }}
 <script src="{{ 'oblure-hero.js' | asset_url }}" defer="defer"></script>
 
-{%- if section.settings.enable_reveal -%}
-  {{ 'oblure-reveal.css' | asset_url | stylesheet_tag }}
-  <script src="{{ 'oblure-reveal.js' | asset_url }}" defer="defer"></script>
-  {% comment %} Lets the reveal hide content only when JavaScript runs; set before the content is painted. {% endcomment %}
-  <script>
-    document.documentElement.classList.add('oblure-js');
-  </script>
-{%- endif -%}
-
 {%- style -%}
   {{ accent_font | font_face: font_display: 'swap' }}
   {{ heading_font_bold | font_face: font_display: 'swap' }}
@@ -102,7 +93,7 @@
 {%- endif -%}
 
 <oblure-hero
-  class="oblure-hero oblure-hero--height-{{ section.settings.hero_height }} oblure-hero--content-{{ section.settings.content_position }} oblure-hero--align-{{ section.settings.content_alignment }}"
+  class="oblure-hero oblure-hero--height-{{ section.settings.hero_height }} oblure-hero--content-{{ section.settings.content_position }} oblure-hero--align-{{ section.settings.content_alignment }}{% if section.settings.enable_parallax %} oblure-hero--parallax{% endif %}"
   {% if overlay_header %}
     data-overlay-header
     data-scroll-background="{{ section.settings.enable_scroll_background }}"
@@ -190,13 +181,20 @@
                 style="--oblure-reveal-order: {{ reveal_order }};"
                 {{ block.shopify_attributes }}
               >
+                {% comment %} Each line slides up from behind its own edge (mask reveal, oblure-hero.css). {% endcomment %}
                 {%- if block.settings.title_primary != blank -%}
                   <span class="oblure-hero__title-line oblure-hero__title-line--primary">
-                    {{- block.settings.title_primary | escape -}}
+                    <span class="oblure-hero__title-text" style="--oblure-title-line: 0;">
+                      {{- block.settings.title_primary | escape -}}
+                    </span>
                   </span>
                 {%- endif -%}
                 {%- if block.settings.title_secondary != blank -%}
-                  <span class="oblure-hero__title-line">{{ block.settings.title_secondary | escape }}</span>
+                  <span class="oblure-hero__title-line">
+                    <span class="oblure-hero__title-text" style="--oblure-title-line: 1;">
+                      {{- block.settings.title_secondary | escape -}}
+                    </span>
+                  </span>
                 {%- endif -%}
               </{{ block.settings.heading_tag }}>
               {%- assign reveal_order = reveal_order | plus: 1 -%}
@@ -445,7 +443,14 @@
       "type": "checkbox",
       "id": "enable_reveal",
       "label": "Animate content in",
-      "info": "Heading, text and button rise in from below, one after the other, when the hero comes into view.",
+      "info": "Heading lines slide up from behind an edge, then text and button rise in, when the hero comes into view.",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_parallax",
+      "label": "Parallax on scroll",
+      "info": "While scrolling down, the image moves slower than the page and the content fades out.",
       "default": true
     }
   ],

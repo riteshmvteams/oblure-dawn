@@ -25,6 +25,7 @@ if (!customElements.get('oblure-full-page-menu')) {
       this.#abortController = new AbortController();
       const { signal } = this.#abortController;
 
+      this.#prepareStagger();
       this.toggle.addEventListener('click', () => (this.isOpen ? this.close() : this.open()), { signal });
       this.addEventListener('keydown', (event) => this.#onKeydown(event), { signal });
 
@@ -72,6 +73,17 @@ if (!customElements.get('oblure-full-page-menu')) {
       document.body.classList.remove('overflow-hidden');
       this.#resetBackground();
       if (restoreFocus) this.toggle.focus();
+    }
+
+    /* Order in which panel content rises in when the menu opens (see .oblure-fpm__stagger). */
+    #prepareStagger() {
+      const items = this.panel.querySelectorAll(
+        '.oblure-fpm__search, .oblure-fpm__list > .oblure-fpm__item, .oblure-fpm__footer'
+      );
+      items.forEach((item, index) => {
+        item.classList.add('oblure-fpm__stagger');
+        item.style.setProperty('--oblure-fpm-order', index);
+      });
     }
 
     /* The panel starts right below the header, wherever the header currently sits. */
