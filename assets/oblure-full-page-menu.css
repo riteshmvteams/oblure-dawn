@@ -36,6 +36,24 @@
 }
 
 /* ---------------------------------------------------------------------------
+ * Header side padding
+ * With this menu type the header uses Dawn's .page-width padding (1.5rem, 5rem from 750px)
+ * instead of its own (3rem / 3.2rem), so the Menu button lines up with page content.
+ * ------------------------------------------------------------------------ */
+
+.header.drawer-menu.page-width {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+@media screen and (min-width: 750px) {
+  .header.drawer-menu.page-width {
+    padding-left: 5rem;
+    padding-right: 5rem;
+  }
+}
+
+/* ---------------------------------------------------------------------------
  * Toggle
  * ------------------------------------------------------------------------ */
 
@@ -120,12 +138,13 @@
 }
 
 /* Same width and side padding as Dawn's header in drawer layout, so it lines up with "Menu". */
+/* Side padding and max width come from Dawn's .page-width (class in the markup). */
 .oblure-fpm__inner {
   display: flex;
   flex: 1 0 auto;
   flex-direction: column;
   width: 100%;
-  padding: 2rem 3rem 3rem;
+  padding-block: 2rem 3rem;
 }
 
 /* Search */
@@ -286,7 +305,4 @@
 }
 
 @media screen and (min-width: 750px) {
-  .oblure-fpm__inner {
-    padding-inline: 3.2rem;
-  }
 }

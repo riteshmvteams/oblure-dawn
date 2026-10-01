@@ -12,11 +12,11 @@
  * already fills a row, so nothing changes there.
  */
 
-/* --oblure-grid-max-width and --oblure-grid-column-gap come from the section settings. */
+/* --oblure-grid-column-gap comes from the section settings. Width and side padding come
+   from Dawn's .page-width (Theme settings > Layout > Page width), like other templates. */
 .oblure-product-grid {
   --oblure-grid-columns: 1;
   --oblure-grid-row-gap: 3.2rem;
-  --oblure-grid-gutter: 3rem;
   --oblure-grid-ease: cubic-bezier(0.22, 1, 0.36, 1);
 
   padding-block: var(--oblure-grid-padding-top) var(--oblure-grid-padding-bottom);
@@ -30,19 +30,6 @@
 
 .oblure-product-grid[data-density='compact'] {
   --oblure-grid-columns: 2;
-}
-
-/* Capped, centered content width (the setting), plus the header's side gutter on small screens. */
-.oblure-product-grid__container {
-  width: 100%;
-  max-width: calc(var(--oblure-grid-max-width) + 2 * var(--oblure-grid-gutter));
-  margin-inline: auto;
-  padding-inline: var(--oblure-grid-gutter);
-}
-
-/* The vertical filter layout already sits in a page-width container. */
-.facets-vertical .oblure-product-grid__container {
-  padding-inline: 0;
 }
 
 .oblure-product-grid__main {
@@ -568,7 +555,6 @@
 @media screen and (min-width: 750px) {
   .oblure-product-grid {
     --oblure-grid-columns: 2;
-    --oblure-grid-gutter: 3.2rem;
     --oblure-grid-row-gap: 4rem;
   }
 
@@ -622,11 +608,5 @@
   .oblure-card__swatch {
     width: 1.4rem;
     height: 1.4rem;
-  }
-}
-
-@media screen and (min-width: 990px) {
-  body:has(.section-header .header:not(.drawer-menu)) .oblure-product-grid {
-    --oblure-grid-gutter: 5rem;
   }
 }

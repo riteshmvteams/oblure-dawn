@@ -87,7 +87,7 @@
     </div>
   {%- endif -%}
 
-  <div class="oblure-collection-banner__container">
+  <div class="oblure-collection-banner__container page-width">
     <h1 class="oblure-collection-banner__title {{ section.settings.heading_size }}{% if section.settings.uppercase_title %} oblure-collection-banner__title--uppercase{% endif %}">
       <span class="visually-hidden">{{ 'sections.collection_template.title' | t }}: </span>
       {{- banner_title | escape -}}
@@ -99,7 +99,7 @@
   </div>
 
   {%- if image_layout == 'below' -%}
-    <div class="oblure-collection-banner__media oblure-collection-banner__media--below{% unless section.settings.image_full_width %} oblure-collection-banner__media--contained{% endunless %}">
+    <div class="oblure-collection-banner__media oblure-collection-banner__media--below{% unless section.settings.image_full_width %} oblure-collection-banner__media--contained page-width{% endunless %}">
       {{- banner_image -}}
     </div>
   {%- endif -%}

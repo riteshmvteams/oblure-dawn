@@ -3,31 +3,17 @@
  * Used by sections/oblure-collection-banner.liquid.
  */
 
-/*
- * --oblure-banner-gutter and the max-width mirror the container of Dawn's header
- * (.header.page-width and its padding in base.css / header.liquid), so the text and a
- * contained image line up with the header at every width.
- */
-.oblure-collection-banner {
-  --oblure-banner-gutter: 3rem;
-  --oblure-banner-max-width: var(--page-width);
-}
-
-body:has(.section-header .drawer-menu) .oblure-collection-banner {
-  --oblure-banner-max-width: 100%;
-}
-
 /* Two classes so this wins over the color scheme's own background. */
 .oblure-collection-banner.oblure-collection-banner {
   background: var(--oblure-page-background, rgb(var(--color-background)));
   color: rgb(var(--color-foreground));
 }
 
+/* Width and side padding come from Dawn's .page-width (class in the markup), like the
+   header and the product grid. */
 .oblure-collection-banner__container {
   width: 100%;
-  max-width: var(--oblure-banner-max-width);
-  margin-inline: auto;
-  padding: var(--oblure-banner-padding-top) var(--oblure-banner-gutter) var(--oblure-banner-padding-bottom);
+  padding-block: var(--oblure-banner-padding-top) var(--oblure-banner-padding-bottom);
 }
 
 .oblure-collection-banner .oblure-collection-banner__title {
@@ -94,9 +80,8 @@ body:has(.section-header .drawer-menu) .oblure-collection-banner {
   height: 52rem;
 }
 
-/* Same side edges as the text column, with the section's bottom padding under it. */
+/* Inside .page-width (markup) like the text, with the section's bottom padding under it. */
 .oblure-collection-banner__media--contained {
-  margin-inline: calc(max(0px, (100% - var(--oblure-banner-max-width)) / 2) + var(--oblure-banner-gutter));
   margin-bottom: var(--oblure-banner-padding-bottom);
 }
 
@@ -149,10 +134,6 @@ body:has(.section-header .drawer-menu) .oblure-collection-banner {
 }
 
 @media screen and (min-width: 750px) {
-  .oblure-collection-banner {
-    --oblure-banner-gutter: 3.2rem;
-  }
-
   .oblure-collection-banner--height-small .oblure-collection-banner__media--below {
     height: 40rem;
   }
@@ -179,11 +160,5 @@ body:has(.section-header .drawer-menu) .oblure-collection-banner {
 
   .oblure-collection-banner__description {
     font-size: 1.8rem;
-  }
-}
-
-@media screen and (min-width: 990px) {
-  body:has(.section-header .header:not(.drawer-menu)) .oblure-collection-banner {
-    --oblure-banner-gutter: 5rem;
   }
 }

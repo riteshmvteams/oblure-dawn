@@ -35,7 +35,6 @@
       "settings": {
         "products_per_page": 10,
         "color_scheme": "scheme-1",
-        "grid_max_width": 1400,
         "column_gap": 24,
         "default_density": "compact",
         "show_density_switch": true,

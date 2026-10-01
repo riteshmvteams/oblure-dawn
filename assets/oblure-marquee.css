@@ -47,7 +47,7 @@
   /* Spreads a short list across the full width, like the design. */
   justify-content: space-around;
   gap: var(--oblure-marquee-gap);
-  min-width: 100%;
+  /* min-width: 100%; */
   animation: oblure-marquee-scroll var(--oblure-marquee-duration) linear infinite;
 }
 

@@ -179,7 +179,7 @@
       # Stagger order of the rendered content blocks (heading, text, button...).
       assign reveal_order = 0
     -%}
-    <div class="oblure-hero__container">
+    <div class="oblure-hero__container{% if section.settings.content_alignment == 'header' %} page-width{% endif %}">
       <{{ content_tag }} class="oblure-hero__content">
         {%- for block in section.blocks -%}
           {%- case block.type -%}

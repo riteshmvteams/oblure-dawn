@@ -34,14 +34,13 @@
   assign half_cycle_3 = 3 | times: wide_rows | plus: 2
   assign half_first_3 = 3 | times: wide_rows | plus: 1
 
-  # Image sizes for the capped grid width.
-  assign grid_max_width = section.settings.grid_max_width
-  assign grid_breakpoint = grid_max_width | plus: 100
-  assign column_width_3 = grid_max_width | divided_by: 3
-  assign card_sizes = '(min-width: ' | append: grid_breakpoint | append: 'px) ' | append: column_width_3 | append: 'px, (min-width: 990px) 33vw, (min-width: 750px) 50vw, 100vw'
-  assign wide_sizes = '(min-width: ' | append: grid_breakpoint | append: 'px) ' | append: grid_max_width | append: 'px, 100vw'
-  assign column_width_half = grid_max_width | divided_by: 2
-  assign half_sizes = '(min-width: ' | append: grid_breakpoint | append: 'px) ' | append: column_width_half | append: 'px, (min-width: 750px) 50vw, 100vw'
+  # Image sizes for Dawn's page width (Theme settings > Layout) minus its 5rem side padding.
+  assign content_width = settings.page_width | minus: 100
+  assign column_width_3 = content_width | divided_by: 3
+  assign column_width_half = content_width | divided_by: 2
+  assign card_sizes = '(min-width: ' | append: settings.page_width | append: 'px) ' | append: column_width_3 | append: 'px, (min-width: 990px) 33vw, (min-width: 750px) 50vw, 100vw'
+  assign wide_sizes = '(min-width: ' | append: settings.page_width | append: 'px) ' | append: content_width | append: 'px, 100vw'
+  assign half_sizes = '(min-width: ' | append: settings.page_width | append: 'px) ' | append: column_width_half | append: 'px, (min-width: 750px) 50vw, 100vw'
 
   case section.settings.image_ratio
     when 'square'
@@ -77,7 +76,6 @@
   {{ price_font | font_face: font_display: 'swap' }}
 
   #shopify-section-{{ section.id }} {
-    --oblure-grid-max-width: {{ grid_max_width }}px;
     --oblure-grid-column-gap: {{ section.settings.column_gap }}px;
     --oblure-card-ratio: {{ card_ratio }};
     --oblure-card-wide-ratio: {{ wide_ratio }};
@@ -248,7 +246,7 @@
           {{ filters }}
         {%- else -%}
           {% comment %} Column switch sits next to the Filter button. {% endcomment %}
-          <div class="oblure-product-grid__controls oblure-product-grid__container oblure-product-grid__controls--{{ section.settings.filter_type }}">
+          <div class="oblure-product-grid__controls page-width oblure-product-grid__controls--{{ section.settings.filter_type }}">
             {{ density_switch }}
             {{ filters }}
           </div>
@@ -281,7 +279,7 @@
                 </div>
               </div>
             {%- else -%}
-              <div class="collection oblure-product-grid__container">
+              <div class="collection{% if section.settings.filter_type != 'vertical' %} page-width{% endif %}">
                 <div class="loading-overlay gradient"></div>
                 <ul id="product-grid" data-id="{{ section.id }}" class="oblure-product-grid__list list-unstyled" role="list">
                   {%- for product in collection.products -%}
@@ -411,17 +409,6 @@
     {
       "type": "header",
       "content": "Columns"
-    },
-    {
-      "type": "range",
-      "id": "grid_max_width",
-      "min": 800,
-      "max": 1800,
-      "step": 20,
-      "unit": "px",
-      "label": "Grid max width",
-      "info": "Smaller keeps more products visible on screen, like the old site (about 1200px).",
-      "default": 1200
     },
     {
       "type": "range",

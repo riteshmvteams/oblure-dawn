@@ -149,20 +149,10 @@
 }
 
 /*
- * Alignment "Header": mirrors the container of Dawn's header (.header.page-width and its
- * padding in base.css / header.liquid) so the content lines up with it at every width.
+ * Alignment "Header": the container gets Dawn's .page-width (in the section markup), the
+ * same container as the header, collection pages and other templates.
  * The content is as wide as its widest line, so the button bar can follow it.
  */
-.oblure-hero--align-header .oblure-hero__container {
-  max-width: var(--page-width);
-  margin-inline: auto;
-  padding-inline: 3rem;
-}
-
-body:has(.section-header .drawer-menu) .oblure-hero--align-header .oblure-hero__container {
-  max-width: 100%;
-}
-
 .oblure-hero--align-header .oblure-hero__content {
   width: fit-content;
 }
@@ -299,10 +289,6 @@ body:has(.section-header .drawer-menu) .oblure-hero--align-header .oblure-hero__
     padding-bottom: 6rem;
   }
 
-  .oblure-hero--align-header .oblure-hero__container {
-    padding-inline: 9.2rem;
-  }
-
   .oblure-hero--align-edge .oblure-hero__content {
     /* The gutter is part of the width so the column matches the percentage of the hero. */
     width: calc(max(var(--oblure-hero-content-width), 36rem) - var(--oblure-hero-gutter));
@@ -313,11 +299,7 @@ body:has(.section-header .drawer-menu) .oblure-hero--align-header .oblure-hero__
   }
 }
 
-@media screen and (min-width: 990px) {
-  body:has(.section-header .header:not(.drawer-menu)) .oblure-hero--align-header .oblure-hero__container {
-    padding-inline: 5rem;
-  }
-}
+
 
 
 
