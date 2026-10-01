@@ -33,7 +33,7 @@
     "oblure_product_grid": {
       "type": "oblure-collection-product-grid",
       "settings": {
-        "products_per_page": 5,
+        "products_per_page": 10,
         "color_scheme": "scheme-1",
         "grid_max_width": 1400,
         "column_gap": 24,
@@ -75,6 +75,7 @@
         "button_label": "",
         "button_link": "",
         "button_style": "outline",
+        "enable_reveal": true,
         "alignment": "center",
         "max_width": 520,
         "text_font": "playfair_display_n4",

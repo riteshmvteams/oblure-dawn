@@ -5,8 +5,8 @@
 }
 
 #shopify-section-template--32433524572490__image_gallery_with_text_eiB8Td,
-.rich-text, .collection,
-.template-index, .oblure-rich-text{
+.template-index .rich-text, .template-index .collection,
+.template-index, .template-index .oblure-rich-text{
 	background-color: var(--background-color);
 }
 
