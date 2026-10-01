@@ -7,6 +7,12 @@
   padding: var(--oblure-rich-text-padding-top) 3rem var(--oblure-rich-text-padding-bottom);
 }
 
+/* The page's light background from its color theme (snippets/oblure-page-color-theme.liquid),
+   otherwise the section's color scheme. Two classes to win over `.gradient`. */
+.oblure-rich-text.oblure-rich-text {
+  background: var(--oblure-page-background-light, var(--gradient-background));
+}
+
 .oblure-rich-text__inner {
   display: flex;
   flex-direction: column;

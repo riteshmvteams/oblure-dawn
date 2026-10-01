@@ -1,5 +1,6 @@
 {% doc %}
-  Applies the current page's color theme to the header and footer backgrounds.
+  Applies the current page's color theme: `page_background` to the header and footer,
+  `light_page_background` to the page body (between header and footer).
 
   The theme is a `page_color_theme` metaobject, taken from:
   1. the `custom.page_color_theme` metafield of the page, collection, product, blog or
@@ -7,8 +8,10 @@
   2. the Theme settings > "Page color themes" entry for pages that have no metafield:
      home, search, all products (/collections/all), collections list, cart and 404.
 
-  Also exposes `--oblure-page-background` on :root, which the full page menu uses as
-  its default background.
+  Exposes both colors on :root for other components:
+  - `--oblure-page-background`: full page menu default background, Oblure collection banner.
+  - `--oblure-page-background-light`: Oblure product grid and Oblure rich text backgrounds
+    (sections with their own color scheme otherwise keep it).
 
   @example
   {% render 'oblure-page-color-theme' %}
@@ -53,17 +56,31 @@
   endif
 
   assign page_background = color_theme.page_background.value
+  assign light_page_background = color_theme.light_page_background.value
 -%}
 
-{%- if page_background != blank -%}
+{%- if page_background != blank or light_page_background != blank -%}
   {%- style -%}
-    :root {
-      --oblure-page-background: {{ page_background }};
-    }
+    {%- if page_background != blank %}
+      :root {
+        --oblure-page-background: {{ page_background }};
+      }
 
-    .section-header .header-wrapper,
-    .shopify-section-group-footer-group .footer {
-      background: var(--oblure-page-background);
-    }
+      .section-header .header-wrapper,
+      .shopify-section-group-footer-group .footer {
+        background: var(--oblure-page-background);
+      }
+    {%- endif %}
+
+    {%- if light_page_background != blank %}
+      :root {
+        --oblure-page-background-light: {{ light_page_background }};
+      }
+
+      {% comment %} body.gradient: beats Dawn's `.gradient` / color scheme background on <body>. {% endcomment %}
+      body.gradient {
+        background: var(--oblure-page-background-light);
+      }
+    {%- endif %}
   {%- endstyle -%}
 {%- endif -%}

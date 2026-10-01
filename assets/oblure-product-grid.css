@@ -22,6 +22,12 @@
   padding-block: var(--oblure-grid-padding-top) var(--oblure-grid-padding-bottom);
 }
 
+/* The page's light background from its color theme (snippets/oblure-page-color-theme.liquid),
+   otherwise the section's color scheme. Two classes to win over `.gradient`. */
+.oblure-product-grid.oblure-product-grid {
+  background: var(--oblure-page-background-light, var(--gradient-background));
+}
+
 .oblure-product-grid[data-density='compact'] {
   --oblure-grid-columns: 2;
 }
