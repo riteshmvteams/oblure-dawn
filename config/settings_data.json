@@ -15,7 +15,7 @@
     "heading_scale": 100,
     "type_body_font": "assistant_n4",
     "body_scale": 100,
-    "page_width": 1600,
+    "page_width": 1800,
     "spacing_sections": 0,
     "spacing_grid_horizontal": 8,
     "spacing_grid_vertical": 8,
@@ -106,8 +106,8 @@
     "badge_corner_radius": 40,
     "sale_badge_color_scheme": "scheme-4",
     "sold_out_badge_color_scheme": "scheme-3",
-    "brand_headline": "",
-    "brand_description": "<p></p>",
+    "brand_headline": "Company",
+    "brand_description": "<p>WWW.OBLURE.COM<br/>FABRIKSGATAN 38<br/>GOTHENBURG<br/>SWEDEN</p><p>INFO@OBLURE.COM<br/>ORDER@OBLURE.COM<br/>&nbsp;+46 31 79 79 896</p>",
     "brand_image_width": 100,
     "social_facebook_link": "",
     "social_instagram_link": "",
@@ -128,6 +128,7 @@
     "cart_drawer_collection": "",
     "cart_color_scheme": "scheme-1",
     "customer_account_menu": "customer-account-main-menu",
+    "oblure_page_theme_home": "homepage",
     "oblure_page_theme_all_products": "ice-blue",
     "sections": {
       "main-password-header": {
@@ -202,10 +203,10 @@
       },
       "scheme-8c830d34-f820-4cde-bd3a-fcce97c43ff9": {
         "settings": {
-          "background": "#F3EFDF",
+          "background": "#f3efdf",
           "background_gradient": "",
           "text": "#121212",
-          "button": "#F3EFDF",
+          "button": "#f3efdf",
           "button_label": "#121212",
           "secondary_button_label": "#121212",
           "shadow": "#121212"

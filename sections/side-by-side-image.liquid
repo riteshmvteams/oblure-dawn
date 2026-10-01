@@ -5,7 +5,9 @@
               <h2>{{ section.settings.left_heading }}</h2>
           </div>
           <div class="image-container">
-              <img src="{{ section.settings.left_image | image_url }}" alt="left image" height="" width="">
+              <a href=" {{ section.settings.left_url }}">
+                <img src="{{ section.settings.left_image | image_url }}" alt="left image" height="" width="">
+              </a>
           </div>
       </div>  
 
@@ -14,7 +16,9 @@
             <h2> {{ section.settings.right_heading }}</h2>
           </div>
           <div class="image-container">
+            <a href="{{ section.settings.right_url }}">
               <img src="{{ section.settings.right_image | image_url }}" alt="right image" height="" width="">
+            </a>
           </div>
       </div>   
     </div>
@@ -108,9 +112,19 @@
       "label": "Right image"
     },
     {
+      "type": "url",
+      "id": "left_url",
+      "label": "Link on left image"
+    },
+    {
       "type": "text",
       "id": "left_heading",
       "label": "Left heading"
+    },
+    {
+      "type": "url",
+      "id": "right_url",
+      "label": "Link on right image"
     },
     {
       "type": "text",

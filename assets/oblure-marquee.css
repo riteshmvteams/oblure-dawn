@@ -116,7 +116,7 @@
 /* Separators */
 .oblure-marquee__separator {
   flex-shrink: 0;
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   color: rgb(var(--color-foreground));

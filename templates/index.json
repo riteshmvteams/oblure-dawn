@@ -71,10 +71,11 @@
         "content_position": "center",
         "content_alignment": "header",
         "content_width": 30,
-        "text_max_width": 330,
+        "text_max_width": 380,
         "button_extension": 36,
         "content_text_color": "#ffffff",
-        "accent_font": "playfair_display_n4"
+        "accent_font": "playfair_display_n4",
+        "enable_reveal": true
       }
     },
     "oblure_marquee_JF3NTF": {
@@ -126,9 +127,9 @@
       "name": "Oblure scrolling text",
       "settings": {
         "color_scheme": "scheme-8c830d34-f820-4cde-bd3a-fcce97c43ff9",
-        "font_size": 24,
+        "font_size": 21,
         "uppercase": true,
-        "letter_spacing": 12,
+        "letter_spacing": 0,
         "accent_font": "playfair_display_n4",
         "separator": "star",
         "padding_block": 18,
@@ -206,7 +207,7 @@
         "heading_aJHVrR": {
           "type": "heading",
           "settings": {
-            "heading": "<strong>Our vision</strong> is to curate the <strong>original, bold</strong> and <strong>beautiful</strong>",
+            "heading": "<p><strong>Our vision</strong> is to curate<br/>the <strong>original, bold</strong> and <strong>beautiful</strong></p>",
             "heading_size": "h1"
           }
         }
@@ -221,8 +222,8 @@
         "content_alignment": "center",
         "color_scheme": "",
         "full_width": true,
-        "padding_top": 100,
-        "padding_bottom": 80
+        "padding_top": 56,
+        "padding_bottom": 56
       }
     },
     "featured_collection": {
@@ -251,7 +252,7 @@
         "columns_mobile": "2",
         "swipe_on_mobile": false,
         "padding_top": 44,
-        "padding_bottom": 36
+        "padding_bottom": 100
       }
     },
     "image_banner_Ydk3ah": {
@@ -307,7 +308,9 @@
         "unique_class": "side-by-side-image",
         "left_image": "shopify://shop_images/VictorCastanera_BALANCE.jpg",
         "right_image": "shopify://shop_images/Oblure_mondo_large_pendant_costum_1.png",
+        "left_url": "#",
         "left_heading": "DESIGNER",
+        "right_url": "shopify://pages/about-us",
         "right_heading": "ABOUT"
       }
     },
@@ -350,6 +353,7 @@
         "button_label": "",
         "button_link": "",
         "button_style": "outline",
+        "enable_reveal": true,
         "alignment": "center",
         "max_width": 520,
         "text_font": "playfair_display_n4",

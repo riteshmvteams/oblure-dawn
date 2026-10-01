@@ -9,6 +9,9 @@
  * is toggled on `.section-header` by assets/oblure-hero.js. Nothing in header.liquid changes.
  * ------------------------------------------------------------------------ */
 
+:root{
+	--playfiar-font:"Playfair Display", serif;
+}
 .oblure-header-overlay .section-header .header-wrapper {
   /* Keeps the header's own scheme color for the popups that don't set one (see below). */
   --oblure-scheme-foreground: var(--color-foreground);
@@ -297,7 +300,7 @@ body:has(.section-header .drawer-menu) .oblure-hero--align-header .oblure-hero__
   }
 
   .oblure-hero--align-header .oblure-hero__container {
-    padding-inline: 3.2rem;
+    padding-inline: 9.2rem;
   }
 
   .oblure-hero--align-edge .oblure-hero__content {
@@ -315,3 +318,21 @@ body:has(.section-header .drawer-menu) .oblure-hero--align-header .oblure-hero__
     padding-inline: 5rem;
   }
 }
+
+
+
+.template-index .oblure-hero__title {
+  font-size: 54px;
+}
+
+.oblure-hero__text{
+  font-size: 21px;
+  font-weight: 400;
+  line-height: 21px;
+  font-family: var(--playfiar-font);
+}
+
+.template-index .oblure-hero__cta{
+  font-size:27px;
+}
+

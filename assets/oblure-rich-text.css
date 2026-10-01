@@ -10,8 +10,8 @@
 .oblure-rich-text__inner {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  max-width: var(--oblure-rich-text-max-width);
+  gap: 1.5rem;
+  max-width: 910px;
 }
 
 .oblure-rich-text--center .oblure-rich-text__inner {
