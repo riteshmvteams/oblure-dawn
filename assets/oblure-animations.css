@@ -17,6 +17,20 @@
 }
 
 /* ---------------------------------------------------------------------------
+ * Smooth scrolling (Lenis) while paused. We stop Lenis while Dawn (or the full page menu)
+ * locks the page with `overflow: hidden` on <body>; lenis.css then adds `overflow: clip` to
+ * <html>. Any overflow value on <html> stops <body>'s overflow from being passed to the
+ * viewport, so <body> becomes its own (unscrolled) scroll box and Dawn's sticky header sticks
+ * to that instead of the window: it jumps to the top of the document, off screen, taking the
+ * menu's Close button with it. Leaving <html> visible keeps Dawn's lock working exactly as
+ * without smooth scrolling. More specific than lenis.css's rule.
+ * ------------------------------------------------------------------------ */
+
+html.lenis.lenis-stopped:not(.lenis-autoToggle) {
+  overflow: visible;
+}
+
+/* ---------------------------------------------------------------------------
  * Reveal items: <oblure-reveal> children rise in one after the other
  * (--oblure-reveal-order: 0, 1, 2 ...).
  * ------------------------------------------------------------------------ */
