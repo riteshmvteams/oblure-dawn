@@ -49,7 +49,7 @@
 {%- endstyle -%}
 
 {%- if section.settings.heading != blank or section.settings.text != blank or has_button -%}
-  <div class="oblure-rich-text color-{{ section.settings.color_scheme }} gradient oblure-rich-text--{{ section.settings.alignment }}">
+  <div class="page-width oblure-rich-text color-{{ section.settings.color_scheme }} gradient oblure-rich-text--{{ section.settings.alignment }}">
     <{{ wrapper_tag }} class="oblure-rich-text__inner">
       {%- if section.settings.heading != blank -%}
         <{{ section.settings.heading_tag }}

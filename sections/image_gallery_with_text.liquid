@@ -45,7 +45,7 @@
 
 
 {% comment %} --------------animation test css----------------- {% endcomment %}
-<style>
+{% comment %} <style>
   /* =========================
      IMAGE GALLERY ANIMATION
   ========================= */
@@ -151,7 +151,95 @@
     transform: translateY(0);
     transition-delay: 0.75s;
   }
+</style> {% endcomment %}
+
+
+
+ <style>
+  .image-gallery{
+    --ig-ink:#161412;               /* colour of the button fill */
+    --ig-ease:cubic-bezier(.77,0,.18,1);
+    --ig-out:cubic-bezier(.2,.9,.2,1);
+  }
+
+  /* ---------- HEADING: letters flip in ---------- */
+  .image-gallery[data-anim] .heading h2{ overflow:hidden; perspective:700px; padding-bottom:.12em; }
+  .oa-word{ display:inline-block; white-space:nowrap; }
+  .oa-char{ display:inline-block; opacity:0; transform:translateY(115%) rotateX(-90deg); transform-origin:50% 100%; }
+  .image-gallery.is-visible .oa-char{
+    animation:ig-drop .9s cubic-bezier(.2,1.4,.4,1) forwards;
+    animation-delay:calc(var(--i) * 70ms);
+  }
+  @keyframes ig-drop{ to{ opacity:1; transform:none; } }
+
+  /* ---------- IMAGES: curtain wipe from 3 directions ---------- */
+  .image-gallery[data-anim] .image-wapper{ position:relative; overflow:hidden; clip-path:inset(0 0 100% 0); }
+  .image-gallery[data-anim] .left-content   .image-wapper{ clip-path:inset(100% 0 0 0); --d:.2s; }
+  .image-gallery[data-anim] .center-content .image-wapper{ clip-path:inset(0 0 100% 0); --d:.5s; }
+  .image-gallery[data-anim] .right-content  .image-wapper{ clip-path:inset(0 0 0 100%); --d:.8s; }
+  .image-gallery.is-visible .image-wapper{ animation:ig-wipe 1.5s var(--ig-ease) var(--d,0s) forwards; }
+  @keyframes ig-wipe{ to{ clip-path:inset(0 0 0 0); } }
+
+  /* image starts zoomed + tilted, settles slightly oversized (room for parallax) */
+  .image-gallery[data-anim] .image-wapper img{
+    width:100%; height:100%; object-fit:cover;
+    scale:1.9; rotate:-6deg;
+    translate:0 var(--py,0px);                       /* set by JS on scroll */
+    transition:scale 2.2s var(--ig-out), rotate 2.2s var(--ig-out);
+  }
+  .image-gallery[data-anim].is-visible .image-wapper img{
+    scale:1.12; rotate:0deg; transition-delay:var(--d,0s);
+  }
+
+  /* light sweep across each image */
+  .image-gallery[data-anim] .image-wapper::after{
+    content:""; position:absolute; inset:0; pointer-events:none;
+    background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.55) 50%,transparent 65%);
+    transform:translateX(-130%);
+  }
+  .image-gallery.is-visible .image-wapper::after{ animation:ig-shine 1.4s ease-out calc(var(--d,0s) + 1.1s) 1 both; }
+  @keyframes ig-shine{ to{ transform:translateX(130%); } }
+
+  /* ---------- CENTER CARD: wipe in, text rises, button pops ---------- */
+  .image-gallery[data-anim] .text-container{ clip-path:inset(0 100% 0 0); }
+  .image-gallery.is-visible .text-container{ animation:ig-card 1.3s var(--ig-ease) 1.1s forwards; }
+  @keyframes ig-card{ to{ clip-path:inset(0 0 0 0); } }
+
+  .oa-mask{ display:block; overflow:hidden; }
+  .oa-mask > span{ display:block; transform:translateY(110%) skewY(6deg); transform-origin:left bottom; }
+  .image-gallery.is-visible .oa-mask > span{
+    animation:ig-rise .9s var(--ig-out) forwards;
+    animation-delay:calc(1.7s + var(--i,0) * .14s);
+  }
+  @keyframes ig-rise{ to{ transform:none; } }
+
+  .image-gallery[data-anim] .text-container a{
+    display:inline-block;
+    background-image:linear-gradient(var(--ig-ink),var(--ig-ink));
+    background-repeat:no-repeat; background-position:center bottom; background-size:100% 0%;
+    transition:background-size .45s var(--ig-ease), color .35s, letter-spacing .35s;
+  }
+  .image-gallery.is-visible .text-container a{ animation:ig-pop .8s cubic-bezier(.2,1.6,.4,1) 2.4s backwards; }
+  @keyframes ig-pop{ from{ transform:scale(0) rotate(-20deg); opacity:0; } }
+  .image-gallery[data-anim] .text-container a:hover{ background-size:100% 100%; color:#F1E2A3; letter-spacing:.04em; }
+
+  /* ---------- HOVER: 3D tilt + dim the other columns ---------- */
+  .image-gallery[data-anim] .static-content{
+    transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));
+    transition:transform .25s ease-out, opacity .5s, filter .5s;
+  }
+  @media (hover:hover){
+    .image-gallery[data-anim].is-visible .inner-content:hover .static-content{ opacity:.55; filter:blur(2px) saturate(.7); }
+    .image-gallery[data-anim].is-visible .inner-content .static-content:hover{ opacity:1; filter:none; }
+    .image-gallery[data-anim].is-visible .static-content:hover .image-wapper img{
+      scale:1.24; rotate:1deg; transition-delay:0s; transition-duration:1.2s;
+    }
+  }
 </style>
+
+
+
+
 
 
 
@@ -224,3 +312,146 @@
   ]
 }
 {% endschema %}
+
+
+
+
+
+{% comment %} --------------animation test js----------------- {% endcomment %}
+
+ {% comment %} <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const sections = document.querySelectorAll('.image-gallery');
+
+    const observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, {
+      threshold: 0.15
+    });
+
+    sections.forEach(function (section) {
+      observer.observe(section);
+    });
+  });
+</script>  {% endcomment %}
+
+
+
+<script>
+(function () {
+  if (window.__igAnim) { window.__igAnim.initAll(); return; }
+
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var fine   = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  var list = [], ticking = false;
+
+  function splitHeading(h2) {
+    var text = h2.textContent.trim(), i = 0;
+    h2.setAttribute('aria-label', text);
+    h2.textContent = '';
+    text.split(/\s+/).forEach(function (word, w, arr) {
+      var wrap = document.createElement('span');
+      wrap.className = 'oa-word';
+      wrap.setAttribute('aria-hidden', 'true');
+      word.split('').forEach(function (ch) {
+        var s = document.createElement('span');
+        s.className = 'oa-char';
+        s.textContent = ch;
+        s.style.setProperty('--i', i++);
+        wrap.appendChild(s);
+      });
+      h2.appendChild(wrap);
+      if (w < arr.length - 1) h2.appendChild(document.createTextNode(' '));
+    });
+  }
+
+  function maskText(el, index) {
+    if (!el || !el.textContent.trim()) return;
+    var outer = document.createElement('span'), inner = document.createElement('span');
+    outer.className = 'oa-mask';
+    outer.style.setProperty('--i', index);
+    while (el.firstChild) inner.appendChild(el.firstChild);
+    outer.appendChild(inner);
+    el.appendChild(outer);
+  }
+
+  /* parallax: left image drifts one way, right the other */
+  function update() {
+    ticking = false;
+    list = list.filter(function (g) { return g.sec.isConnected; });
+    list.forEach(function (g) {
+      var r = g.sec.getBoundingClientRect();
+      if (r.bottom < 0 || r.top > innerHeight) return;
+      var p = (r.top + r.height / 2 - innerHeight / 2) / innerHeight;
+      p = Math.max(-1, Math.min(1, p));
+      if (g.left)   g.left.style.setProperty('--py',   (p * 36)  + 'px');
+      if (g.center) g.center.style.setProperty('--py', (p * -18) + 'px');
+      if (g.right)  g.right.style.setProperty('--py',  (p * -36) + 'px');
+    });
+  }
+  function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
+
+  function init(sec) {
+    if (sec.__igInit) return;
+    sec.__igInit = true;
+
+    if (reduce || !('IntersectionObserver' in window)) {
+      sec.classList.add('is-visible');
+      return;
+    }
+
+    var h2 = sec.querySelector('.heading h2');
+    if (h2 && h2.textContent.trim()) splitHeading(h2);
+    maskText(sec.querySelector('.text-container h3'), 0);
+    maskText(sec.querySelector('.text-container p'), 1);
+    sec.setAttribute('data-anim', 'ready');
+
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { sec.classList.add('is-visible'); io.unobserve(sec); }
+      });
+    }, { threshold: 0.2 });
+    io.observe(sec);
+
+    list.push({
+      sec: sec,
+      left:   sec.querySelector('.left-content img'),
+      center: sec.querySelector('.center-content .image-wapper img'),
+      right:  sec.querySelector('.right-content img')
+    });
+
+    if (fine) {
+      sec.querySelectorAll('.static-content').forEach(function (card) {
+        card.addEventListener('mousemove', function (e) {
+          var b = card.getBoundingClientRect();
+          var x = (e.clientX - b.left) / b.width - 0.5;
+          var y = (e.clientY - b.top) / b.height - 0.5;
+          card.style.setProperty('--ry', (x * 10) + 'deg');
+          card.style.setProperty('--rx', (-y * 10) + 'deg');
+        });
+        card.addEventListener('mouseleave', function () {
+          card.style.setProperty('--ry', '0deg');
+          card.style.setProperty('--rx', '0deg');
+        });
+      });
+    }
+    update();
+  }
+
+  function initAll(root) {
+    (root || document).querySelectorAll('.image-gallery').forEach(init);
+  }
+
+  window.__igAnim = { initAll: initAll };
+  addEventListener('scroll', onScroll, { passive: true });
+  addEventListener('resize', onScroll);
+  document.addEventListener('DOMContentLoaded', function () { initAll(); });
+  document.addEventListener('shopify:section:load', function (e) { initAll(e.target); });
+  initAll();
+})();
+</script>
