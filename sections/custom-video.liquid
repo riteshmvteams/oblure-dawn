@@ -76,15 +76,46 @@
 
   <div class="banner__media media video-banner__media">
     {%- if section.settings.video != blank -%}
-      {{
-        section.settings.video
-        | video_tag:
-          autoplay: true,
-          loop: true,
-          muted: true,
-          controls: false,
-          playsinline: true
-      }}
+      {% comment %}
+        Oblure: the MP4 closest to 1080p, a sharp poster, nothing downloaded up front, and
+        playback only while the video is on or near the screen (data-oblure-autoplay,
+        assets/oblure-animations.js). Shopify's video_tag autoplayed from page load and kept
+        playing off screen, which cost CPU on every scroll frame.
+      {% endcomment %}
+      {%- liquid
+        assign video_source = null
+        assign smallest_source = null
+        for source in section.settings.video.sources
+          if source.mime_type != 'video/mp4'
+            continue
+          endif
+          if smallest_source == null or source.height < smallest_source.height
+            assign smallest_source = source
+          endif
+          if source.height <= 1080
+            if video_source == null or source.height > video_source.height
+              assign video_source = source
+            endif
+          endif
+        endfor
+        if video_source == null
+          assign video_source = smallest_source
+        endif
+      -%}
+      <video
+        poster="{{ section.settings.video.preview_image | image_url: width: 1920 }}"
+        muted
+        loop
+        playsinline
+        disablepictureinpicture
+        preload="none"
+        aria-hidden="true"
+        tabindex="-1"
+        data-oblure-autoplay
+      >
+        {% # theme-check-disable-next-line RemoteAsset %}
+        <source src="{{ video_source.url }}" type="video/mp4">
+      </video>
     {%- else -%}
       {{ 'lifestyle-2' | placeholder_svg_tag: 'placeholder-svg' }}
     {%- endif -%}

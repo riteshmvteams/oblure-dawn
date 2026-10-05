@@ -65,14 +65,16 @@ oblure-reveal {
 }
 
 /* ---------------------------------------------------------------------------
- * Expand on scroll: [data-oblure-expand] grows from an inset, rounded frame to full width
+ * Expand on scroll: [data-oblure-expand] grows from a smaller, rounded frame to full width
  * while it scrolls into view (CSS scroll-driven animation; browsers without support show
- * it full width).
+ * it full width). Animated with `scale` (handled by the GPU) rather than clip-path, which
+ * would be repainted on every scroll frame over a playing video.
  * ------------------------------------------------------------------------ */
 
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
     [data-oblure-expand] {
+      overflow: hidden;
       animation: oblure-expand linear both;
       animation-timeline: view();
       animation-range: entry 0% cover 45%;
@@ -82,11 +84,13 @@ oblure-reveal {
 
 @keyframes oblure-expand {
   from {
-    clip-path: inset(0 8% round 2.4rem);
+    border-radius: 2.4rem;
+    scale: 0.86;
   }
 
   to {
-    clip-path: inset(0 0 round 0);
+    border-radius: 0;
+    scale: 1;
   }
 }
 

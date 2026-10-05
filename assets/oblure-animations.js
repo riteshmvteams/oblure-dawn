@@ -13,7 +13,9 @@
  * 3. Rolling text on hover (Theme settings > Oblure animations): button and footer link labels
  *    are wrapped so they roll up to a copy of themselves (styles in oblure-animations.css).
  *    Only plain-text labels are wrapped; buttons whose content scripts update are left alone.
- * 4. Smooth scrolling (same settings group): Lenis (assets/lenis.min.js) on desktop pointers.
+ * 4. Background videos: video[data-oblure-autoplay] plays only while on or near the screen and
+ *    pauses otherwise (not at all for reduced motion), so off-screen videos cost nothing.
+ * 5. Smooth scrolling (same settings group): Lenis (assets/lenis.min.js) on desktop pointers.
  *    It pauses while Dawn locks the page scroll (drawers, modals, the full page menu), and
  *    scrollable panels inside the page keep their own native scrolling.
  *
@@ -95,6 +97,28 @@
     observeReveal(element, Number.isFinite(requested) ? requested : DEFAULT_THRESHOLD);
   };
 
+  let autoplayObserver = null;
+
+  const bindAutoplay = (video) => {
+    if (video.hasAttribute('data-oblure-autoplay-bound')) return;
+    video.setAttribute('data-oblure-autoplay-bound', '');
+
+    autoplayObserver ??= new IntersectionObserver(
+      (entries) => {
+        entries.forEach(({ target, isIntersecting }) => {
+          if (isIntersecting && !reducedMotion.matches) {
+            // Can be refused (e.g. data saver); the poster then stays.
+            target.play().catch(() => {});
+          } else {
+            target.pause();
+          }
+        });
+      },
+      { rootMargin: '200px 0px' }
+    );
+    autoplayObserver.observe(video);
+  };
+
   const bindGlow = (element) => {
     if (element.querySelector(':scope > .oblure-glow')) return;
 
@@ -139,6 +163,7 @@
   const scan = (scope = document) => {
     scope.querySelectorAll('[data-oblure-reveal]').forEach(bindRevealAttribute);
     scope.querySelectorAll('[data-oblure-glow]').forEach(bindGlow);
+    scope.querySelectorAll('video[data-oblure-autoplay]').forEach(bindAutoplay);
     if ('oblureHoverRoll' in root.dataset) scope.querySelectorAll(ROLL_SELECTOR).forEach(wrapRoll);
   };
 

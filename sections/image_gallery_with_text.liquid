@@ -1,4 +1,5 @@
 {% comment %} Oblure: `.is-visible` is added by assets/oblure-animations.js (data-oblure-reveal = visible share that triggers it). {% endcomment %}
+{% comment %} Oblure: images are responsive (image_tag with widths/sizes, lazy) instead of the original uploads, which were up to 18 MB each and made scrolling stutter. {% endcomment %}
 <div class="image-gallery gallery-bg page-width" data-oblure-reveal="0.15">
    <div class="whole-content">
       <div class="heading">
@@ -9,7 +10,22 @@
 			<div class="static-content left-content">
 				<div class="image-wapper">
 					<a href="{{ section.settings.left_image_url }}">
-						<img src="{{ section.settings.left_image | image_url }}" alt="left image" height="" width="">
+						{%- liquid
+  assign oblure_image = section.settings.left_image
+  assign oblure_alt = oblure_image.alt | default: section.settings.heading | escape
+-%}
+{%- if oblure_image != blank -%}
+  {{
+    oblure_image
+    | image_url: width: 2000
+    | image_tag:
+      widths: '400, 550, 750, 1000, 1300, 1600',
+      sizes: '(min-width: 750px) 33vw, 100vw',
+      loading: 'lazy',
+      decoding: 'async',
+      alt: oblure_alt
+  }}
+{%- endif -%}
 					</a>
 				</div>
 			</div> 
@@ -17,7 +33,22 @@
 			<div class="static-content center-content">
 				<div class="image-wapper">
 					<a href="{{ section.settings.center_image_url }}">
-						<img src="{{ section.settings.center_image | image_url }}" alt="center image" height="" width="">
+						{%- liquid
+  assign oblure_image = section.settings.center_image
+  assign oblure_alt = oblure_image.alt | default: section.settings.center_heading | escape
+-%}
+{%- if oblure_image != blank -%}
+  {{
+    oblure_image
+    | image_url: width: 2000
+    | image_tag:
+      widths: '400, 550, 750, 1000, 1300, 1600',
+      sizes: '(min-width: 750px) 33vw, 100vw',
+      loading: 'lazy',
+      decoding: 'async',
+      alt: oblure_alt
+  }}
+{%- endif -%}
 					</a>
 				</div>
 				<div class="text-container">
@@ -34,7 +65,22 @@
 			<div class="static-content right-content">
 				<div class="image-wapper">
 					<a href="{{ section.settings.right_image_url }}">
-						<img src="{{ section.settings.right_image | image_url }}" alt="right image" height="" width="">
+						{%- liquid
+  assign oblure_image = section.settings.right_image
+  assign oblure_alt = oblure_image.alt | default: section.settings.heading | escape
+-%}
+{%- if oblure_image != blank -%}
+  {{
+    oblure_image
+    | image_url: width: 2000
+    | image_tag:
+      widths: '400, 550, 750, 1000, 1300, 1600',
+      sizes: '(min-width: 750px) 33vw, 100vw',
+      loading: 'lazy',
+      decoding: 'async',
+      alt: oblure_alt
+  }}
+{%- endif -%}
 					</a>
 				</div>
 			</div>  
