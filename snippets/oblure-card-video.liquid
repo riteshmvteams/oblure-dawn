@@ -3,8 +3,9 @@
   no controls, and nothing downloaded until it plays (preload="none", poster frame shown).
   Playback is started and stopped by assets/oblure-card-media.js.
 
-  Uses the MP4 closest to 720p (Shopify generates several sizes), which is plenty for a
-  card and much lighter than the original upload.
+  Uses the MP4 closest to 1080p (Shopify generates several sizes): sharp on large cards and
+  high-density screens (720p looked soft), and still lighter than the original upload.
+  It only downloads once the card's video starts playing.
 
   @param {object} media - A media object with media_type 'video'.
   @param {string} class - Classes for the <video> element.
@@ -27,7 +28,7 @@
       assign smallest_source = source
     endif
 
-    if source.height <= 720
+    if source.height <= 1080
       if video_source == null or source.height > video_source.height
         assign video_source = source
       endif

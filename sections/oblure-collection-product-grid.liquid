@@ -75,8 +75,10 @@
 {%- style -%}
   {{ price_font | font_face: font_display: 'swap' }}
 
+  {% comment %} Gaps: the settings on desktop, divided by 1.5 on mobile. {% endcomment %}
   #shopify-section-{{ section.id }} {
-    --oblure-grid-column-gap: {{ section.settings.column_gap }}px;
+    --oblure-grid-column-gap: {{ section.settings.column_gap | divided_by: 1.5 | round: 1 }}px;
+    --oblure-grid-row-gap: {{ section.settings.row_gap | divided_by: 1.5 | round: 1 }}px;
     --oblure-card-ratio: {{ card_ratio }};
     --oblure-card-wide-ratio: {{ wide_ratio }};
     --oblure-card-half-ratio: {{ half_ratio }};
@@ -91,6 +93,8 @@
 
   @media screen and (min-width: 750px) {
     #shopify-section-{{ section.id }} {
+      --oblure-grid-column-gap: {{ section.settings.column_gap }}px;
+      --oblure-grid-row-gap: {{ section.settings.row_gap }}px;
       --oblure-grid-padding-top: {{ section.settings.padding_top }}px;
       --oblure-grid-padding-bottom: {{ section.settings.padding_bottom }}px;
     }
@@ -418,7 +422,19 @@
       "step": 2,
       "unit": "px",
       "label": "Space between products",
+      "info": "Side by side. On mobile it is divided by 1.5.",
       "default": 16
+    },
+    {
+      "type": "range",
+      "id": "row_gap",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Space between rows",
+      "info": "On mobile it is divided by 1.5.",
+      "default": 40
     },
     {
       "type": "select",

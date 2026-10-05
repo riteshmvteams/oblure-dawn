@@ -271,6 +271,22 @@
         grid-template-columns: 1fr;
     }
 
+    /* Oblure: on mobile, replace the desktop 950px / 885px tall crop (taller than the
+       screen in one column). Side-by-side: both images share one 4:5 frame so they line up;
+       Stories: each image shows whole, in its own aspect ratio. */
+    .side-by-side-image .image-container{
+        height: auto;
+        aspect-ratio: 4 / 5;
+    }
+
+    .image-gallery .static-content{
+        height: auto;
+    }
+
+    .image-gallery .image-wapper img{
+        height: auto;
+    }
+
 	.footer .grid--4-col-tablet .grid__item {
 		width: 100%;
 	}

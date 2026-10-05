@@ -99,6 +99,43 @@
   display: block;
 }
 
+/* Phones and tablets, logo centred on the mobile header: Dawn's grid
+   ('left-icons search heading icons' / auto auto 1fr auto) centres the logo between the icon
+   groups, so it drifts whenever the left and right groups differ in width. Spanning the whole
+   row centres it on the header instead; the icons stay in their own cells (the menu button is
+   pinned to its cell, as it has no grid area of its own and would otherwise move to a new row). */
+@media screen and (max-width: 989px) {
+  .header--mobile-center > .header__heading,
+  .header--mobile-center > .header__heading-link {
+    grid-row: 1;
+    grid-column: 1 / -1;
+  }
+
+  .header--mobile-center > oblure-full-page-menu {
+    grid-area: left-icons;
+  }
+}
+
+/* Phones: icon only. The label is hidden visually but stays the button's accessible name.
+   ☰ stays on the content's left edge in a 44px tap area; the negative margin pulls the
+   search icon in so ☰ → search is 44px centre to centre, the same as account → cart. */
+@media screen and (max-width: 749px) {
+  .oblure-fpm__toggle {
+    min-width: 4.4rem;
+    margin-right: -1.3rem;
+  }
+
+  .oblure-fpm__toggle-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
+
 /* ---------------------------------------------------------------------------
  * Panel
  * ------------------------------------------------------------------------ */

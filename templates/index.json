@@ -68,6 +68,7 @@
         "enable_zoom": true,
         "image_overlay_opacity": 10,
         "hero_height": "full",
+        "mobile_height": "large",
         "content_position": "center",
         "content_alignment": "header",
         "content_width": 30,

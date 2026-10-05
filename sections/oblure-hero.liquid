@@ -15,6 +15,9 @@
 
 {%- liquid
   assign slides = section.blocks | where: 'type', 'slide'
+
+  # Mobile height "Adapt to image": the first slide's mobile image, otherwise its image.
+  assign mobile_ratio_image = slides.first.settings.image_mobile | default: slides.first.settings.image
   assign content_blocks_count = section.blocks.size | minus: slides.size
   assign overlay_header = false
   if section.settings.transparent_header and section.index == 1
@@ -75,6 +78,29 @@
       --oblure-header-scrolled-background: {{ section.settings.scrolled_background_color | default: '#ffffff' }};
     }
   {%- endif %}
+
+  {%- unless section.settings.mobile_height == 'desktop' %}
+    {% comment %}
+      Mobile height. The repeated class outranks the Oblure scrolling text's "fit with the
+      hero" rule, which targets the hero by section id too and comes later in the page.
+      The content can still make the hero taller.
+    {% endcomment %}
+    @media screen and (max-width: 749px) {
+      #shopify-section-{{ section.id }} .oblure-hero.oblure-hero.oblure-hero {
+        {%- case section.settings.mobile_height -%}
+          {%- when 'large' %}
+            min-height: 80vh;
+            min-height: 80svh;
+          {%- when 'medium' %}
+            min-height: 60vh;
+            min-height: 60svh;
+          {%- when 'adapt' %}
+            min-height: auto;
+            aspect-ratio: {{ mobile_ratio_image.aspect_ratio | default: 0.8 }};
+        {%- endcase %}
+      }
+    }
+  {%- endunless %}
 {%- endstyle -%}
 
 {%- if overlay_header -%}
@@ -356,6 +382,31 @@
         }
       ],
       "default": "full"
+    },
+    {
+      "type": "select",
+      "id": "mobile_height",
+      "label": "Height on mobile",
+      "info": "Phones only. The hero still grows if its text needs more room. For best results, add a portrait \"Mobile image\" to each slide.",
+      "options": [
+        {
+          "value": "desktop",
+          "label": "Same as desktop"
+        },
+        {
+          "value": "large",
+          "label": "Large (80% of the screen)"
+        },
+        {
+          "value": "medium",
+          "label": "Medium (60% of the screen)"
+        },
+        {
+          "value": "adapt",
+          "label": "Adapt to first image"
+        }
+      ],
+      "default": "medium"
     },
     {
       "type": "header",

@@ -12,11 +12,11 @@
  * already fills a row, so nothing changes there.
  */
 
-/* --oblure-grid-column-gap comes from the section settings. Width and side padding come
-   from Dawn's .page-width (Theme settings > Layout > Page width), like other templates. */
+/* --oblure-grid-column-gap and --oblure-grid-row-gap come from the section settings (divided
+   by 1.5 on mobile). Width and side padding come from Dawn's .page-width
+   (Theme settings > Layout > Page width), like other templates. */
 .oblure-product-grid {
   --oblure-grid-columns: 1;
-  --oblure-grid-row-gap: 3.2rem;
   --oblure-grid-ease: cubic-bezier(0.22, 1, 0.36, 1);
 
   padding-block: var(--oblure-grid-padding-top) var(--oblure-grid-padding-bottom);
@@ -568,7 +568,6 @@
 @media screen and (min-width: 750px) {
   .oblure-product-grid {
     --oblure-grid-columns: 2;
-    --oblure-grid-row-gap: 4rem;
   }
 
   .oblure-product-grid[data-density='compact'] {
